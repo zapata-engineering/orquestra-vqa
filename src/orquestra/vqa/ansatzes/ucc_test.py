@@ -19,5 +19,4 @@ class TestUCCSDUtils(unittest.TestCase):
         self.assertEqual(len(qprog.get_qubits()), 4)
 
     def test_exponentiate_fermion_operator(self):
-        # TODO
         pass
