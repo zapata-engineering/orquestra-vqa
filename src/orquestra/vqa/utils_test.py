@@ -1,18 +1,25 @@
-import os
 import unittest
-from .utils import build_circuit_template
+from zquantum.core.circuit import Circuit, Gate, Qubit
+from .utils import exponentiate_fermion_operator, create_layer_of_gates
 
-class TestGeneralPurpose(unittest.TestCase):
 
-    def test_build_circuit_template(self):
-        # Singlet H2O
-        n_alpha = 4
-        n_beta = 4
-        n_mo = 12
-        ansatz = build_circuit_template('singlet UCCSD', n_mo, n_alpha, n_beta, transformation='Jordan-Wigner')
-        self.assertEqual(sum(ansatz['n_params']), 560)
+class TestUCCSDUtils(unittest.TestCase):
+    def test_create_layer_of_gates(self):
+        # Given
+        number_of_qubits = 4
+        gate_name = "X"
+        qubits = [Qubit(i) for i in range(0, number_of_qubits)]
+        gate_0 = Gate(gate_name, qubits=[qubits[0]])
+        gate_1 = Gate(gate_name, qubits=[qubits[1]])
+        gate_2 = Gate(gate_name, qubits=[qubits[2]])
+        gate_3 = Gate(gate_name, qubits=[qubits[3]])
+        target_circuit = Circuit()
+        target_circuit.qubits = qubits
+        target_circuit.gates = [gate_0, gate_1, gate_2, gate_3]
 
-        def build_invalid_ansatz():
-            build_circuit_template('singlet UCCSD', n_mo, n_alpha-1, n_beta+1, transformation='Jordan-Wigner')
+        # When
+        layer_of_x = create_layer_of_gates(number_of_qubits, gate_name)
 
-        self.assertRaises(RuntimeError, build_invalid_ansatz)
+        # Then
+        self.assertEqual(layer_of_x, target_circuit)
+
