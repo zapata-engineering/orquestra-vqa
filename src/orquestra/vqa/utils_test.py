@@ -3,7 +3,7 @@ from zquantum.core.circuit import Circuit, Gate, Qubit
 from .utils import exponentiate_fermion_operator, create_layer_of_gates
 
 
-class TestUCCSDUtils(unittest.TestCase):
+class TestVQEUtils(unittest.TestCase):
     def test_create_layer_of_gates(self):
         # Given
         number_of_qubits = 4
