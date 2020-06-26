@@ -7,97 +7,105 @@ import numpy as np
 
 class TestSingletUCCSDAnsatz(unittest.TestCase, AnsatzTests):
     def setUp(self):
-        self.n_alpha = 1
-        self.n_spatial_orbitals = 3
-        self.n_layers = 1
+        self.number_of_layers = 1
+        self.number_of_alpha_electrons = 1
+        self.number_of_spatial_orbitals = 3
         self.transformation = "Jordan-Wigner"
 
         self.ansatz = SingletUCCSDAnsatz(
-            n_layers=self.n_layers,
-            n_spatial_orbitals=self.n_spatial_orbitals,
-            n_alpha=self.n_alpha,
+            number_of_layers=self.number_of_layers,
+            number_of_spatial_orbitals=self.number_of_spatial_orbitals,
+            number_of_alpha_electrons=self.number_of_alpha_electrons,
             transformation=self.transformation,
         )
 
-    def test_init_asserts_n_spatial_orbitals(self):
+    def test_init_asserts_number_of_spatial_orbitals(self):
         # Given
-        incorrect_n_spatial_orbitals = 0
+        incorrect_number_of_spatial_orbitals = 0
 
         # When/Then
         with self.assertRaises(ValueError):
             self.ansatz = SingletUCCSDAnsatz(
-                n_layers=self.n_layers,
-                n_spatial_orbitals=incorrect_n_spatial_orbitals,
-                n_alpha=self.n_alpha,
+                number_of_layers=self.number_of_layers,
+                number_of_spatial_orbitals=incorrect_number_of_spatial_orbitals,
+                number_of_alpha_electrons=self.number_of_alpha_electrons,
                 transformation=self.transformation,
             )
 
-    def test_set_n_alpha(self):
+    def test_set_number_of_alpha_electrons(self):
         # Given
-        new_n_alpha = 2
+        new_number_of_alpha_electrons = 2
 
         # When
-        self.ansatz.n_alpha = new_n_alpha
+        self.ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
 
         # Then
-        self.assertEqual(self.ansatz._n_alpha, new_n_alpha)
+        self.assertEqual(
+            self.ansatz._number_of_alpha_electrons, new_number_of_alpha_electrons
+        )
 
-    def test_set_n_alpha_asserts_n_spatial_orbitals(self):
+    def test_set_number_of_alpha_electrons_asserts_number_of_spatial_orbitals(self):
         # Given
-        new_n_alpha = 3
+        new_number_of_alpha_electrons = 3
 
         # When/Then
         with self.assertRaises(ValueError):
-            self.ansatz.n_alpha = new_n_alpha
+            self.ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
 
-    def test_get_n_beta(self):
+    def test_get_number_of_beta_electrons(self):
         # Given
-        new_n_alpha = 2
+        new_number_of_alpha_electrons = 2
 
         # When
-        self.ansatz.n_alpha = new_n_alpha
+        self.ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
 
         # Then
-        self.assertEqual(self.ansatz._n_beta, new_n_alpha)
+        self.assertEqual(
+            self.ansatz._number_of_beta_electrons, new_number_of_alpha_electrons
+        )
 
-    def test_get_n_qubits(self):
+    def test_get_number_of_qubits(self):
         # Given
-        new_n_spatial_orbitals = 4
-        target_n_qubits = 8
+        new_number_of_spatial_orbitals = 4
+        target_number_of_qubits = 8
 
         # When
-        self.ansatz.n_spatial_orbitals = new_n_spatial_orbitals
+        self.ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
         # Then
-        self.assertEqual(self.ansatz.n_qubits, target_n_qubits)
+        self.assertEqual(self.ansatz.number_of_qubits, target_number_of_qubits)
 
-    def test_set_n_spatial_orbitals(self):
+    def test_set_number_of_spatial_orbitals(self):
         # Given
-        new_n_spatial_orbitals = 4
+        new_number_of_spatial_orbitals = 4
 
         # When
-        self.ansatz.n_spatial_orbitals = new_n_spatial_orbitals
+        self.ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
         # Then
-        self.assertEqual(self.ansatz._n_spatial_orbitals, new_n_spatial_orbitals)
+        self.assertEqual(
+            self.ansatz._number_of_spatial_orbitals, new_number_of_spatial_orbitals
+        )
 
-    def test_set_n_spatial_orbitals_asserts_when_smaller_than_2(self):
+    def test_set_number_of_spatial_orbitals_asserts_when_smaller_than_2(self):
         # Given
-        new_n_spatial_orbitals = 1
+        new_number_of_spatial_orbitals = 1
 
         # When/Then
         with self.assertRaises(ValueError):
-            self.ansatz.n_spatial_orbitals = new_n_spatial_orbitals
+            self.ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
-    def test_set_n_spatial_orbitals_asserts_when_smaller_than_n_alpha(self):
+    def test_set_number_of_spatial_orbitals_asserts_when_smaller_than_number_of_alpha_electrons(
+        self,
+    ):
         # Given
-        self.ansatz.n_spatial_orbitals = 4
-        self.ansatz.n_alpha = 3
-        new_n_spatial_orbitals = 3
+        self.ansatz.number_of_spatial_orbitals = 4
+        self.ansatz.number_of_alpha_electrons = 3
+        new_number_of_spatial_orbitals = 3
 
         # When/Then
         with self.assertRaises(ValueError):
-            self.ansatz.n_spatial_orbitals = new_n_spatial_orbitals
+            self.ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
     def test_set_transformation(self):
         # Given
