@@ -13,9 +13,9 @@ class TestSingletUCCSDAnsatz(unittest.TestCase, AnsatzTests):
         self.transformation = "Jordan-Wigner"
 
         self.ansatz = SingletUCCSDAnsatz(
+            n_layers=self.n_layers,
             n_spatial_orbitals=self.n_spatial_orbitals,
             n_alpha=self.n_alpha,
-            n_layers=self.n_layers,
             transformation=self.transformation,
         )
 
@@ -26,9 +26,9 @@ class TestSingletUCCSDAnsatz(unittest.TestCase, AnsatzTests):
         # When/Then
         with self.assertRaises(ValueError):
             self.ansatz = SingletUCCSDAnsatz(
+                n_layers=self.n_layers,
                 n_spatial_orbitals=incorrect_n_spatial_orbitals,
                 n_alpha=self.n_alpha,
-                n_layers=self.n_layers,
                 transformation=self.transformation,
             )
 

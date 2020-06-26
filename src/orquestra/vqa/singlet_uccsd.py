@@ -7,10 +7,7 @@ from zquantum.core.circuit import Circuit
 from openfermion.utils import uccsd_singlet_paramsize, uccsd_singlet_generator
 from overrides import overrides
 from .utils import exponentiate_fermion_operator, create_layer_of_gates
-from pyquil import Program
-from pyquil.gates import X
 from typing import List, Optional
-import sympy
 import numpy as np
 
 
@@ -21,18 +18,18 @@ class SingletUCCSDAnsatz(Ansatz):
 
     def __init__(
         self,
+        n_layers: int,
         n_spatial_orbitals: int,
         n_alpha: int,
-        n_layers: int,
         transformation: str = "Jordan-Wigner",
     ):
         """ 
         Ansatz class representing Singlet UCCSD Ansatz.
 
         Args:
+            n_layers: number of layers of the ansatz.
             n_spatial_orbitals: number of spatial orbitals.
             n_alpha: number of alpha electrons.
-            n_layers: number of layers of the ansatz.
             transformation: transformation used for translation between fermions and qubits.
 
         Attributes:
@@ -80,6 +77,7 @@ class SingletUCCSDAnsatz(Ansatz):
         return self._n_alpha + self._n_beta
 
     @property
+    @overrides
     def number_of_params(self) -> int:
         """
         Returns number of parameters in the ansatz.
@@ -115,7 +113,7 @@ class SingletUCCSDAnsatz(Ansatz):
         if self._n_spatial_orbitals < 2:
             raise (
                 ValueError(
-                    "Number of spatials orbitals must be greater or equal and is {0}.".format(
+                    "Number of spatials orbitals must be greater or equal 2 and is {0}.".format(
                         self._n_spatial_orbitals
                     )
                 )
