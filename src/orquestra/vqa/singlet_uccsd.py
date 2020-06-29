@@ -6,7 +6,7 @@ from zquantum.core.interfaces.ansatz_utils import (
 from zquantum.core.circuit import Circuit
 from openfermion.utils import uccsd_singlet_paramsize, uccsd_singlet_generator
 from overrides import overrides
-from .utils import exponentiate_fermion_operator, create_layer_of_gates
+from .utils import exponentiate_fermion_operator
 from typing import List, Optional
 import numpy as np
 
@@ -93,8 +93,12 @@ class SingletUCCSDAnsatz(Ansatz):
             params: parameters of the circuit. 
         """
         circuit = Circuit()
+        circuit.gates = []
 
-        circuit += create_layer_of_gates(self.number_of_qubits, "X")
+        # Prepare initial state
+        for i in range(n_electrons):
+            qubit_index = n_electrons - i - 1
+            circuit.gates.append(Gate("X", Qubit(qubit_index)))
 
         # Build UCCSD generator
         fermion_generator = uccsd_singlet_generator(
