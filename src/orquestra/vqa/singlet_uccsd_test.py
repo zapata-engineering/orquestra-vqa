@@ -41,7 +41,7 @@ class TestSingletUCCSDAnsatz(unittest.TestCase, AnsatzTests):
 
         # Then
         self.assertEqual(
-            self.ansatz._number_of_alpha_electrons, new_number_of_alpha_electrons
+            self.ansatz.number_of_alpha_electrons, new_number_of_alpha_electrons
         )
 
     def test_set_number_of_alpha_electrons_asserts_number_of_spatial_orbitals(self):
@@ -115,7 +115,7 @@ class TestSingletUCCSDAnsatz(unittest.TestCase, AnsatzTests):
         self.ansatz.transformation = new_transformation
 
         # Then
-        self.assertEqual(self.ansatz._transformation, new_transformation)
+        self.assertEqual(self.ansatz.transformation, new_transformation)
 
     def test_does_not_support_parametrized_circuit(self):
         # When/Then
