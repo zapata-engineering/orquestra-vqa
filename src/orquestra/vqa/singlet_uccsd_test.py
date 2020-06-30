@@ -19,6 +19,19 @@ class TestSingletUCCSDAnsatz(unittest.TestCase, AnsatzTests):
             transformation=self.transformation,
         )
 
+    def test_init_asserts_number_of_layers(self):
+        # Given
+        incorrect_number_of_layers = 0
+
+        # When/Then
+        with self.assertRaises(ValueError):
+            self.ansatz = SingletUCCSDAnsatz(
+                number_of_layers=incorrect_number_of_layers,
+                number_of_spatial_orbitals=self.number_of_spatial_orbitals,
+                number_of_alpha_electrons=self.number_of_alpha_electrons,
+                transformation=self.transformation,
+            )
+
     def test_init_asserts_number_of_spatial_orbitals(self):
         # Given
         incorrect_number_of_spatial_orbitals = 0
@@ -31,6 +44,14 @@ class TestSingletUCCSDAnsatz(unittest.TestCase, AnsatzTests):
                 number_of_alpha_electrons=self.number_of_alpha_electrons,
                 transformation=self.transformation,
             )
+
+    def test_set_number_of_layers(self):
+        # Given
+        new_number_of_layers = 100
+
+        # When/Then
+        with self.assertRaises(ValueError):
+            self.ansatz.number_of_layers = new_number_of_layers
 
     def test_set_number_of_alpha_electrons(self):
         # Given
