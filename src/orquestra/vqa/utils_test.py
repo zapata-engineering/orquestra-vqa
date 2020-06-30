@@ -1,6 +1,5 @@
 import unittest
-from zquantum.core.circuit import Circuit, Gate, Qubit
-from .utils import exponentiate_fermion_operator, create_layer_of_gates
+from .utils import exponentiate_fermion_operator
 
 
 class TestVQEUtils(unittest.TestCase):
