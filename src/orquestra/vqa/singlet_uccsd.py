@@ -96,8 +96,8 @@ class SingletUCCSDAnsatz(Ansatz):
         circuit.gates = []
 
         # Prepare initial state
-        for i in range(self.number_of_qubits):
-            qubit_index = self.number_of_qubits - i - 1
+        for i in range(self.number_of_electrons):
+            qubit_index = self.number_of_electrons - i - 1
             circuit.gates.append(Gate("X", Qubit(qubit_index)))
 
         # Build UCCSD generator
