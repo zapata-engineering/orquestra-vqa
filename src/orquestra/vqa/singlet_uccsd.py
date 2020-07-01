@@ -27,7 +27,7 @@ class SingletUCCSDAnsatz(Ansatz):
         Ansatz class representing Singlet UCCSD Ansatz.
 
         Args:
-            number_of_layers: number of layers of the ansatz. Since it's a Singlet Ansatz, it can only be equal to 1.
+            number_of_layers: number of layers of the ansatz. Since it's a UCCSD Ansatz, it can only be equal to 1.
             number_of_spatial_orbitals: number of spatial orbitals.
             number_of_alpha_electrons: number of alpha electrons.
             transformation: transformation used for translation between fermions and qubits.
@@ -109,7 +109,7 @@ class SingletUCCSDAnsatz(Ansatz):
         # Prepare initial state
         for i in range(self.number_of_electrons):
             qubit_index = self.number_of_electrons - i - 1
-            circuit.gates.append(Gate("X", Qubit(qubit_index)))
+            circuit.gates.append(Gate("X", [Qubit(qubit_index)]))
 
         # Build UCCSD generator
         fermion_generator = uccsd_singlet_generator(
