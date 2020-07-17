@@ -3,11 +3,11 @@ from zquantum.core.interfaces.ansatz_utils import (
     ansatz_property,
     invalidates_parametrized_circuit,
 )
-from zquantum.core.circuit import Circuit, Gate, Qubit
+from zquantum.core.circuit import Circuit
 from openfermion.utils import uccsd_singlet_paramsize, uccsd_singlet_generator
 from overrides import overrides
-from .utils import exponentiate_fermion_operator
-from typing import List, Optional
+from .utils import exponentiate_fermion_operator, build_hartree_fock_circuit
+from typing import Optional
 import numpy as np
 
 
@@ -103,13 +103,12 @@ class SingletUCCSDAnsatz(Ansatz):
         Args:
             params: parameters of the circuit. 
         """
-        circuit = Circuit()
-        circuit.gates = []
-
-        # Prepare initial state
-        for i in range(self.number_of_electrons):
-            qubit_index = self.number_of_electrons - i - 1
-            circuit.gates.append(Gate("X", [Qubit(qubit_index)]))
+        circuit = build_hartree_fock_circuit(
+            self.number_of_qubits,
+            self.number_of_alpha_electrons,
+            self._number_of_beta_electrons,
+            self._transformation,
+        )
 
         # Build UCCSD generator
         fermion_generator = uccsd_singlet_generator(
@@ -120,7 +119,7 @@ class SingletUCCSDAnsatz(Ansatz):
         )
 
         evolution_operator = exponentiate_fermion_operator(
-            fermion_generator, self._transformation
+            fermion_generator, self._transformation, self.number_of_qubits,
         )
 
         circuit += evolution_operator
