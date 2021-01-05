@@ -1,14 +1,17 @@
+import numpy as np
+
+from openfermion import uccsd_singlet_paramsize, uccsd_singlet_generator
+from overrides import overrides
+from typing import Optional
+
+from zquantum.core.circuit import Circuit
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
     ansatz_property,
     invalidates_parametrized_circuit,
 )
-from zquantum.core.circuit import Circuit
-from openfermion.utils import uccsd_singlet_paramsize, uccsd_singlet_generator
-from overrides import overrides
+
 from .utils import exponentiate_fermion_operator, build_hartree_fock_circuit
-from typing import Optional
-import numpy as np
 
 
 class SingletUCCSDAnsatz(Ansatz):
@@ -23,7 +26,7 @@ class SingletUCCSDAnsatz(Ansatz):
         number_of_layers: int = 1,
         transformation: str = "Jordan-Wigner",
     ):
-        """ 
+        """
         Ansatz class representing Singlet UCCSD Ansatz.
 
         Args:
@@ -93,7 +96,8 @@ class SingletUCCSDAnsatz(Ansatz):
         Returns number of parameters in the ansatz.
         """
         return uccsd_singlet_paramsize(
-            n_qubits=self.number_of_qubits, n_electrons=self.number_of_electrons,
+            n_qubits=self.number_of_qubits,
+            n_electrons=self.number_of_electrons,
         )
 
     @overrides
@@ -101,7 +105,7 @@ class SingletUCCSDAnsatz(Ansatz):
         """
         Returns a parametrizable circuit represention of the ansatz.
         Args:
-            params: parameters of the circuit. 
+            params: parameters of the circuit.
         """
         circuit = build_hartree_fock_circuit(
             self.number_of_qubits,
@@ -119,7 +123,9 @@ class SingletUCCSDAnsatz(Ansatz):
         )
 
         evolution_operator = exponentiate_fermion_operator(
-            fermion_generator, self._transformation, self.number_of_qubits,
+            fermion_generator,
+            self._transformation,
+            self.number_of_qubits,
         )
 
         circuit += evolution_operator
