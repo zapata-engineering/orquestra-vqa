@@ -3,7 +3,7 @@ from zquantum.core.circuit import Circuit, Qubit, Gate
 from .utils import exponentiate_fermion_operator, build_hartree_fock_circuit
 
 
-class TestVQEUtils(unittest.TestCase):
+class TestVQEUtils:
     def test_build_hartree_fock_circuit_jordan_wigner(self):
         number_of_qubits = 4
         number_of_alpha_electrons = 1
@@ -17,7 +17,7 @@ class TestVQEUtils(unittest.TestCase):
             number_of_beta_electrons,
             transformation,
         )
-        self.assertEqual(actual_circuit, expected_circuit)
+        assert actual_circuit == expected_circuit
 
     def test_build_hartree_fock_circuit_bravyi_kitaev(self):
         number_of_qubits = 4
@@ -32,4 +32,4 @@ class TestVQEUtils(unittest.TestCase):
             number_of_beta_electrons,
             transformation,
         )
-        self.assertEqual(actual_circuit, expected_circuit)
+        assert actual_circuit == expected_circuit

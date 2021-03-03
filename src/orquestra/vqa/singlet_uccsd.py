@@ -41,6 +41,7 @@ class SingletUCCSDAnsatz(Ansatz):
             number_of_qubits: number of qubits required for the ansatz circuit.
             number_of_params: number of the parameters that need to be set for the ansatz circuit.
         """
+        super().__init__(number_of_layers=number_of_layers)
         self._number_of_layers = number_of_layers
         self._assert_number_of_layers()
         self._number_of_spatial_orbitals = number_of_spatial_orbitals
