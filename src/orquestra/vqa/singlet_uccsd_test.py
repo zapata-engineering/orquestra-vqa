@@ -1,145 +1,171 @@
+import pytest
+import numpy as np
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 from zquantum.core.circuit import Circuit
 from .singlet_uccsd import SingletUCCSDAnsatz
-import unittest
-import numpy as np
 
 
-class TestSingletUCCSDAnsatz(unittest.TestCase, AnsatzTests):
-    def setUp(self):
-        self.number_of_layers = 1
-        self.number_of_alpha_electrons = 1
-        self.number_of_spatial_orbitals = 3
-        self.transformation = "Jordan-Wigner"
+class TestSingletUCCSDAnsatz(AnsatzTests):
+    @pytest.fixture
+    def number_of_layers(self):
+        return 1
 
-        self.ansatz = SingletUCCSDAnsatz(
-            number_of_layers=self.number_of_layers,
-            number_of_spatial_orbitals=self.number_of_spatial_orbitals,
-            number_of_alpha_electrons=self.number_of_alpha_electrons,
-            transformation=self.transformation,
+    @pytest.fixture
+    def number_of_spatial_orbitals(self):
+        return 3
+
+    @pytest.fixture
+    def number_of_alpha_electrons(self):
+        return 1
+
+    @pytest.fixture
+    def transformation(self):
+        return "Jordan-Wigner"
+
+    @pytest.fixture
+    def ansatz(
+        self,
+        number_of_layers,
+        number_of_spatial_orbitals,
+        number_of_alpha_electrons,
+        transformation,
+    ):
+        return SingletUCCSDAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_spatial_orbitals=number_of_spatial_orbitals,
+            number_of_alpha_electrons=number_of_alpha_electrons,
+            transformation=transformation,
         )
 
-    def test_init_asserts_number_of_layers(self):
+    def test_init_asserts_number_of_layers(
+        self,
+        ansatz,
+        number_of_spatial_orbitals,
+        number_of_alpha_electrons,
+        transformation,
+    ):
         # Given
         incorrect_number_of_layers = 0
 
         # When/Then
-        with self.assertRaises(ValueError):
-            self.ansatz = SingletUCCSDAnsatz(
+        with pytest.raises(ValueError):
+            ansatz = SingletUCCSDAnsatz(
                 number_of_layers=incorrect_number_of_layers,
-                number_of_spatial_orbitals=self.number_of_spatial_orbitals,
-                number_of_alpha_electrons=self.number_of_alpha_electrons,
-                transformation=self.transformation,
+                number_of_spatial_orbitals=number_of_spatial_orbitals,
+                number_of_alpha_electrons=number_of_alpha_electrons,
+                transformation=transformation,
             )
 
-    def test_init_asserts_number_of_spatial_orbitals(self):
+    def test_init_asserts_number_of_spatial_orbitals(
+        self,
+        ansatz,
+        number_of_layers,
+        number_of_alpha_electrons,
+        transformation,
+    ):
         # Given
         incorrect_number_of_spatial_orbitals = 0
 
         # When/Then
-        with self.assertRaises(ValueError):
-            self.ansatz = SingletUCCSDAnsatz(
-                number_of_layers=self.number_of_layers,
+        with pytest.raises(ValueError):
+            ansatz = SingletUCCSDAnsatz(
+                number_of_layers=number_of_layers,
                 number_of_spatial_orbitals=incorrect_number_of_spatial_orbitals,
-                number_of_alpha_electrons=self.number_of_alpha_electrons,
-                transformation=self.transformation,
+                number_of_alpha_electrons=number_of_alpha_electrons,
+                transformation=transformation,
             )
 
-    def test_set_number_of_layers(self):
+    def test_set_number_of_layers(self, ansatz):
         # Given
         new_number_of_layers = 100
 
         # When/Then
-        with self.assertRaises(ValueError):
-            self.ansatz.number_of_layers = new_number_of_layers
+        with pytest.raises(ValueError):
+            ansatz.number_of_layers = new_number_of_layers
 
-    def test_set_number_of_alpha_electrons(self):
+    def test_set_number_of_alpha_electrons(self, ansatz):
         # Given
         new_number_of_alpha_electrons = 2
 
         # When
-        self.ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
+        ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
 
         # Then
-        self.assertEqual(
-            self.ansatz.number_of_alpha_electrons, new_number_of_alpha_electrons
-        )
+        assert ansatz.number_of_alpha_electrons == new_number_of_alpha_electrons
 
-    def test_set_number_of_alpha_electrons_asserts_number_of_spatial_orbitals(self):
+    def test_set_number_of_alpha_electrons_asserts_number_of_spatial_orbitals(
+        self, ansatz
+    ):
         # Given
         new_number_of_alpha_electrons = 3
 
         # When/Then
-        with self.assertRaises(ValueError):
-            self.ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
+        with pytest.raises(ValueError):
+            ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
 
-    def test_get_number_of_beta_electrons(self):
+    def test_get_number_of_beta_electrons(self, ansatz):
         # Given
         new_number_of_alpha_electrons = 2
 
         # When
-        self.ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
+        ansatz.number_of_alpha_electrons = new_number_of_alpha_electrons
 
         # Then
-        self.assertEqual(
-            self.ansatz._number_of_beta_electrons, new_number_of_alpha_electrons
-        )
+        assert ansatz._number_of_beta_electrons == new_number_of_alpha_electrons
 
-    def test_get_number_of_qubits(self):
+    def test_get_number_of_qubits(self, ansatz):
         # Given
         new_number_of_spatial_orbitals = 4
         target_number_of_qubits = 8
 
         # When
-        self.ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
+        ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
         # Then
-        self.assertEqual(self.ansatz.number_of_qubits, target_number_of_qubits)
+        assert ansatz.number_of_qubits == target_number_of_qubits
 
-    def test_set_number_of_spatial_orbitals(self):
+    def test_set_number_of_spatial_orbitals(self, ansatz):
         # Given
         new_number_of_spatial_orbitals = 4
 
         # When
-        self.ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
+        ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
         # Then
-        self.assertEqual(
-            self.ansatz._number_of_spatial_orbitals, new_number_of_spatial_orbitals
-        )
+        assert ansatz._number_of_spatial_orbitals == new_number_of_spatial_orbitals
 
-    def test_set_number_of_spatial_orbitals_asserts_when_smaller_than_2(self):
+    def test_set_number_of_spatial_orbitals_asserts_when_smaller_than_2(self, ansatz):
         # Given
         new_number_of_spatial_orbitals = 1
 
         # When/Then
-        with self.assertRaises(ValueError):
-            self.ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
+        with pytest.raises(ValueError):
+            ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
     def test_set_number_of_spatial_orbitals_asserts_when_smaller_than_number_of_alpha_electrons(
-        self,
+        self, ansatz
     ):
         # Given
-        self.ansatz.number_of_spatial_orbitals = 4
-        self.ansatz.number_of_alpha_electrons = 3
+        ansatz.number_of_spatial_orbitals = 4
+        ansatz.number_of_alpha_electrons = 3
         new_number_of_spatial_orbitals = 3
 
         # When/Then
-        with self.assertRaises(ValueError):
-            self.ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
+        with pytest.raises(ValueError):
+            ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
-    def test_set_transformation(self):
+    def test_set_transformation(self, ansatz):
         # Given
         new_transformation = "transformation"
 
         # When
-        self.ansatz.transformation = new_transformation
+        ansatz.transformation = new_transformation
 
         # Then
-        self.assertEqual(self.ansatz.transformation, new_transformation)
+        assert ansatz.transformation == new_transformation
 
-    def test_does_not_support_parametrized_circuit(self):
+    def test_does_not_support_parametrized_circuit(self, ansatz):
         # When/Then
-        self.assertFalse(self.ansatz.supports_parametrized_circuits)
-        with self.assertRaises(Exception):
-            parametrized_circuit = self.ansatz.parametrized_circuit
+        assert ansatz.supports_parametrized_circuits == False
+        with pytest.raises(NotImplementedError):
+            parametrized_circuit = ansatz.parametrized_circuit
