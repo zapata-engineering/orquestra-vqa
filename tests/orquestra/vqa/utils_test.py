@@ -1,6 +1,6 @@
 import unittest
 from zquantum.core.circuit import Circuit, Qubit, Gate
-from .utils import exponentiate_fermion_operator, build_hartree_fock_circuit
+from zquantum.vqe.utils import exponentiate_fermion_operator, build_hartree_fock_circuit
 
 
 class TestVQEUtils:

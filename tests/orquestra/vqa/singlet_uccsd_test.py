@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 from zquantum.core.circuit import Circuit
-from .singlet_uccsd import SingletUCCSDAnsatz
+from zquantum.vqe.singlet_uccsd import SingletUCCSDAnsatz
 
 
 class TestSingletUCCSDAnsatz(AnsatzTests):
