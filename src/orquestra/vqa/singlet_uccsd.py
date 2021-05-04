@@ -3,6 +3,7 @@ import numpy as np
 from openfermion import uccsd_singlet_paramsize, uccsd_singlet_generator
 from overrides import overrides
 from typing import Optional
+import sympy
 
 from zquantum.core.circuit import Circuit
 from zquantum.core.interfaces.ansatz import Ansatz
@@ -16,7 +17,7 @@ from .utils import exponentiate_fermion_operator, build_hartree_fock_circuit
 
 class SingletUCCSDAnsatz(Ansatz):
 
-    supports_parametrized_circuits = False
+    supports_parametrized_circuits = True
     transformation = ansatz_property("transformation")
 
     def __init__(
@@ -114,7 +115,11 @@ class SingletUCCSDAnsatz(Ansatz):
             self._number_of_beta_electrons,
             self._transformation,
         )
-
+        if params is None:
+            params = [
+                sympy.Symbol("theta_" + str(i), real=True)
+                for i in range(self.number_of_params)
+            ]
         # Build UCCSD generator
         fermion_generator = uccsd_singlet_generator(
             params,
