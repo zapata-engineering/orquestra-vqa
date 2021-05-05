@@ -37,6 +37,10 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
             transformation=transformation,
         )
 
+    def test_set_number_of_layers_invalidates_parametrized_circuit(self, ansatz):
+        # This test overwrites test from base class AnsatzTests.
+        pytest.xfail("Singlet UCCSD Ansatz can only have one layer")
+
     def test_init_asserts_number_of_layers(
         self,
         ansatz,
@@ -163,9 +167,3 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
 
         # Then
         assert ansatz.transformation == new_transformation
-
-    def test_does_not_support_parametrized_circuit(self, ansatz):
-        # When/Then
-        assert ansatz.supports_parametrized_circuits == False
-        with pytest.raises(NotImplementedError):
-            parametrized_circuit = ansatz.parametrized_circuit
