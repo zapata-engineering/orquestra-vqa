@@ -84,7 +84,7 @@ class TestHEAQuantumCompilingAnsatz(AnsatzTests):
         )
 
         assert (
-            len(ansatz.parametrized_circuit.gates)
+            len(ansatz.parametrized_circuit.operations)
             == expected_number_of_single_qubit_gates
             + expected_number_of_two_qubit_gates
         )
