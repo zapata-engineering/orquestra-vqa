@@ -1,5 +1,5 @@
 from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.circuit import Circuit, Qubit, Gate
+from zquantum.core.circuits import Circuit, RZ, RX, CNOT
 from zquantum.core.interfaces.ansatz_utils import ansatz_property
 
 from typing import Optional, List
@@ -43,16 +43,16 @@ class HEAQuantumCompilingAnsatz(Ansatz):
         Returns:
             circuit with added rotational sub-layer
         """
-        # Add Rz(theta) Rx(pi/2) Rz(theta') Rx(pi/2) Rz(theta'')
-        for qubit_index, qubit in enumerate(circuit.qubits):
+        # Add RZ(theta) RX(pi/2) RZ(theta') RX(pi/2) RZ(theta'')
+        for qubit_index in range(self.number_of_qubits):
 
             qubit_parameters = parameters[qubit_index * 3 : (qubit_index + 1) * 3]
 
-            circuit.gates.append(Gate("Rz", [qubit], [qubit_parameters[0]]))
-            circuit.gates.append(Gate("Rx", [qubit], [np.pi / 2]))
-            circuit.gates.append(Gate("Rz", [qubit], [qubit_parameters[1]]))
-            circuit.gates.append(Gate("Rx", [qubit], [np.pi / 2]))
-            circuit.gates.append(Gate("Rz", [qubit], [qubit_parameters[2]]))
+            circuit += RZ(qubit_parameters[0])(qubit_index)
+            circuit += RX(np.pi / 2)(qubit_index)
+            circuit += RZ(qubit_parameters[1])(qubit_index)
+            circuit += RX(np.pi / 2)(qubit_index)
+            circuit += RZ(qubit_parameters[2])(qubit_index)
 
         return circuit
 
@@ -66,37 +66,36 @@ class HEAQuantumCompilingAnsatz(Ansatz):
             Circuit containing a single layer of the Hardware Efficient Quantum Compiling Ansatz
         """
         circuit_layer = Circuit()
-        circuit_layer.qubits = [Qubit(i) for i in range(self.number_of_qubits)]
 
-        # Add Rz(theta) Rx(pi/2) Rz(theta') Rx(pi/2) Rz(theta'')
+        # Add RZ(theta) RX(pi/2) RZ(theta') RX(pi/2) RZ(theta'')
         circuit_layer = self._build_rotational_subcircuit(
             circuit_layer, parameters[: 3 * self.number_of_qubits]
         )
 
+        qubit_ids = list(range(self.number_of_qubits))
         # Add CNOT(x, x+1) for x in even(qubits)
         for control, target in zip(
-            circuit_layer.qubits[::2], circuit_layer.qubits[1::2]
+            qubit_ids[::2], qubit_ids[1::2]
         ):  # loop over qubits 0, 2, 4...
-            circuit_layer.gates.append(Gate("CNOT", [control, target], []))
+            circuit_layer += CNOT(control, target)
 
-        # Add Rz(theta) Rx(pi/2) Rz(theta') Rx(pi/2) Rz(theta'')
+        # Add RZ(theta) RX(pi/2) RZ(theta') RX(pi/2) RZ(theta'')
         circuit_layer = self._build_rotational_subcircuit(
             circuit_layer,
             parameters[3 * self.number_of_qubits : 6 * self.number_of_qubits],
         )
 
         # Add CNOT layer working "inside -> out", skipping every other qubit
-        for qubit_index, qubit in enumerate(
-            circuit_layer.qubits[: int(self.number_of_qubits / 2)][::-1][::2]
-        ):
-            control = qubit
-            target = circuit_layer.qubits[self.number_of_qubits - qubit.index - 1]
-            circuit_layer.gates.append(Gate("CNOT", [control, target], []))
 
-            if not (qubit.index == 0 and self.number_of_qubits % 4 != 0):
-                control = circuit_layer.qubits[self.number_of_qubits - qubit.index]
-                target = circuit_layer.qubits[qubit.index - 1]
-                circuit_layer.gates.append(Gate("CNOT", [control, target], []))
+        for qubit_index in qubit_ids[: int(self.number_of_qubits / 2)][::-1][::2]:
+            control = qubit_index
+            target = self.number_of_qubits - qubit_index - 1
+            circuit_layer += CNOT(control, target)
+
+            if qubit_index != 0 or self.number_of_qubits % 4 == 0:
+                control = self.number_of_qubits - qubit_index
+                target = qubit_index - 1
+                circuit_layer += CNOT(control, target)
 
         return circuit_layer
 
