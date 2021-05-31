@@ -5,7 +5,7 @@ from overrides import overrides
 from typing import Optional
 import sympy
 
-from zquantum.core.wip.circuits import Circuit
+from zquantum.core.circuits import Circuit
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
     ansatz_property,

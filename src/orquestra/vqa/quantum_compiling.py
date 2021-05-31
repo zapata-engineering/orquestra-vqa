@@ -1,5 +1,5 @@
 from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.wip.circuits import Circuit, RZ, RX, CNOT
+from zquantum.core.circuits import Circuit, RZ, RX, CNOT
 from zquantum.core.interfaces.ansatz_utils import ansatz_property
 
 from typing import Optional, List
