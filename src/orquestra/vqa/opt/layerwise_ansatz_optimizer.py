@@ -17,6 +17,7 @@ class LayerwiseAnsatzOptimizer:
         inner_optimizer: Optimizer,
         min_layer: int,
         max_layer: int,
+        n_layers_per_iteration: int = 1,
         parameters_initializer: Optional[Callable] = None,
         recorder: RecorderFactory = _recorder,
     ):
@@ -28,9 +29,11 @@ class LayerwiseAnsatzOptimizer:
             recorder: recorder object which defines how to store the optimization history.
         """
         assert 0 <= min_layer <= max_layer
+        assert n_layers_per_iteration > 0
         self.inner_optimizer = inner_optimizer
         self.min_layer = min_layer
         self.max_layer = max_layer
+        self.n_layers_per_iteration = n_layers_per_iteration
         if parameters_initializer is None:
             self.parameters_initializer = partial(np.random.uniform, -np.pi, np.pi)
         else:
@@ -56,8 +59,7 @@ class LayerwiseAnsatzOptimizer:
         """
         # Since this optimizer modifies the ansatz which is a part of the input cost function
         # we use copy of it instead.
-        cost_function_1 = cost_function
-        cost_function = copy.deepcopy(cost_function_1)
+        cost_function = copy.deepcopy(cost_function)
 
         if not hasattr(cost_function, "ansatz"):
             raise ValueError("Provided cost function needs to have ansatz property.")
@@ -70,7 +72,7 @@ class LayerwiseAnsatzOptimizer:
         if initial_params is None:
             initial_params = self.parameters_initializer(number_of_params)
 
-        for i in range(self.min_layer, self.max_layer + 1):
+        for i in range(self.min_layer, self.max_layer + 1, self.n_layers_per_iteration):
             # keep_history is set to False, as the cost function is already being recorded
             # if keep_history is specified.
             if i != self.min_layer:
@@ -83,7 +85,7 @@ class LayerwiseAnsatzOptimizer:
                 cost_function, initial_params, keep_history=False
             )
             optimal_params = layer_results.opt_params
-            cost_function.ansatz.number_of_layers += 1
+            cost_function.ansatz.number_of_layers += self.n_layers_per_iteration
 
         # layer_results["history"] will be empty as inner_optimizer was used with
         # keep_history false.

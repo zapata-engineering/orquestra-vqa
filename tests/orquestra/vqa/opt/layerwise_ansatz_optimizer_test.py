@@ -23,7 +23,7 @@ def keep_history(request):
     return request.param
 
 
-class TestLayerwiseOptimizer(OptimizerTests):
+class TestLayerwiseAnsatzOptimizer(OptimizerTests):
     @pytest.fixture
     def sum_x_squared(self):
         class my_fun:
@@ -79,22 +79,28 @@ class TestLayerwiseOptimizer(OptimizerTests):
         with pytest.raises(ValueError):
             _ = optimizer.minimize(cost_function_without_ansatz, initial_params=[0, 0])
 
-    @pytest.mark.parametrize("min_layer,max_layer", [[1, 2], [1, 5], [100, 120]])
+    @pytest.mark.parametrize(
+        "min_layer,max_layer,n_layers_per_iteration",
+        [[1, 2, 1], [1, 5, 1], [100, 120, 1], [1, 5, 2], [1, 10, 4], [1, 10, 20]],
+    )
     def test_parameters_are_properly_initialized_for_each_layer(
-        self, sum_x_squared, optimizer, min_layer, max_layer
+        self, sum_x_squared, optimizer, min_layer, max_layer, n_layers_per_iteration
     ):
         parameters_initializer = recorder(partial(np.random.uniform, -np.pi, np.pi))
         optimizer = LayerwiseAnsatzOptimizer(
             inner_optimizer=ScipyOptimizer("L-BFGS-B"),
             min_layer=min_layer,
             max_layer=max_layer,
+            n_layers_per_iteration=n_layers_per_iteration,
             parameters_initializer=parameters_initializer,
         )
 
         _ = optimizer.minimize(sum_x_squared, initial_params=np.ones(min_layer))
-        assert parameters_initializer.call_number == max_layer - min_layer
+        assert parameters_initializer.call_number == np.floor(
+            (max_layer - min_layer) / n_layers_per_iteration
+        )
         for entry in parameters_initializer.history:
-            assert len(entry.value) == 1
+            assert len(entry.value) == n_layers_per_iteration
 
     @pytest.mark.parametrize("min_layer,max_layer", [[-1, 2], [3, 2], [-5, -1]])
     def test_fails_for_invalid_min_max_layer(self, min_layer, max_layer):
