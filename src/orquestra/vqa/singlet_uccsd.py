@@ -1,6 +1,10 @@
 import numpy as np
 
-from openfermion import uccsd_singlet_paramsize, uccsd_singlet_generator
+from openfermion import (
+    uccsd_singlet_paramsize,
+    uccsd_singlet_generator,
+    FermionOperator,
+)
 from overrides import overrides
 from typing import Optional
 import sympy
@@ -98,9 +102,60 @@ class SingletUCCSDAnsatz(Ansatz):
         Returns number of parameters in the ansatz.
         """
         return uccsd_singlet_paramsize(
-            n_qubits=self.number_of_qubits,
-            n_electrons=self.number_of_electrons,
+            n_qubits=self.number_of_qubits, n_electrons=self.number_of_electrons,
         )
+
+    @staticmethod
+    def screen_out_operator_terms_below_threshold(
+        threshold, fermion_generator, ignore_singles=False
+    ):
+        """Screen single and double excitation operators based on a guess
+            for the amplitudes
+        Args:
+            threshold (float): threshold to select excitations. Only those with
+                absolute amplitudes above the threshold are kept.
+            fermion_generator (openfermion.FermionOperator): Fermion Operator
+                containing the generators for the UCC ansatz
+        Returns:
+            amplitudes (np.array): screened amplitudes
+            new_fermion_generator (openfermion.FermionOperator): screened
+                Fermion Operator
+        """
+
+        new_fermion_generator = FermionOperator()
+        amplitudes = []
+        for op in fermion_generator.terms:
+            if abs(fermion_generator.terms[op]) > threshold or (
+                len(op) == 2 and ignore_singles == True
+            ):
+                new_fermion_generator += FermionOperator(
+                    op, fermion_generator.terms[op]
+                )
+                amplitudes.append(fermion_generator.terms[op])
+        amplitudes = np.array(amplitudes)
+        return amplitudes, new_fermion_generator
+
+    def generate_circuit_from_mp2_amplitudes(
+        self, raw_mp2_operator: FermionOperator, screening_threshold: float = 0.0
+    ) -> Circuit:
+        _, screened_mp2_operator = self.screen_out_operator_terms_below_threshold(
+            screening_threshold, raw_mp2_operator
+        )
+
+        ansatz_operator = uccsd_singlet_generator(
+            np.arange(1.0, self.number_of_params + 1),
+            2 * self.number_of_spatial_orbitals,
+            self.number_of_electrons,
+            anti_hermitian=True,
+        )
+
+        params_vector = np.zeros(self.number_of_params)
+
+        for term, coeff in screened_mp2_operator.terms.items():
+            if term in ansatz_operator.terms.keys():
+                params_vector[int(ansatz_operator.terms[term]) - 1] = coeff
+
+        return self.get_executable_circuit(params_vector)
 
     @overrides
     def _generate_circuit(self, params: Optional[np.ndarray] = None) -> Circuit:
@@ -129,9 +184,7 @@ class SingletUCCSDAnsatz(Ansatz):
         )
 
         evolution_operator = exponentiate_fermion_operator(
-            fermion_generator,
-            self._transformation,
-            self.number_of_qubits,
+            fermion_generator, self._transformation, self.number_of_qubits,
         )
 
         circuit += evolution_operator
