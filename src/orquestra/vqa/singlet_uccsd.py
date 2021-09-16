@@ -155,6 +155,8 @@ class SingletUCCSDAnsatz(Ansatz):
             if term in ansatz_operator.terms.keys():
                 params_vector[int(ansatz_operator.terms[term]) - 1] = coeff
 
+        self.init_guess = params_vector
+
         return self.get_executable_circuit(params_vector)
 
     @overrides
