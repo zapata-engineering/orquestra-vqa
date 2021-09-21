@@ -6,7 +6,7 @@ from openfermion import (
     FermionOperator,
 )
 from overrides import overrides
-from typing import Optional
+from typing import Optional, Tuple
 import sympy
 
 from zquantum.core.circuits import Circuit
@@ -102,13 +102,22 @@ class SingletUCCSDAnsatz(Ansatz):
         Returns number of parameters in the ansatz.
         """
         return uccsd_singlet_paramsize(
-            n_qubits=self.number_of_qubits, n_electrons=self.number_of_electrons,
+            n_qubits=self.number_of_qubits,
+            n_electrons=self.number_of_electrons,
         )
+
+    @property
+    def init_guess(self) -> np.ndarray:
+        return self._init_guess
+
+    @init_guess.setter
+    def init_guess(self, new_val: np.ndarray):
+        self._init_guess = new_val
 
     @staticmethod
     def screen_out_operator_terms_below_threshold(
-        threshold, fermion_generator, ignore_singles=False
-    ):
+        threshold: float, fermion_generator: FermionOperator, ignore_singles=False
+    ) -> Tuple[np.ndarray, FermionOperator]:
         """Screen single and double excitation operators based on a guess
             for the amplitudes
         Args:
@@ -186,7 +195,9 @@ class SingletUCCSDAnsatz(Ansatz):
         )
 
         evolution_operator = exponentiate_fermion_operator(
-            fermion_generator, self._transformation, self.number_of_qubits,
+            fermion_generator,
+            self._transformation,
+            self.number_of_qubits,
         )
 
         circuit += evolution_operator
