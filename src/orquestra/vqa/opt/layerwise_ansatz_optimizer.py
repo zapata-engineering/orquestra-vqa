@@ -1,96 +1,150 @@
-from zquantum.core.interfaces.functions import CallableWithGradient
-from zquantum.core.interfaces.optimizer import Optimizer, construct_history_info
-from zquantum.core.interfaces.functions import CallableStoringArtifacts
-from zquantum.core.history.recorder import recorder as _recorder
-from zquantum.core.interfaces.functions import CallableWithGradient
-from zquantum.core.typing import RecorderFactory
-from scipy.optimize import OptimizeResult
-from typing import Dict, Optional, List, Union, Callable
-import numpy as np
-from functools import partial
 import copy
+from collections import defaultdict
+from typing import Callable
+
+import numpy as np
+from scipy.optimize import OptimizeResult
+from zquantum.core.history.recorder import recorder as _recorder
+from zquantum.core.interfaces.ansatz import Ansatz
+from zquantum.core.interfaces.cost_function import CostFunction
+from zquantum.core.interfaces.optimizer import (
+    NestedOptimizer,
+    Optimizer,
+    extend_histories,
+)
+from zquantum.core.typing import RecorderFactory
 
 
-class LayerwiseAnsatzOptimizer:
+def append_random_params(target_size: int, params: np.ndarray) -> np.ndarray:
+    """
+    Adds new random parameters to the `params` so that the size
+    of the output is `target_size`.
+    New parameters are sampled from a uniform distribution over [-pi, pi].
+
+    Args:
+        target_size: target number of parameters
+        params: params that we want to extend
+    """
+    assert len(params) < target_size
+    new_params = np.random.uniform(-np.pi, np.pi, target_size - len(params))
+    return np.concatenate([params, new_params])
+
+
+class LayerwiseAnsatzOptimizer(NestedOptimizer):
+    @property
+    def inner_optimizer(self) -> Optimizer:
+        return self._inner_optimizer
+
+    @property
+    def recorder(self) -> RecorderFactory:
+        return self._recorder
+
     def __init__(
         self,
+        ansatz: Ansatz,
         inner_optimizer: Optimizer,
         min_layer: int,
         max_layer: int,
         n_layers_per_iteration: int = 1,
-        parameters_initializer: Optional[Callable] = None,
+        parameters_initializer: Callable[
+            [int, np.ndarray], np.ndarray
+        ] = append_random_params,
         recorder: RecorderFactory = _recorder,
-    ):
+    ) -> None:
         """
+        LayerwiseAnsatzOptimizer is an optimizer for optimizing ansatz parameters
+        for ansatzes with layered structure.
+        In each iteration it adds specific number of new layers and initializes their parameters
+        using `parameters_initializer`.
+        The idea behind this method is to start from a less complex problem (i.e. small number of layers)
+        and gradually increase its difficulty using parameters obtained in the previous iteration
+        as good starting points for the following iteration.
+
+        To make it work it requires using a cost function factory that takes `Ansatz` object as input
+        to generate the cost function (see `_minimize` method).
+
         Args:
-            inner_optimizer: optimizer used for optimization at each layer.
+            ansatz: ansatz that will be used for creating the cost function.
+            inner_optimizer: optimizer used for optimization of parameters
+                after adding a new layer to the ansatz.
             min_layer: starting number of layers.
             max_layer: maximum number of layers, at which optimization should stop.
-            recorder: recorder object which defines how to store the optimization history.
+            n_layers_per_iteration: number of layers added for each iteration.
+            parameters_initializer: method for initializing parameters of the added layers.
+                See append_new_random_params for example of an implementation.
         """
+
         assert 0 <= min_layer <= max_layer
         assert n_layers_per_iteration > 0
-        self.inner_optimizer = inner_optimizer
-        self.min_layer = min_layer
-        self.max_layer = max_layer
-        self.n_layers_per_iteration = n_layers_per_iteration
-        if parameters_initializer is None:
-            self.parameters_initializer = partial(np.random.uniform, -np.pi, np.pi)
-        else:
-            self.parameters_initializer = parameters_initializer
-        self.recorder = recorder
+        self._ansatz = ansatz
+        self._inner_optimizer = inner_optimizer
+        self._min_layer = min_layer
+        self._max_layer = max_layer
+        self._n_layers_per_iteration = n_layers_per_iteration
+        self._parameters_initializer = parameters_initializer
+        self._recorder = recorder
 
-    def minimize(
+    def _minimize(
         self,
-        cost_function: Union[CallableWithGradient, Callable],
+        cost_function_factory: Callable[[Ansatz], CostFunction],
         initial_params: np.ndarray,
         keep_history: bool = False,
     ) -> OptimizeResult:
         """
-        Finds the parameters which minimize given cost function, by trying all the parameters from the grid.
+        Finds the parameters that minimize the value of the cost function created using `cost_function_factory`.
+        In each iteration the number of layers of ansatz are increased, and therefore new cost function
+        is created and the size of the parameter vector increases.
 
-        Note:
-            Cost function needs to have `ansatz` property
+        NOTE:
+            - The size of `initial_params` should correspond to the number of parameters of the ansatz
+                with number of layers specified by `min_layer`.
+            - The optimal parameters should minimize the value of the cost function for the ansatz with
+                number of layers specified by `max_layer`.
 
         Args:
-            cost_function(zquantum.core.interfaces.cost_function.CostFunction): object representing cost function we want to minimize
-            inital_params (np.ndarray): initial parameters for the cost function
+            cost_function_factory: a function that returns a cost function that depends on the provided ansatz.
+            inital_params: initial parameters for the cost function,
+            keep_history: flag indicating whether history of cost function
+                evaluations should be recorded.
 
         """
-        # Since this optimizer modifies the ansatz which is a part of the input cost function
-        # we use copy of it instead.
-        cost_function = copy.deepcopy(cost_function)
+        ansatz = copy.deepcopy(self._ansatz)
+        ansatz.number_of_layers = self._min_layer
 
-        if not hasattr(cost_function, "ansatz"):
-            raise ValueError("Provided cost function needs to have ansatz property.")
-        if keep_history:
-            cost_function = self.recorder(cost_function)
+        nit = 0
+        nfev = 0
+        histories = defaultdict(list)
+        histories["history"] = []
+        initial_params_per_iteration = initial_params
+        for i in range(
+            self._min_layer, self._max_layer + 1, self._n_layers_per_iteration
+        ):
+            assert ansatz.number_of_layers == i
 
-        cost_function.ansatz.number_of_layers = self.min_layer
-
-        number_of_params = cost_function.ansatz.number_of_params
-        if initial_params is None:
-            initial_params = self.parameters_initializer(number_of_params)
-
-        for i in range(self.min_layer, self.max_layer + 1, self.n_layers_per_iteration):
-            # keep_history is set to False, as the cost function is already being recorded
-            # if keep_history is specified.
-            if i != self.min_layer:
-                new_layer_params = self.parameters_initializer(
-                    cost_function.ansatz.number_of_params - len(optimal_params)
+            if i != self._min_layer:
+                initial_params_per_iteration = self._parameters_initializer(
+                    ansatz.number_of_params, optimal_params
                 )
-                initial_params = np.concatenate([optimal_params, new_layer_params])
 
+            cost_function = cost_function_factory(ansatz=ansatz)
+
+            if keep_history:
+                cost_function = self.recorder(cost_function)
             layer_results = self.inner_optimizer.minimize(
-                cost_function, initial_params, keep_history=False
+                cost_function, initial_params_per_iteration, keep_history=False
             )
-            optimal_params = layer_results.opt_params
-            cost_function.ansatz.number_of_layers += self.n_layers_per_iteration
 
-        # layer_results["history"] will be empty as inner_optimizer was used with
-        # keep_history false.
+            optimal_params: np.ndarray = layer_results.opt_params
+            ansatz.number_of_layers += self._n_layers_per_iteration
+
+            nfev += layer_results.nfev
+            nit += layer_results.nit
+
+            if keep_history:
+                histories = extend_histories(cost_function, histories)
+
         del layer_results["history"]
+        del layer_results["nit"]
+        del layer_results["nfev"]
 
-        return OptimizeResult(
-            **layer_results, **construct_history_info(cost_function, keep_history)
-        )
+        return OptimizeResult(**layer_results, **histories, nfev=nfev, nit=nit)
