@@ -1,6 +1,7 @@
+import numpy as np
 import pytest
 from openfermion import FermionOperator
-import numpy as np
+from zquantum.core.circuits import Circuit
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 from zquantum.vqe.singlet_uccsd import SingletUCCSDAnsatz
 
@@ -52,6 +53,22 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
         result_fop += -0.00783761365 * FermionOperator("7^ 1 2^ 0")
 
         return result_fop
+
+    @pytest.fixture
+    def expected_mp2_based_guess(self):
+        return np.array(
+            [
+                0.0,
+                0.0,
+                0.0,
+                -0.00821798,
+                -0.02528934,
+                -0.01426386,
+                0.0,
+                -0.00783761,
+                0.0,
+            ]
+        )
 
     def test_set_number_of_layers_invalidates_parametrized_circuit(self, ansatz):
         # This test overwrites test from base class AnsatzTests.
@@ -194,23 +211,26 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
 
         assert len(new_fop.terms) == expected_new_size
 
-    def test_generating_circuit_from_mp2_amplitudes(self, raw_ccsd_fop):
+    def test_computing_uccsd_vector_from_mp2_amplitudes(
+        self, raw_ccsd_fop, expected_mp2_based_guess
+    ):
         ansatz = SingletUCCSDAnsatz(4, 1)
-        expected_guess = np.array(
-            [
-                0.0,
-                0.0,
-                0.0,
-                -0.00821798,
-                -0.02528934,
-                -0.01426386,
-                0.0,
-                -0.00783761,
-                0.0,
-            ]
-        )
 
         np.testing.assert_array_almost_equal(
             ansatz._compute_uccsd_vector_from_mp2_amplitudes(raw_ccsd_fop),
-            expected_guess,
+            expected_mp2_based_guess,
         )
+
+    def test_generating_circuit_from_mp2_amplitudes(
+        self, raw_ccsd_fop, expected_mp2_based_guess
+    ):
+        ansatz = SingletUCCSDAnsatz(4, 1)
+
+        circuit = ansatz.generate_circuit_from_mp2_amplitudes(raw_ccsd_fop)
+        assert isinstance(circuit, Circuit)
+
+        # Let's create a simple mock here to check params
+        ansatz.get_executable_circuit = lambda x: x
+
+        passed_params = ansatz.generate_circuit_from_mp2_amplitudes(raw_ccsd_fop)
+        np.testing.assert_array_almost_equal(passed_params, expected_mp2_based_guess)
