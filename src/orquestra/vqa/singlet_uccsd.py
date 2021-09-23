@@ -106,14 +106,6 @@ class SingletUCCSDAnsatz(Ansatz):
             n_electrons=self.number_of_electrons,
         )
 
-    @property
-    def init_guess(self) -> np.ndarray:
-        return self._init_guess
-
-    @init_guess.setter
-    def init_guess(self, new_val: np.ndarray):
-        self._init_guess = new_val
-
     @staticmethod
     def screen_out_operator_terms_below_threshold(
         threshold: float, fermion_generator: FermionOperator, ignore_singles=False
@@ -144,9 +136,9 @@ class SingletUCCSDAnsatz(Ansatz):
         amplitudes = np.array(amplitudes)
         return amplitudes, new_fermion_generator
 
-    def generate_circuit_from_mp2_amplitudes(
+    def _compute_uccsd_vector_from_mp2_amplitudes(
         self, raw_mp2_operator: FermionOperator, screening_threshold: float = 0.0
-    ) -> Circuit:
+    ) -> np.ndarray:
         _, screened_mp2_operator = self.screen_out_operator_terms_below_threshold(
             screening_threshold, raw_mp2_operator
         )
@@ -164,7 +156,14 @@ class SingletUCCSDAnsatz(Ansatz):
             if term in ansatz_operator.terms.keys():
                 params_vector[int(ansatz_operator.terms[term]) - 1] = coeff
 
-        self.init_guess = params_vector
+        return params_vector
+
+    def generate_circuit_from_mp2_amplitudes(
+        self, raw_mp2_operator: FermionOperator, screening_threshold: float = 0.0
+    ) -> Circuit:
+        params_vector = self._compute_uccsd_vector_from_mp2_amplitudes(
+            raw_mp2_operator, screening_threshold
+        )
 
         return self.get_executable_circuit(params_vector)
 

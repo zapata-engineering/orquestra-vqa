@@ -210,6 +210,7 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
             ]
         )
 
-        ansatz.generate_circuit_from_mp2_amplitudes(raw_ccsd_fop)
-
-        np.testing.assert_array_almost_equal(ansatz.init_guess, expected_guess)
+        np.testing.assert_array_almost_equal(
+            ansatz.compute_uccsd_vector_from_mp2_amplitudes(raw_ccsd_fop),
+            expected_guess,
+        )
