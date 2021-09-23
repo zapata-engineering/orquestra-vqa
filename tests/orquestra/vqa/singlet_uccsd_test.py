@@ -211,6 +211,6 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
         )
 
         np.testing.assert_array_almost_equal(
-            ansatz.compute_uccsd_vector_from_mp2_amplitudes(raw_ccsd_fop),
+            ansatz._compute_uccsd_vector_from_mp2_amplitudes(raw_ccsd_fop),
             expected_guess,
         )
