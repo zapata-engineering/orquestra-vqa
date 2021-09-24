@@ -211,26 +211,26 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
 
         assert len(new_fop.terms) == expected_new_size
 
-    def test_computing_uccsd_vector_from_mp2_amplitudes(
+    def test_computing_uccsd_vector_from_fermion_generator(
         self, raw_ccsd_fop, expected_mp2_based_guess
     ):
         ansatz = SingletUCCSDAnsatz(4, 1)
 
         np.testing.assert_array_almost_equal(
-            ansatz._compute_uccsd_vector_from_mp2_amplitudes(raw_ccsd_fop),
+            ansatz.compute_uccsd_vector_from_fermion_generator(raw_ccsd_fop),
             expected_mp2_based_guess,
         )
 
-    def test_generating_circuit_from_mp2_amplitudes(
+    def test_generating_circuit_from_fermion_generator(
         self, raw_ccsd_fop, expected_mp2_based_guess
     ):
         ansatz = SingletUCCSDAnsatz(4, 1)
 
-        circuit = ansatz.generate_circuit_from_mp2_amplitudes(raw_ccsd_fop)
+        circuit = ansatz.generate_circuit_from_fermion_generator(raw_ccsd_fop)
         assert isinstance(circuit, Circuit)
 
         # Let's create a simple mock here to check params
         ansatz.get_executable_circuit = lambda x: x
 
-        passed_params = ansatz.generate_circuit_from_mp2_amplitudes(raw_ccsd_fop)
+        passed_params = ansatz.generate_circuit_from_fermion_generator(raw_ccsd_fop)
         np.testing.assert_array_almost_equal(passed_params, expected_mp2_based_guess)

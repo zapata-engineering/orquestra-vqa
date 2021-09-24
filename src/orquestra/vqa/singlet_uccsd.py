@@ -136,11 +136,11 @@ class SingletUCCSDAnsatz(Ansatz):
         amplitudes = np.array(amplitudes)
         return amplitudes, new_fermion_generator
 
-    def _compute_uccsd_vector_from_mp2_amplitudes(
-        self, raw_mp2_operator: FermionOperator, screening_threshold: float = 0.0
+    def compute_uccsd_vector_from_fermion_generator(
+        self, raw_fermion_generator: FermionOperator, screening_threshold: float = 0.0
     ) -> np.ndarray:
         _, screened_mp2_operator = self.screen_out_operator_terms_below_threshold(
-            screening_threshold, raw_mp2_operator
+            screening_threshold, raw_fermion_generator
         )
 
         ansatz_operator = uccsd_singlet_generator(
@@ -158,11 +158,11 @@ class SingletUCCSDAnsatz(Ansatz):
 
         return params_vector
 
-    def generate_circuit_from_mp2_amplitudes(
-        self, raw_mp2_operator: FermionOperator, screening_threshold: float = 0.0
+    def generate_circuit_from_fermion_generator(
+        self, raw_fermion_generator: FermionOperator, screening_threshold: float = 0.0
     ) -> Circuit:
-        params_vector = self._compute_uccsd_vector_from_mp2_amplitudes(
-            raw_mp2_operator, screening_threshold
+        params_vector = self.compute_uccsd_vector_from_fermion_generator(
+            raw_fermion_generator, screening_threshold
         )
 
         return self.get_executable_circuit(params_vector)
