@@ -111,7 +111,7 @@ class HEAQuantumCompilingAnsatz(Ansatz):
             Circuit
         """
         if parameters is None:
-            parameters = np.ndarray(self.symbols, dtype=object)
+            parameters = np.asarray(self.symbols, dtype=object)
 
         assert len(parameters) == self.number_of_params
 

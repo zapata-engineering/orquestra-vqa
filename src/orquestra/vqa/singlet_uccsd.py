@@ -185,7 +185,7 @@ class SingletUCCSDAnsatz(Ansatz):
             self._transformation,
         )
         if params is None:
-            params = np.array(
+            params = np.asarray(
                 [
                     sympy.Symbol("theta_" + str(i), real=True)
                     for i in range(self.number_of_params)
