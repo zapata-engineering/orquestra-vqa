@@ -45,7 +45,7 @@ class TestHEAQuantumCompilingAnsatz(AnsatzTests):
 
         # When/Then
         with pytest.raises(ValueError):
-            ansatz = HEAQuantumCompilingAnsatz(
+            _ = HEAQuantumCompilingAnsatz(
                 number_of_layers=incorrect_number_of_layers,
                 number_of_qubits=number_of_qubits,
             )
@@ -56,7 +56,7 @@ class TestHEAQuantumCompilingAnsatz(AnsatzTests):
     ):
         # When/Then
         with pytest.raises(AssertionError):
-            ansatz = HEAQuantumCompilingAnsatz(
+            _ = HEAQuantumCompilingAnsatz(
                 number_of_layers=number_of_layers,
                 number_of_qubits=odd_number_of_qubits,
             )

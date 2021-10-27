@@ -35,16 +35,21 @@ class SingletUCCSDAnsatz(Ansatz):
         Ansatz class representing Singlet UCCSD Ansatz.
 
         Args:
-            number_of_layers: number of layers of the ansatz. Since it's a UCCSD Ansatz, it can only be equal to 1.
+            number_of_layers: number of layers of the ansatz. Since it's
+                a UCCSD Ansatz, it can only be equal to 1.
             number_of_spatial_orbitals: number of spatial orbitals.
             number_of_alpha_electrons: number of alpha electrons.
-            transformation: transformation used for translation between fermions and qubits.
+            transformation: transformation used for translation between fermions
+                and qubits.
 
         Attributes:
-            number_of_beta_electrons: number of beta electrons (equal to number_of_alpha_electrons).
-            number_of_electrons: total number of electrons (number_of_alpha_electrons + number_of_beta_electrons).
+            number_of_beta_electrons: number of beta electrons
+                (equal to number_of_alpha_electrons).
+            number_of_electrons: total number of electrons (number_of_alpha_electrons
+                + number_of_beta_electrons).
             number_of_qubits: number of qubits required for the ansatz circuit.
-            number_of_params: number of the parameters that need to be set for the ansatz circuit.
+            number_of_params: number of the parameters that need to be set for
+                the ansatz circuit.
         """
         super().__init__(number_of_layers=number_of_layers)
         self._number_of_layers = number_of_layers
@@ -127,7 +132,7 @@ class SingletUCCSDAnsatz(Ansatz):
         amplitudes = []
         for op in fermion_generator.terms:
             if abs(fermion_generator.terms[op]) > threshold or (
-                len(op) == 2 and ignore_singles == True
+                len(op) == 2 and ignore_singles
             ):
                 new_fermion_generator += FermionOperator(
                     op, fermion_generator.terms[op]
@@ -206,15 +211,15 @@ class SingletUCCSDAnsatz(Ansatz):
         if self._number_of_spatial_orbitals < 2:
             raise (
                 ValueError(
-                    "Number of spatials orbitals must be greater or equal 2 and is {0}.".format(
-                        self._number_of_spatial_orbitals
-                    )
+                    "Number of spatials orbitals must be greater "
+                    "or equal 2 and is {0}.".format(self._number_of_spatial_orbitals)
                 )
             )
         if self._number_of_spatial_orbitals <= self._number_of_alpha_electrons:
             raise (
                 ValueError(
-                    "Number of spatial orbitals must be greater than number_of_alpha_electrons and is {0}".format(
+                    "Number of spatial orbitals must be greater than "
+                    "number_of_alpha_electrons and is {0}".format(
                         self._number_of_spatial_orbitals
                     )
                 )

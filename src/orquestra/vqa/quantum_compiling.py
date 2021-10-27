@@ -63,7 +63,8 @@ class HEAQuantumCompilingAnsatz(Ansatz):
             parameters: The variational parameters (or symbolic parameters)
 
         Returns:
-            Circuit containing a single layer of the Hardware Efficient Quantum Compiling Ansatz
+            Circuit containing a single layer of the Hardware Efficient Quantum
+            Compiling Ansatz
         """
         circuit_layer = Circuit()
 
@@ -143,7 +144,8 @@ class HEAQuantumCompilingAnsatz(Ansatz):
     def symbols(self) -> List[sympy.Symbol]:
         """
         Returns a list of symbolic parameters used for creating the ansatz.
-        The order of the symbols should match the order in which parameters should be passed for creating executable circuit.
+        The order of the symbols should match the order in which parameters
+        should be passed for creating executable circuit.
         """
         return np.asarray(
             [sympy.Symbol("theta_{}".format(i)) for i in range(self.number_of_params)]
