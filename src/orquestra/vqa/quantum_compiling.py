@@ -1,11 +1,11 @@
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.circuits import Circuit, RZ, RX, CNOT
-from zquantum.core.interfaces.ansatz_utils import ansatz_property
+from typing import List, Optional
 
-from typing import Optional, List
-from overrides import overrides
 import numpy as np
 import sympy
+from overrides import overrides
+from zquantum.core.circuits import CNOT, RX, RZ, Circuit
+from zquantum.core.interfaces.ansatz import Ansatz
+from zquantum.core.interfaces.ansatz_utils import ansatz_property
 
 
 class HEAQuantumCompilingAnsatz(Ansatz):
@@ -63,7 +63,8 @@ class HEAQuantumCompilingAnsatz(Ansatz):
             parameters: The variational parameters (or symbolic parameters)
 
         Returns:
-            Circuit containing a single layer of the Hardware Efficient Quantum Compiling Ansatz
+            Circuit containing a single layer of the Hardware Efficient Quantum
+            Compiling Ansatz
         """
         circuit_layer = Circuit()
 
@@ -104,13 +105,13 @@ class HEAQuantumCompilingAnsatz(Ansatz):
         """Builds the ansatz circuit (based on: 2011.12245, Fig. 1)
 
         Args:
-            params (numpy.array): input parameters of the circuit (1d array).
+            params (numpy.ndarray): input parameters of the circuit (1d array).
 
         Returns:
             Circuit
         """
         if parameters is None:
-            parameters = self.symbols
+            parameters = np.asarray(self.symbols, dtype=object)
 
         assert len(parameters) == self.number_of_params
 
@@ -143,8 +144,9 @@ class HEAQuantumCompilingAnsatz(Ansatz):
     def symbols(self) -> List[sympy.Symbol]:
         """
         Returns a list of symbolic parameters used for creating the ansatz.
-        The order of the symbols should match the order in which parameters should be passed for creating executable circuit.
+        The order of the symbols should match the order in which parameters
+        should be passed for creating executable circuit.
         """
-        return np.asarray(
-            [sympy.Symbol("theta_{}".format(i)) for i in range(self.number_of_params)]
-        )
+        return [
+            sympy.Symbol("theta_{}".format(i)) for i in range(self.number_of_params)
+        ]

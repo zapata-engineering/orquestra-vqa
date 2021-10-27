@@ -86,7 +86,7 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
 
         # When/Then
         with pytest.raises(ValueError):
-            ansatz = SingletUCCSDAnsatz(
+            _ = SingletUCCSDAnsatz(
                 number_of_layers=incorrect_number_of_layers,
                 number_of_spatial_orbitals=number_of_spatial_orbitals,
                 number_of_alpha_electrons=number_of_alpha_electrons,
@@ -95,7 +95,6 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
 
     def test_init_asserts_number_of_spatial_orbitals(
         self,
-        ansatz,
         number_of_layers,
         number_of_alpha_electrons,
         transformation,
@@ -105,7 +104,7 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
 
         # When/Then
         with pytest.raises(ValueError):
-            ansatz = SingletUCCSDAnsatz(
+            _ = SingletUCCSDAnsatz(
                 number_of_layers=number_of_layers,
                 number_of_spatial_orbitals=incorrect_number_of_spatial_orbitals,
                 number_of_alpha_electrons=number_of_alpha_electrons,
@@ -179,7 +178,7 @@ class TestSingletUCCSDAnsatz(AnsatzTests):
         with pytest.raises(ValueError):
             ansatz.number_of_spatial_orbitals = new_number_of_spatial_orbitals
 
-    def test_set_number_of_spatial_orbitals_asserts_when_smaller_than_number_of_alpha_electrons(
+    def test_set_number_of_spatial_orbitals_asserts_when_smaller_than_number_of_alpha_electrons(  # noqa: E501
         self, ansatz
     ):
         # Given

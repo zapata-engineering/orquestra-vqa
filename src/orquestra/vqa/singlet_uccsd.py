@@ -1,14 +1,13 @@
-import numpy as np
+from typing import Optional, Tuple
 
+import numpy as np
+import sympy
 from openfermion import (
-    uccsd_singlet_paramsize,
-    uccsd_singlet_generator,
     FermionOperator,
+    uccsd_singlet_generator,
+    uccsd_singlet_paramsize,
 )
 from overrides import overrides
-from typing import Optional, Tuple
-import sympy
-
 from zquantum.core.circuits import Circuit
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
@@ -16,7 +15,7 @@ from zquantum.core.interfaces.ansatz_utils import (
     invalidates_parametrized_circuit,
 )
 
-from .utils import exponentiate_fermion_operator, build_hartree_fock_circuit
+from .utils import build_hartree_fock_circuit, exponentiate_fermion_operator
 
 
 class SingletUCCSDAnsatz(Ansatz):
@@ -35,16 +34,21 @@ class SingletUCCSDAnsatz(Ansatz):
         Ansatz class representing Singlet UCCSD Ansatz.
 
         Args:
-            number_of_layers: number of layers of the ansatz. Since it's a UCCSD Ansatz, it can only be equal to 1.
+            number_of_layers: number of layers of the ansatz. Since it's
+                a UCCSD Ansatz, it can only be equal to 1.
             number_of_spatial_orbitals: number of spatial orbitals.
             number_of_alpha_electrons: number of alpha electrons.
-            transformation: transformation used for translation between fermions and qubits.
+            transformation: transformation used for translation between fermions
+                and qubits.
 
         Attributes:
-            number_of_beta_electrons: number of beta electrons (equal to number_of_alpha_electrons).
-            number_of_electrons: total number of electrons (number_of_alpha_electrons + number_of_beta_electrons).
+            number_of_beta_electrons: number of beta electrons
+                (equal to number_of_alpha_electrons).
+            number_of_electrons: total number of electrons (number_of_alpha_electrons
+                + number_of_beta_electrons).
             number_of_qubits: number of qubits required for the ansatz circuit.
-            number_of_params: number of the parameters that need to be set for the ansatz circuit.
+            number_of_params: number of the parameters that need to be set for
+                the ansatz circuit.
         """
         super().__init__(number_of_layers=number_of_layers)
         self._number_of_layers = number_of_layers
@@ -58,7 +62,7 @@ class SingletUCCSDAnsatz(Ansatz):
     def number_of_layers(self):
         return self._number_of_layers
 
-    @invalidates_parametrized_circuit
+    @invalidates_parametrized_circuit  # type: ignore
     @number_of_layers.setter
     def number_of_layers(self, new_number_of_layers):
         self._number_of_layers = new_number_of_layers
@@ -68,7 +72,7 @@ class SingletUCCSDAnsatz(Ansatz):
     def number_of_spatial_orbitals(self):
         return self._number_of_spatial_orbitals
 
-    @invalidates_parametrized_circuit
+    @invalidates_parametrized_circuit  # type: ignore
     @number_of_spatial_orbitals.setter
     def number_of_spatial_orbitals(self, new_number_of_spatial_orbitals):
         self._number_of_spatial_orbitals = new_number_of_spatial_orbitals
@@ -82,7 +86,7 @@ class SingletUCCSDAnsatz(Ansatz):
     def number_of_alpha_electrons(self):
         return self._number_of_alpha_electrons
 
-    @invalidates_parametrized_circuit
+    @invalidates_parametrized_circuit  # type: ignore
     @number_of_alpha_electrons.setter
     def number_of_alpha_electrons(self, new_number_of_alpha_electrons):
         self._number_of_alpha_electrons = new_number_of_alpha_electrons
@@ -127,14 +131,14 @@ class SingletUCCSDAnsatz(Ansatz):
         amplitudes = []
         for op in fermion_generator.terms:
             if abs(fermion_generator.terms[op]) > threshold or (
-                len(op) == 2 and ignore_singles == True
+                len(op) == 2 and ignore_singles
             ):
                 new_fermion_generator += FermionOperator(
                     op, fermion_generator.terms[op]
                 )
                 amplitudes.append(fermion_generator.terms[op])
-        amplitudes = np.array(amplitudes)
-        return amplitudes, new_fermion_generator
+        amplitudes_array = np.asarray(amplitudes)
+        return amplitudes_array, new_fermion_generator
 
     def compute_uccsd_vector_from_fermion_generator(
         self, raw_fermion_generator: FermionOperator, screening_threshold: float = 0.0
@@ -181,10 +185,12 @@ class SingletUCCSDAnsatz(Ansatz):
             self._transformation,
         )
         if params is None:
-            params = [
-                sympy.Symbol("theta_" + str(i), real=True)
-                for i in range(self.number_of_params)
-            ]
+            params = np.asarray(
+                [
+                    sympy.Symbol("theta_" + str(i), real=True)
+                    for i in range(self.number_of_params)
+                ]
+            )
         # Build UCCSD generator
         fermion_generator = uccsd_singlet_generator(
             params,
@@ -206,15 +212,15 @@ class SingletUCCSDAnsatz(Ansatz):
         if self._number_of_spatial_orbitals < 2:
             raise (
                 ValueError(
-                    "Number of spatials orbitals must be greater or equal 2 and is {0}.".format(
-                        self._number_of_spatial_orbitals
-                    )
+                    "Number of spatials orbitals must be greater "
+                    "or equal 2 and is {0}.".format(self._number_of_spatial_orbitals)
                 )
             )
         if self._number_of_spatial_orbitals <= self._number_of_alpha_electrons:
             raise (
                 ValueError(
-                    "Number of spatial orbitals must be greater than number_of_alpha_electrons and is {0}".format(
+                    "Number of spatial orbitals must be greater than "
+                    "number_of_alpha_electrons and is {0}".format(
                         self._number_of_spatial_orbitals
                     )
                 )
