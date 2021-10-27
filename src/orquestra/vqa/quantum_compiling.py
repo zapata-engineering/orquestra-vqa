@@ -1,11 +1,11 @@
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.circuits import Circuit, RZ, RX, CNOT
-from zquantum.core.interfaces.ansatz_utils import ansatz_property
+from typing import List, Optional
 
-from typing import Optional, List
-from overrides import overrides
 import numpy as np
 import sympy
+from overrides import overrides
+from zquantum.core.circuits import CNOT, RX, RZ, Circuit
+from zquantum.core.interfaces.ansatz import Ansatz
+from zquantum.core.interfaces.ansatz_utils import ansatz_property
 
 
 class HEAQuantumCompilingAnsatz(Ansatz):
