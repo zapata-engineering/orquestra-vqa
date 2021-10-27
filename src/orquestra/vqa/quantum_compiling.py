@@ -105,13 +105,13 @@ class HEAQuantumCompilingAnsatz(Ansatz):
         """Builds the ansatz circuit (based on: 2011.12245, Fig. 1)
 
         Args:
-            params (numpy.array): input parameters of the circuit (1d array).
+            params (numpy.ndarray): input parameters of the circuit (1d array).
 
         Returns:
             Circuit
         """
         if parameters is None:
-            parameters = self.symbols
+            parameters = np.ndarray(self.symbols, dtype=object)
 
         assert len(parameters) == self.number_of_params
 
@@ -147,6 +147,6 @@ class HEAQuantumCompilingAnsatz(Ansatz):
         The order of the symbols should match the order in which parameters
         should be passed for creating executable circuit.
         """
-        return np.asarray(
-            [sympy.Symbol("theta_{}".format(i)) for i in range(self.number_of_params)]
-        )
+        return [
+            sympy.Symbol("theta_{}".format(i)) for i in range(self.number_of_params)
+        ]

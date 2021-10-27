@@ -63,7 +63,7 @@ class SingletUCCSDAnsatz(Ansatz):
     def number_of_layers(self):
         return self._number_of_layers
 
-    @invalidates_parametrized_circuit
+    @invalidates_parametrized_circuit  # type: ignore
     @number_of_layers.setter
     def number_of_layers(self, new_number_of_layers):
         self._number_of_layers = new_number_of_layers
@@ -73,7 +73,7 @@ class SingletUCCSDAnsatz(Ansatz):
     def number_of_spatial_orbitals(self):
         return self._number_of_spatial_orbitals
 
-    @invalidates_parametrized_circuit
+    @invalidates_parametrized_circuit  # type: ignore
     @number_of_spatial_orbitals.setter
     def number_of_spatial_orbitals(self, new_number_of_spatial_orbitals):
         self._number_of_spatial_orbitals = new_number_of_spatial_orbitals
@@ -87,7 +87,7 @@ class SingletUCCSDAnsatz(Ansatz):
     def number_of_alpha_electrons(self):
         return self._number_of_alpha_electrons
 
-    @invalidates_parametrized_circuit
+    @invalidates_parametrized_circuit  # type: ignore
     @number_of_alpha_electrons.setter
     def number_of_alpha_electrons(self, new_number_of_alpha_electrons):
         self._number_of_alpha_electrons = new_number_of_alpha_electrons
@@ -138,8 +138,8 @@ class SingletUCCSDAnsatz(Ansatz):
                     op, fermion_generator.terms[op]
                 )
                 amplitudes.append(fermion_generator.terms[op])
-        amplitudes = np.array(amplitudes)
-        return amplitudes, new_fermion_generator
+        amplitudes_array = np.asarray(amplitudes)
+        return amplitudes_array, new_fermion_generator
 
     def compute_uccsd_vector_from_fermion_generator(
         self, raw_fermion_generator: FermionOperator, screening_threshold: float = 0.0
@@ -186,10 +186,12 @@ class SingletUCCSDAnsatz(Ansatz):
             self._transformation,
         )
         if params is None:
-            params = [
-                sympy.Symbol("theta_" + str(i), real=True)
-                for i in range(self.number_of_params)
-            ]
+            params = np.array(
+                [
+                    sympy.Symbol("theta_" + str(i), real=True)
+                    for i in range(self.number_of_params)
+                ]
+            )
         # Build UCCSD generator
         fermion_generator = uccsd_singlet_generator(
             params,
