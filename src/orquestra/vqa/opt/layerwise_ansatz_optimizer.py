@@ -1,6 +1,6 @@
 import copy
 from collections import defaultdict
-from typing import Callable
+from typing import Callable, Dict
 
 import numpy as np
 from scipy.optimize import OptimizeResult
@@ -117,7 +117,7 @@ class LayerwiseAnsatzOptimizer(NestedOptimizer):
 
         nit = 0
         nfev = 0
-        histories = defaultdict(list)
+        histories: Dict = defaultdict(list)
         histories["history"] = []
         initial_params_per_iteration = initial_params
         optimal_params = np.array([])
@@ -131,7 +131,7 @@ class LayerwiseAnsatzOptimizer(NestedOptimizer):
                     ansatz.number_of_params, optimal_params
                 )
 
-            cost_function = cost_function_factory(ansatz=ansatz)
+            cost_function = cost_function_factory(ansatz=ansatz)  # type: ignore
 
             if keep_history:
                 cost_function = self.recorder(cost_function)
@@ -139,7 +139,7 @@ class LayerwiseAnsatzOptimizer(NestedOptimizer):
                 cost_function, initial_params_per_iteration, keep_history=False
             )
 
-            optimal_params: np.ndarray = layer_results.opt_params
+            optimal_params = layer_results.opt_params
             ansatz.number_of_layers += self._n_layers_per_iteration
 
             nfev += layer_results.nfev
