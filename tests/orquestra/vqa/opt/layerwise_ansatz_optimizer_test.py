@@ -129,5 +129,3 @@ def test_append_random_params(target_size, params):
 def test_append_random_params_fails_for_wrong_input(target_size, params):
     with pytest.raises(AssertionError):
         _ = append_random_params(target_size, params)
-
-
