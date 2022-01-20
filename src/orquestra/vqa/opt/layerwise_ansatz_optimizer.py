@@ -120,7 +120,7 @@ class LayerwiseAnsatzOptimizer(NestedOptimizer):
         histories: Dict = defaultdict(list)
         histories["history"] = []
         initial_params_per_iteration = initial_params
-        optimal_params = np.array([])
+        optimal_params: np.ndarray = np.array([])
         for i in range(
             self._min_layer, self._max_layer + 1, self._n_layers_per_iteration
         ):
