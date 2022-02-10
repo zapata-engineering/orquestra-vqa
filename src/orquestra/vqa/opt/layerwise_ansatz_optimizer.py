@@ -1,6 +1,6 @@
 import copy
 from collections import defaultdict
-from typing import Callable, Dict
+from typing import Callable, Dict, cast
 
 import numpy as np
 from scipy.optimize import OptimizeResult
@@ -12,7 +12,7 @@ from zquantum.core.interfaces.optimizer import (
     Optimizer,
     extend_histories,
 )
-from zquantum.core.typing import RecorderFactory
+from zquantum.core.typing import AnyRecorder, RecorderFactory
 
 
 def append_random_params(target_size: int, params: np.ndarray) -> np.ndarray:
@@ -146,7 +146,9 @@ class LayerwiseAnsatzOptimizer(NestedOptimizer):
             nit += layer_results.nit
 
             if keep_history:
-                histories = extend_histories(cost_function, histories)
+                histories = extend_histories(
+                    cast(AnyRecorder, cost_function), histories
+                )
 
         del layer_results["history"]
         del layer_results["nit"]
