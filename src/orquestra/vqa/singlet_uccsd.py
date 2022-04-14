@@ -2,17 +2,17 @@ from typing import Optional, Tuple
 
 import numpy as np
 import sympy
-from openfermion import (
-    FermionOperator,
-    uccsd_singlet_generator,
-    uccsd_singlet_paramsize,
-)
 from overrides import overrides
 from zquantum.core.circuits import Circuit
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
     ansatz_property,
     invalidates_parametrized_circuit,
+)
+from zquantum.core.openfermion import (
+    FermionOperator,
+    uccsd_singlet_generator,
+    uccsd_singlet_paramsize,
 )
 
 from .utils import build_hartree_fock_circuit, exponentiate_fermion_operator

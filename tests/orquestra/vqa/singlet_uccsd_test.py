@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
-from openfermion import FermionOperator
 from zquantum.core.circuits import Circuit
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
+from zquantum.core.openfermion import FermionOperator
 from zquantum.vqe.singlet_uccsd import SingletUCCSDAnsatz
 
 
