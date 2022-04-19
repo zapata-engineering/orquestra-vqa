@@ -1,3 +1,6 @@
+################################################################################
+# © Copyright 2021 Zapata Computing Inc.
+################################################################################
 import pytest
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 from zquantum.vqe.quantum_compiling import HEAQuantumCompilingAnsatz
