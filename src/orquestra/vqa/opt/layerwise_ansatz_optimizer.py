@@ -1,3 +1,6 @@
+################################################################################
+# © Copyright 2021-2022 Zapata Computing Inc.
+################################################################################
 import copy
 from collections import defaultdict
 from typing import Callable, Dict, cast
