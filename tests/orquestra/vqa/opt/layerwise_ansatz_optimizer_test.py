@@ -1,3 +1,6 @@
+################################################################################
+# © Copyright 2021-2022 Zapata Computing Inc.
+################################################################################
 from unittest import mock
 
 import numpy as np
@@ -23,7 +26,7 @@ def initial_params():
 
 def cost_function_factory(ansatz):
     def cost_function(x):
-        return sum(x ** 2) * ansatz.number_of_layers
+        return sum(x**2) * ansatz.number_of_layers
 
     return cost_function
 
