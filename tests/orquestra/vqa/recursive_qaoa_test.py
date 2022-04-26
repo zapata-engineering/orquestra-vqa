@@ -22,7 +22,7 @@ from orquestra.quantum.estimation._estimationimport import (
 from orquestra.quantum.openfermion import IsingOperator, SymbolicOperator
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 
-from orquestra. import QAOAFarhiAnsatz
+from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
 from orquestra.vqa.api.ansatz import Ansatz
 from orquestra.vqa.opt.recursive_qaoa import (
     RecursiveQAOA,
