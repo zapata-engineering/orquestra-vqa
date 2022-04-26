@@ -49,7 +49,7 @@ def get_new_layer_params_using_interp(
         old_params: params that we want to extend
     """
 
-    if not target_size > len(old_params):
+    if target_size <= len(old_params):
         raise ValueError("Target size must be larger than old params.")
     if not len(old_params) % 2 == target_size % 2 == 0:
         raise ValueError("Size of both old and target parameters must be even.")
