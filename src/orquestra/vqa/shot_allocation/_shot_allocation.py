@@ -2,6 +2,16 @@
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
 
+from typing import List, Optional, Tuple, cast
+
+import numpy as np
+from orquestra.quantum.api.estimation import EstimationTask
+from orquestra.quantum.measurements import ExpectationValues
+from orquestra.quantum.openfermion import QubitOperator
+from orquestra.quantum.utils import scale_and_discretize
+
+from orquestra.vqa.grouping._grouping import compute_group_variances
+
 
 def allocate_shots_uniformly(
     estimation_tasks: List[EstimationTask], number_of_shots: int
@@ -32,7 +42,7 @@ def allocate_shots_proportionally(
 ) -> List[EstimationTask]:
     """Allocates specified number of shots proportionally to the variance associated
     with each operator in a list of estimation tasks. For more details please refer to
-    the documentation of `zquantum.core.hamiltonian.estimate_nmeas_for_frames`.
+    the documentation of `orquestra.vqa.shot_allocation._shot_allocation`.
 
     Args:
         total_n_shots: total number of shots to be allocated

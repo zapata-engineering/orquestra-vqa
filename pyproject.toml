@@ -25,6 +25,7 @@ module = [
     'scipy.*',
     'sympy.*',
     'rapidjson',
+    'overrides.*'
 ]
 ignore_missing_imports = true
 

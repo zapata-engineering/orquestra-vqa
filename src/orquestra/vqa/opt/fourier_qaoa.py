@@ -7,22 +7,15 @@ from collections import defaultdict
 from typing import Callable, Dict, List, Optional, cast
 
 import numpy as np
+from orquestra.opt.api.cost_function import CostFunction
+from orquestra.opt.api.functions import CallableWithGradient, function_with_gradient
+from orquestra.opt.api.optimizer import NestedOptimizer, Optimizer, extend_histories
+from orquestra.opt.gradients import finite_differences_gradient
+from orquestra.opt.history.recorder import AnyRecorder, HistoryEntry, RecorderFactory
+from orquestra.opt.history.recorder import recorder as _recorder
 from scipy.optimize import OptimizeResult
-from zquantum.core.gradients import finite_differences_gradient
-from zquantum.core.history.recorder import HistoryEntry
-from zquantum.core.history.recorder import recorder as _recorder
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.cost_function import CostFunction
-from zquantum.core.interfaces.functions import (
-    CallableWithGradient,
-    function_with_gradient,
-)
-from zquantum.core.interfaces.optimizer import (
-    NestedOptimizer,
-    Optimizer,
-    extend_histories,
-)
-from zquantum.core.typing import AnyRecorder, RecorderFactory
+
+from orquestra.vqa.api.ansatz import Ansatz
 
 
 class FourierOptimizer(NestedOptimizer):

@@ -6,15 +6,13 @@ from typing import List, Optional
 
 import numpy as np
 import sympy
+from orquestra.quantum.circuits import RX, RZ, XX, Circuit, create_layer_of_gates
 from overrides import overrides
-from zquantum.core.circuits import RX, RZ, XX, Circuit, create_layer_of_gates
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.ansatz_utils import ansatz_property
 
-from .ansatz_utils import get_entangling_layer
+from orquestra.vqa.api.ansatz import Ansatz
+from orquestra.vqa.api.ansatz_utils import ansatz_property
 
-ANSATZ_SCHEMA = "zquantum.qcbm.ansatz.v1"
-ANSATZSET_SCHEMA = "zquantum.qcbm.ansatzset.v1"
+from ._qcbm_utils import get_entangling_layer
 
 
 class QCBMAnsatz(Ansatz):
@@ -300,7 +298,6 @@ class QCBMAnsatz(Ansatz):
             dictionary (dict): the dictionary
         """
         dictionary = {
-            "schema": ANSATZ_SCHEMA,
             "number_of_layers": self.number_of_layers,
             "number_of_qubits": self.number_of_qubits,
             "topology": self.topology,
@@ -330,7 +327,6 @@ def save_qcbm_ansatz_set(qcbm_ansatz_set: List[QCBMAnsatz], filename: str) -> No
         file (str): the name of the file
     """
     dictionary = {
-        "schema": ANSATZSET_SCHEMA,
         "qcbm_ansatz_set": [ansatz.to_dict() for ansatz in qcbm_ansatz_set],
     }
 

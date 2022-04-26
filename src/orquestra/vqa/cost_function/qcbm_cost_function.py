@@ -6,16 +6,17 @@ from numbers import Number
 from typing import Callable
 
 import numpy as np
-from zquantum.core.bitstring_distribution import (
-    BitstringDistribution,
+from orquestra.opt.api.cost_function import CostFunction
+from orquestra.opt.api.functions import StoreArtifact, function_with_gradient
+from orquestra.opt.gradients import finite_differences_gradient
+from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.distributions import (
+    MeasurementOutcomeDistribution,
     evaluate_distribution_distance,
 )
-from zquantum.core.gradients import finite_differences_gradient
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.backend import QuantumBackend
-from zquantum.core.interfaces.cost_function import CostFunction
-from zquantum.core.interfaces.functions import StoreArtifact, function_with_gradient
-from zquantum.core.utils import ValueEstimate
+from orquestra.quantum.utils import ValueEstimate
+
+from orquestra.vqa.api.ansatz import Ansatz
 
 GradientFactory = Callable[[Callable], Callable[[np.ndarray], np.ndarray]]
 DistanceMeasure = Callable[..., Number]
@@ -27,7 +28,7 @@ def QCBMCostFunction(
     n_samples: int,
     distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
-    target_bitstring_distribution: BitstringDistribution,
+    target_bitstring_distribution: MeasurementOutcomeDistribution,
     gradient_type: str = "finite_difference",
     gradient_kwargs: dict = None,
 ) -> CostFunction:
@@ -83,7 +84,7 @@ def _create_QCBM_cost_function(
     n_samples: int,
     distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
-    target_bitstring_distribution: BitstringDistribution,
+    target_bitstring_distribution: MeasurementOutcomeDistribution,
 ):
     assert (
         int(target_bitstring_distribution.get_number_of_subsystems())

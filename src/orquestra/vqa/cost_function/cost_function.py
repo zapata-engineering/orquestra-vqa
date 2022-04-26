@@ -6,37 +6,37 @@ from typing import Any, Callable, Iterable, List, Optional, Union
 
 import numpy as np
 import sympy
-from zquantum.core.openfermion import SymbolicOperator
-
-from .circuits import Circuit
-from .estimation import (
-    estimate_expectation_values_by_averaging,
-    evaluate_estimation_circuits,
-)
-from .gradients import finite_differences_gradient
-from .interfaces.ansatz import Ansatz
-from .interfaces.ansatz_utils import combine_ansatz_params
-from .interfaces.backend import QuantumBackend
-from .interfaces.cost_function import CostFunction, ParameterPreprocessor
-from .interfaces.estimation import (
-    EstimateExpectationValues,
-    EstimationPreprocessor,
-    EstimationTask,
-    EstimationTasksFactory,
-)
-from .interfaces.functions import (
+from orquestra.opt.api.functions import (
     FunctionWithGradient,
     FunctionWithGradientStoringArtifacts,
     StoreArtifact,
     function_with_gradient,
 )
-from .measurement import (
+from orquestra.opt.gradients import finite_differences_gradient
+from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.api.estimation import (
+    EstimateExpectationValues,
+    EstimationPreprocessor,
+    EstimationTask,
+    EstimationTasksFactory,
+)
+from orquestra.quantum.circuits import Circuit
+from orquestra.quantum.estimation import (
+    estimate_expectation_values_by_averaging,
+    evaluate_estimation_circuits,
+)
+from orquestra.quantum.measurements import (
     ExpectationValues,
     concatenate_expectation_values,
     expectation_values_to_real,
 )
-from .typing import SupportsLessThan
-from .utils import ValueEstimate, create_symbols_map
+from orquestra.quantum.openfermion import SymbolicOperator
+from orquestra.quantum.typing import SupportsLessThan
+from orquestra.quantum.utils import ValueEstimate, create_symbols_map
+
+from ..api.ansatz import Ansatz
+from ..api.ansatz_utils import combine_ansatz_params
+from ..cost_function.cost_function import CostFunction, ParameterPreprocessor
 
 GradientFactory = Callable[[Callable], Callable[[np.ndarray], np.ndarray]]
 SymbolsSortKey = Callable[[sympy.Symbol], SupportsLessThan]
@@ -89,7 +89,7 @@ def get_ground_state_cost_function(
             using parameter_precision
         gradient_function: a function which returns a function used to compute the
             gradient of the cost function (see
-            zquantum.core.gradients.finite_differences_gradient for reference)
+            orquestra.opt.gradients.finite_differences_gradient for reference)
         symbols_sort_key: key defining ordering on parametrized_circuits free symbols.
             If s1,...,sN are all free symbols in parametrized_circuit, and cost function
             is called with `parameters` then the following binding occurs:
@@ -361,7 +361,7 @@ def create_cost_function(
             adhere to the ParameterPreprocessor protocol.
         gradient_function: a function which returns a function used to compute the
             gradient of the cost function (see
-            zquantum.core.gradients.finite_differences_gradient for reference)
+            orquestra.opt.gradients.finite_differences_gradient for reference)
 
     Returns:
         A callable CostFunction object.

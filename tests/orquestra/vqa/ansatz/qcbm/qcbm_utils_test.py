@@ -3,9 +3,10 @@
 ################################################################################
 import numpy as np
 import pytest
-from zquantum.core.circuits import RX, XX
-from zquantum.qcbm.ansatz import QCBMAnsatz
-from zquantum.qcbm.ansatz_utils import (
+from orquestra.quantum.circuits import XX
+
+from orquestra.vqa.ansatz.qcbm._qcbm import (
+    QCBMAnsatz,
     adjacency_list_to_matrix,
     get_entangling_layer,
     get_entangling_layer_all_topology,

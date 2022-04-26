@@ -5,9 +5,9 @@ from typing import Optional, Union
 
 import numpy as np
 import sympy
-from zquantum.core.circuits import Circuit, X
-from zquantum.core.evolution import time_evolution
-from zquantum.core.openfermion import (
+from orquestra.quantum.circuits import Circuit, X
+from orquestra.quantum.evolution import time_evolution
+from orquestra.quantum.openfermion import (
     FermionOperator,
     InteractionOperator,
     bravyi_kitaev,
@@ -81,7 +81,7 @@ def build_hartree_fock_circuit(
         spin_ordering: the spin ordering convention to use. Defaults to "interleaved".
 
     Returns:
-        zquantum.core.circuit.Circuit: a circuit that prepares the Hartree-Fock state.
+        orquestra.quantum.circuit.Circuit: a circuit that prepares the Hartree-Fock state.
     """
     if spin_ordering != "interleaved":
         raise RuntimeError(

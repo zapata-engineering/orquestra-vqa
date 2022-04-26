@@ -5,12 +5,17 @@ from typing import Optional, Union
 
 import numpy as np
 import sympy
+from orquestra.quantum.circuits import RY, RZ, Circuit, create_layer_of_gates
+from orquestra.quantum.evolution import time_evolution
+from orquestra.quantum.openfermion import (
+    IsingOperator,
+    QubitOperator,
+    change_operator_type,
+)
+from orquestra.quantum.openfermion.utils import count_qubits
 from overrides import overrides
-from zquantum.core.circuits import RY, RZ, Circuit, create_layer_of_gates
-from zquantum.core.evolution import time_evolution
-from zquantum.core.interfaces.ansatz import Ansatz, ansatz_property
-from zquantum.core.openfermion import IsingOperator, QubitOperator, change_operator_type
-from zquantum.core.openfermion.utils import count_qubits
+
+from orquestra.vqa.api.ansatz import Ansatz, ansatz_property
 
 
 class WarmStartQAOAAnsatz(Ansatz):

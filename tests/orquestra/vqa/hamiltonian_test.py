@@ -5,7 +5,17 @@ import math
 
 import numpy as np
 import pytest
-from zquantum.core.hamiltonian import (
+from orquestra.quantum.measurements import ExpectationValues
+from orquestra.quantum.openfermion import (
+    FermionOperator,
+    InteractionRDM,
+    QubitOperator,
+    eigenspectrum,
+    get_interaction_operator,
+    jordan_wigner,
+)
+
+from orquestra.vqa.grouping._grouping import (
     compute_group_variances,
     estimate_nmeas_for_frames,
     get_expectation_values_from_rdms,
@@ -13,15 +23,6 @@ from zquantum.core.hamiltonian import (
     group_comeasureable_terms_greedy,
     is_comeasureable,
     reorder_fermionic_modes,
-)
-from zquantum.core.measurement import ExpectationValues
-from zquantum.core.openfermion import (
-    FermionOperator,
-    InteractionRDM,
-    QubitOperator,
-    eigenspectrum,
-    get_interaction_operator,
-    jordan_wigner,
 )
 
 h2_hamiltonian = QubitOperator(

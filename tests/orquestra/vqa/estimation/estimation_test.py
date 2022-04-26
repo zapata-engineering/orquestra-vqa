@@ -6,30 +6,35 @@ from functools import partial
 import numpy as np
 import pytest
 import sympy
-from zquantum.core.circuits import RX, RY, RZ, Circuit, H, I, X
-from zquantum.core.estimation import (
-    allocate_shots_proportionally,
-    allocate_shots_uniformly,
+from orquestra.quantum.api.estimation import EstimationTask
+from orquestra.quantum.circuits import RX, RY, RZ, Circuit, H, I, X
+from orquestra.quantum.estimation._estimation import (
     calculate_exact_expectation_values,
     estimate_expectation_values_by_averaging,
     evaluate_estimation_circuits,
     evaluate_non_measured_estimation_tasks,
-    get_context_selection_circuit_for_group,
-    group_greedily,
-    group_individually,
-    perform_context_selection,
     split_estimation_tasks_to_measure,
 )
-from zquantum.core.interfaces.estimation import EstimationTask
-from zquantum.core.interfaces.mock_objects import MockQuantumBackend
-from zquantum.core.measurement import ExpectationValues, Measurements
-from zquantum.core.openfermion import (
+from orquestra.quantum.measurements import ExpectationValues, Measurements
+from orquestra.quantum.openfermion import (
     IsingOperator,
     QubitOperator,
     qubit_operator_sparse,
 )
-from zquantum.core.openfermion.zapata_utils._utils import change_operator_type
-from zquantum.core.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.openfermion.zapata_utils._utils import change_operator_type
+from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from zquantum.core.interfaces.mock_objects import MockQuantumBackend
+
+from orquestra.vqa.estimation.context_selection import (
+    get_context_selection_circuit_for_group,
+    group_greedily,
+    group_individually,
+    perform_context_selection,
+)
+from orquestra.vqa.shot_allocation._shot_allocation import (
+    allocate_shots_proportionally,
+    allocate_shots_uniformly,
+)
 
 
 class TestEstimatorUtils:

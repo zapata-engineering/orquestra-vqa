@@ -1,18 +1,12 @@
 ################################################################################
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
-from typing import Dict, List, Optional, Tuple, cast
+from typing import List, Tuple, cast
 
 import numpy as np
-import sympy
-from zquantum.core.openfermion import IsingOperator, QubitOperator
-
-from ..circuits import RX, RY, Circuit
-from ..interfaces.backend import QuantumBackend, QuantumSimulator
-from ..interfaces.estimation import EstimationTask
-from ..measurement import ExpectationValues, expectation_values_to_real
-from ..openfermion import change_operator_type
-from ..utils import scale_and_discretize
+from orquestra.quantum.api.estimation import EstimationTask
+from orquestra.quantum.circuits import RX, RY, Circuit
+from orquestra.quantum.openfermion import IsingOperator, QubitOperator
 
 
 def get_context_selection_circuit_for_group(

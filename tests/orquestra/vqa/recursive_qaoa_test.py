@@ -6,24 +6,25 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 import pytest
-from zquantum.core.cost_function import (
+from orquestra.opt.api.cost_function import CostFunction
+from orquestra.opt.api.optimizer import optimization_result
+from orquestra.opt.api.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
+from orquestra.opt.cost_function.cost_function import (
     create_cost_function,
     substitution_based_estimation_tasks_factory,
 )
-from zquantum.core.estimation import (
+from orquestra.opt.mock_objects import MockOptimizer
+from orquestra.quantum.api.estimation import EstimationTask
+from orquestra.quantum.estimation._estimationimport import (
     allocate_shots_uniformly,
     estimate_expectation_values_by_averaging,
 )
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.cost_function import CostFunction
-from zquantum.core.interfaces.estimation import EstimationTask
-from zquantum.core.interfaces.mock_objects import MockOptimizer
-from zquantum.core.interfaces.optimizer import optimization_result
-from zquantum.core.interfaces.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
-from zquantum.core.openfermion import IsingOperator, SymbolicOperator
-from zquantum.core.symbolic_simulator import SymbolicSimulator
-from zquantum.qaoa.ansatzes import QAOAFarhiAnsatz
-from zquantum.qaoa.recursive_qaoa import (
+from orquestra.quantum.openfermion import IsingOperator, SymbolicOperator
+from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+
+from orquestra. import QAOAFarhiAnsatz
+from orquestra.vqa.api.ansatz import Ansatz
+from orquestra.vqa.opt.recursive_qaoa import (
     RecursiveQAOA,
     _create_default_qubit_map,
     _create_reduced_hamiltonian,

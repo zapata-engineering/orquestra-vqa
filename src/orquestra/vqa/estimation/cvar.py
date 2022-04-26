@@ -1,20 +1,17 @@
 ################################################################################
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
-from typing import Dict, List, Optional, Sequence, Tuple, TypeVar
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
+from orquestra.quantum.api.backend import QuantumBackend, QuantumSimulator
+from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
+from orquestra.quantum.distributions import MeasurementOutcomeDistribution
+from orquestra.quantum.measurements import ExpectationValues, check_parity_of_vector
+from orquestra.quantum.openfermion import IsingOperator
+from orquestra.quantum.utils import dec2bin
+from orquestra.quantum.wavefunction import Wavefunction
 from typing_extensions import overload
-from zquantum.core.bitstring_distribution import BitstringDistribution
-from zquantum.core.interfaces.backend import QuantumBackend, QuantumSimulator
-from zquantum.core.interfaces.estimation import (
-    EstimateExpectationValues,
-    EstimationTask,
-)
-from zquantum.core.measurement import ExpectationValues, check_parity_of_vector
-from zquantum.core.openfermion import IsingOperator
-from zquantum.core.utils import dec2bin
-from zquantum.core.wavefunction import Wavefunction
 
 PROBABILITY_CUTOFF = 1e-8
 
@@ -109,7 +106,7 @@ class CvarEstimator(EstimateExpectationValues):
 
 
 def _calculate_expectation_value_for_distribution(
-    distribution: BitstringDistribution, operator: IsingOperator, alpha: float
+    distribution: MeasurementOutcomeDistribution, operator: IsingOperator, alpha: float
 ) -> float:
     # Calculates expectation value per bitstring
     expectation_values = _calculate_expectation_values(

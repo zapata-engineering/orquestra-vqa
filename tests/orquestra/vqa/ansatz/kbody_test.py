@@ -3,10 +3,11 @@
 ################################################################################
 import pytest
 import sympy
-from zquantum.core.circuits import CNOT, RZ, Circuit, H
-from zquantum.core.interfaces.ansatz_test import AnsatzTests
-from zquantum.core.utils import compare_unitary
-from zquantum.qaoa.ansatzes import XAnsatz, XZAnsatz
+from orquestra.quantum.circuits import CNOT, RZ, Circuit, H
+from orquestra.quantum.utils import compare_unitary
+
+from orquestra.vqa.ansatz.kbody import XAnsatz, XZAnsatz
+from orquestra.vqa.api.ansatz_test import AnsatzTests
 
 
 def create_thetas(number_of_params):

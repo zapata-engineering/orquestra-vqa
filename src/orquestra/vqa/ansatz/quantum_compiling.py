@@ -5,10 +5,11 @@ from typing import List, Optional
 
 import numpy as np
 import sympy
+from orquestra.quantum.circuits import CNOT, RX, RZ, Circuit
 from overrides import overrides
-from zquantum.core.circuits import CNOT, RX, RZ, Circuit
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.ansatz_utils import ansatz_property
+
+from orquestra.vqa.api.ansatz import Ansatz
+from orquestra.vqa.api.ansatz_utils import ansatz_property
 
 
 class HEAQuantumCompilingAnsatz(Ansatz):

@@ -3,16 +3,12 @@
 ################################################################################
 
 import copy
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import List, Tuple, cast
 
 import numpy as np
-from zquantum.core.openfermion.ops import (
-    InteractionOperator,
-    InteractionRDM,
-    QubitOperator,
-)
-
-from .measurement import ExpectationValues, expectation_values_to_real
+from orquestra.quantum.api.estimation import EstimationTask
+from orquestra.quantum.measurements import ExpectationValues, expectation_values_to_real
+from orquestra.quantum.openfermion.ops import QubitOperator
 
 
 def group_individually(estimation_tasks: List[EstimationTask]) -> List[EstimationTask]:

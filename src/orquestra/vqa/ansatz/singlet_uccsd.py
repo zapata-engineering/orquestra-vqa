@@ -5,17 +5,18 @@ from typing import Optional, Tuple
 
 import numpy as np
 import sympy
-from overrides import overrides
-from zquantum.core.circuits import Circuit
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.ansatz_utils import (
-    ansatz_property,
-    invalidates_parametrized_circuit,
-)
-from zquantum.core.openfermion import (
+from orquestra.quantum.circuits import Circuit
+from orquestra.quantum.openfermion import (
     FermionOperator,
     uccsd_singlet_generator,
     uccsd_singlet_paramsize,
+)
+from overrides import overrides
+
+from orquestra.vqa.api.ansatz import Ansatz
+from orquestra.vqa.api.ansatz_utils import (
+    ansatz_property,
+    invalidates_parametrized_circuit,
 )
 
 from .utils import build_hartree_fock_circuit, exponentiate_fermion_operator

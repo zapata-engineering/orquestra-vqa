@@ -6,8 +6,20 @@ from unittest import mock
 
 import numpy as np
 import pytest
+from orquestra.opt.gradients import finite_differences_gradient
+from orquestra.quantum.estimation._estimationimport import (
+    allocate_shots_uniformly,
+    calculate_exact_expectation_values,
+    estimate_expectation_values_by_averaging,
+)
+from orquestra.quantum.measurements import ExpectationValues
+from orquestra.quantum.openfermion import QubitOperator
+from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.utils import create_symbols_map
 from sympy import Symbol
-from zquantum.core.cost_function import (
+from zquantum.core.interfaces.mock_objects import MockAnsatz
+
+from orquestra.vqa.cost_function.cost_function import (
     AnsatzBasedCostFunction,
     add_normal_noise,
     create_cost_function,
@@ -18,17 +30,6 @@ from zquantum.core.cost_function import (
     substitution_based_estimation_tasks_factory,
     sum_expectation_values,
 )
-from zquantum.core.estimation import (
-    allocate_shots_uniformly,
-    calculate_exact_expectation_values,
-    estimate_expectation_values_by_averaging,
-)
-from zquantum.core.gradients import finite_differences_gradient
-from zquantum.core.interfaces.mock_objects import MockAnsatz
-from zquantum.core.measurement import ExpectationValues
-from zquantum.core.openfermion import QubitOperator
-from zquantum.core.symbolic_simulator import SymbolicSimulator
-from zquantum.core.utils import create_symbols_map
 
 RNGSEED = 1234
 

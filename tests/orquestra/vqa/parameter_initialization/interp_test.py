@@ -3,7 +3,8 @@
 ################################################################################
 import numpy as np
 import pytest
-from zquantum.qaoa.parameter_initialization import get_new_layer_params_using_interp
+
+from orquestra.vqa.parameter_initialization import get_new_layer_params_using_interp
 
 
 class TestInterp:

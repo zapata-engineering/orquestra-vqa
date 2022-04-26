@@ -3,28 +3,26 @@
 ################################################################################
 import numpy as np
 import pytest
-from zquantum.core.cost_function import (
+from orquestra.opt.api.cost_function import CostFunction
+from orquestra.opt.api.functions import CallableWithGradient, function_with_gradient
+from orquestra.opt.api.optimizer import optimization_result
+from orquestra.opt.api.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
+from orquestra.opt.mock_objects import MockOptimizer, mock_cost_function
+from orquestra.quantum.estimation._estimation import calculate_exact_expectation_values
+from orquestra.quantum.openfermion import IsingOperator
+from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+
+from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
+from orquestra.vqa.api.ansatz import Ansatz
+from orquestra.vqa.cost_function.cost_function import (
     create_cost_function,
     substitution_based_estimation_tasks_factory,
 )
-from zquantum.core.estimation import calculate_exact_expectation_values
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.cost_function import CostFunction
-from zquantum.core.interfaces.functions import (
-    CallableWithGradient,
-    function_with_gradient,
-)
-from zquantum.core.interfaces.mock_objects import MockOptimizer, mock_cost_function
-from zquantum.core.interfaces.optimizer import optimization_result
-from zquantum.core.interfaces.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
-from zquantum.core.openfermion import IsingOperator
-from zquantum.core.symbolic_simulator import SymbolicSimulator
-from zquantum.qaoa.ansatzes import QAOAFarhiAnsatz
-from zquantum.qaoa.parameter_initialization import (
+from orquestra.vqa.opt.fourier_qaoa import (
     FourierOptimizer,
+    _perturb_params_randomly,
     convert_u_v_to_gamma_beta,
 )
-from zquantum.qaoa.parameter_initialization._fourier import _perturb_params_randomly
 
 
 @pytest.fixture

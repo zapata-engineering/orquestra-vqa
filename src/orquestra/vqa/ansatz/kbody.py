@@ -6,11 +6,12 @@ from typing import Optional
 
 import numpy as np
 import sympy
+from orquestra.quantum.circuits import Circuit
+from orquestra.quantum.evolution import time_evolution
+from orquestra.quantum.openfermion import QubitOperator
 from overrides import overrides
-from zquantum.core.circuits import Circuit
-from zquantum.core.evolution import time_evolution
-from zquantum.core.interfaces.ansatz import Ansatz, ansatz_property
-from zquantum.core.openfermion import QubitOperator
+
+from orquestra.vqa.api.ansatz import Ansatz, ansatz_property
 
 
 class XAnsatz(Ansatz):

@@ -1,17 +1,16 @@
 ################################################################################
 # © Copyright 2020-2021 Zapata Computing Inc.
 ################################################################################
-import warnings
 from abc import ABC
-from typing import Any, Callable, List, Optional, Sequence, Tuple
+from typing import Callable, Optional
 
 import numpy as np
 import sympy
+from orquestra.quantum.circuits import Circuit, natural_key_revlex
+from orquestra.quantum.typing import SupportsLessThan
+from orquestra.quantum.utils import create_symbols_map
 from overrides import EnforceOverrides
 
-from ..circuits import Circuit, natural_key_revlex
-from ..typing import SupportsLessThan
-from ..utils import create_symbols_map
 from .ansatz_utils import ansatz_property
 
 SymbolsSortKey = Callable[[sympy.Symbol], SupportsLessThan]
@@ -31,9 +30,9 @@ class Ansatz(ABC, EnforceOverrides):
 
         Attributes:
             number_of_layers: see Args
-            parametrized_circuit (zquantum.core.circuit.Circuit): parametrized circuit
-                representation of the ansatz. Might not be supported for given ansatz,
-                see supports_parametrized_circuits.
+            parametrized_circuit (orquestra.quantum.circuit.Circuit): parametrized
+                circuit representation of the ansatz. Might not be supported for given
+                ansatz, see supports_parametrized_circuits.
             supports_parametrized_circuits: a flag.
             symbols_sort_key: a key used for defining natural ordering of free symbols
                 for this ansatz. This is used by `get_executable` circuit to map

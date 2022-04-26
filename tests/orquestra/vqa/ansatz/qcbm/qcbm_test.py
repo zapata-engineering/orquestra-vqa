@@ -5,15 +5,15 @@ import os
 
 import numpy as np
 import pytest
-from zquantum.core.circuits import RX, RZ, XX, Circuit
-from zquantum.core.interfaces.ansatz_test import AnsatzTests
-from zquantum.qcbm.ansatz import (
-    ANSATZ_SCHEMA,
+from orquestra.quantum.circuits import RX, RZ, XX, Circuit
+
+from orquestra.vqa.ansatz.qcbm._qcbm import (
     QCBMAnsatz,
     load_qcbm_ansatz_set,
     save_qcbm_ansatz_set,
 )
-from zquantum.qcbm.ansatz_utils import get_entangling_layer
+from orquestra.vqa.ansatz.qcbm_qcbm_utils import get_entangling_layer
+from orquestra.vqa.api.ansatz_test import AnsatzTests
 
 
 class TestQCBMAnsatz(AnsatzTests):
@@ -429,7 +429,6 @@ class TestQCBMAnsatz(AnsatzTests):
     def test_ansatz_to_dict(self, ansatz, n_qubits, topology):
         # Given
         expected_dict = {
-            "schema": ANSATZ_SCHEMA,
             "number_of_layers": 2,
             "number_of_qubits": n_qubits,
             "topology": topology,
@@ -448,7 +447,6 @@ class TestQCBMAnsatz(AnsatzTests):
         # When
         ansatz = ansatz.from_dict(
             {
-                "schema": ANSATZ_SCHEMA,
                 "number_of_layers": 2,
                 "number_of_qubits": n_qubits,
                 "topology": topology,

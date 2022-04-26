@@ -3,22 +3,26 @@
 ################################################################################
 import numpy as np
 import pytest
-from zquantum.core.bitstring_distribution import (
-    BitstringDistribution,
+from orquestra.opt.gradients import finite_differences_gradient
+from orquestra.opt.history.recorder import recorder
+from orquestra.quantum.distributions import (
+    MeasurementOutcomeDistribution,
     compute_clipped_negative_log_likelihood,
     compute_mmd,
 )
-from zquantum.core.gradients import finite_differences_gradient
-from zquantum.core.history.recorder import recorder
-from zquantum.core.utils import ValueEstimate, create_object
-from zquantum.qcbm.ansatz import QCBMAnsatz
-from zquantum.qcbm.cost_function import QCBMCostFunction, create_QCBM_cost_function
+from zquantum.core.utils import create_object
+
+from orquestra.vqa.ansatz.qcbm._qcbm import QCBMAnsatz
+from orquestra.vqa.cost_function.qcbm_cost_function import (
+    QCBMCostFunction,
+    create_QCBM_cost_function,
+)
 
 number_of_layers = 1
 number_of_qubits = 4
 topology = "all"
 ansatz = QCBMAnsatz(number_of_layers, number_of_qubits, topology)
-target_bitstring_distribution = BitstringDistribution(
+target_bitstring_distribution = MeasurementOutcomeDistribution(
     {
         "0000": 1.0,
         "0001": 0.0,
@@ -41,7 +45,7 @@ target_bitstring_distribution = BitstringDistribution(
 
 backend = create_object(
     {
-        "module_name": "zquantum.core.symbolic_simulator",
+        "module_name": "orquestra.quantum.symbolic_simulator",
         "function_name": "SymbolicSimulator",
     }
 )

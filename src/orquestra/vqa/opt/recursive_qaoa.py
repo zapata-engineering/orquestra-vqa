@@ -6,21 +6,25 @@ from copy import copy, deepcopy
 from typing import Callable, Dict, List, Tuple
 
 import numpy as np
-from scipy.optimize import OptimizeResult
-from zquantum.core.history.recorder import HistoryEntry
-from zquantum.core.history.recorder import recorder as _recorder
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.cost_function import CostFunction
-from zquantum.core.interfaces.optimizer import (
+from orquestra.opt.api.cost_function import CostFunction
+from orquestra.opt.api.optimizer import (
     NestedOptimizer,
     Optimizer,
     extend_histories,
     optimization_result,
 )
-from zquantum.core.openfermion import IsingOperator, QubitOperator, change_operator_type
-from zquantum.core.openfermion.utils import count_qubits
-from zquantum.core.typing import RecorderFactory
+from orquestra.opt.history.recorder import HistoryEntry, RecorderFactory
+from orquestra.opt.history.recorder import recorder as _recorder
+from orquestra.quantum.openfermion import (
+    IsingOperator,
+    QubitOperator,
+    change_operator_type,
+)
+from orquestra.quantum.openfermion.utils import count_qubits
+from scipy.optimize import OptimizeResult
 from zquantum.qaoa.problems import solve_problem_by_exhaustive_search
+
+from ..api.ansatz import Ansatz
 
 
 class RecursiveQAOA(NestedOptimizer):

@@ -4,14 +4,19 @@
 import numpy as np
 import pytest
 import sympy
-from zquantum.core.circuits import RY, RZ, Circuit
-from zquantum.core.interfaces.ansatz_test import AnsatzTests
-from zquantum.core.openfermion import IsingOperator, QubitOperator, change_operator_type
-from zquantum.core.utils import compare_unitary
-from zquantum.qaoa.ansatzes.warm_start_ansatz import (
+from orquestra.quantum.circuits import RY, RZ, Circuit
+from orquestra.quantum.openfermion import (
+    IsingOperator,
+    QubitOperator,
+    change_operator_type,
+)
+from orquestra.quantum.utils import compare_unitary
+
+from orquestra.vqa.ansatz.qaoa_warm_start import (
     WarmStartQAOAAnsatz,
     convert_relaxed_solution_to_angles,
 )
+from orquestra.vqa.api.ansatz_test import AnsatzTests
 
 
 def create_betas(number_of_layers):

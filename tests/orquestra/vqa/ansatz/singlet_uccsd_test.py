@@ -3,10 +3,11 @@
 ################################################################################
 import numpy as np
 import pytest
-from zquantum.core.circuits import Circuit
-from zquantum.core.interfaces.ansatz_test import AnsatzTests
-from zquantum.core.openfermion import FermionOperator
-from zquantum.vqe.singlet_uccsd import SingletUCCSDAnsatz
+from orquestra.quantum.circuits import Circuit
+from orquestra.quantum.openfermion import FermionOperator
+
+from orquestra.vqa.ansatz.singlet_uccsd import SingletUCCSDAnsatz
+from orquestra.vqa.api.ansatz_test import AnsatzTests
 
 
 class TestSingletUCCSDAnsatz(AnsatzTests):

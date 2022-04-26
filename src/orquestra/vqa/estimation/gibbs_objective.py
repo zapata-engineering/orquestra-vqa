@@ -4,14 +4,11 @@
 from typing import List
 
 import numpy as np
-from zquantum.core.bitstring_distribution import BitstringDistribution
-from zquantum.core.interfaces.backend import QuantumBackend
-from zquantum.core.interfaces.estimation import (
-    EstimateExpectationValues,
-    EstimationTask,
-)
-from zquantum.core.measurement import ExpectationValues, Measurements
-from zquantum.core.openfermion import IsingOperator
+from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
+from orquestra.quantum.distributions import MeasurementOutcomeDistribution
+from orquestra.quantum.measurements import ExpectationValues, Measurements
+from orquestra.quantum.openfermion import IsingOperator
 
 
 class GibbsObjectiveEstimator(EstimateExpectationValues):
@@ -69,7 +66,7 @@ class GibbsObjectiveEstimator(EstimateExpectationValues):
 
 
 def _calculate_expectation_value_for_distribution(
-    distribution: BitstringDistribution, operator: IsingOperator, alpha: float
+    distribution: MeasurementOutcomeDistribution, operator: IsingOperator, alpha: float
 ) -> float:
 
     # Calculates expectation value per bitstring

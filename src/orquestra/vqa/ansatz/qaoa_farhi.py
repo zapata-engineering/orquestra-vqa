@@ -5,13 +5,18 @@ from typing import List, Optional, Union
 
 import numpy as np
 import sympy
+from orquestra.quantum.circuits import Circuit, H, create_layer_of_gates
+from orquestra.quantum.circuits.symbolic import natural_key_fixed_names_order
+from orquestra.quantum.evolution import time_evolution
+from orquestra.quantum.openfermion import (
+    IsingOperator,
+    QubitOperator,
+    change_operator_type,
+)
+from orquestra.quantum.openfermion.utils import count_qubits
 from overrides import overrides
-from zquantum.core.circuits import Circuit, H, create_layer_of_gates
-from zquantum.core.circuits.symbolic import natural_key_fixed_names_order
-from zquantum.core.evolution import time_evolution
-from zquantum.core.interfaces.ansatz import Ansatz, SymbolsSortKey, ansatz_property
-from zquantum.core.openfermion import IsingOperator, QubitOperator, change_operator_type
-from zquantum.core.openfermion.utils import count_qubits
+
+from orquestra.vqa.api.ansatz import Ansatz, SymbolsSortKey, ansatz_property
 
 _SYMBOL_SORT_KEY = natural_key_fixed_names_order(["gamma", "beta"])
 
@@ -116,7 +121,7 @@ def create_farhi_qaoa_circuits(
             the integer at index i of the number_of_layers list.
 
     Returns:
-        List of zquantum.core.circuit.Circuit
+        List of orquestra.quantum.circuit.Circuit
     """
     if isinstance(number_of_layers, int):
         number_of_layers = [number_of_layers for _ in range(len(hamiltonians))]

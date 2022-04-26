@@ -4,7 +4,7 @@
 from typing import Any, Dict, Optional
 
 import numpy as np
-from zquantum.core.circuits import Circuit, GatePrototype
+from orquestra.quantum.circuits import Circuit, GatePrototype
 
 
 def get_entangling_layer(
