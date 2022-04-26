@@ -21,46 +21,6 @@ GradientFactory = Callable[[Callable], Callable[[np.ndarray], np.ndarray]]
 DistanceMeasure = Callable[..., Number]
 
 
-def create_QCBM_cost_function(
-    ansatz: Ansatz,
-    backend: QuantumBackend,
-    n_samples: int,
-    distance_measure: DistanceMeasure,
-    distance_measure_parameters: dict,
-    target_bitstring_distribution: BitstringDistribution,
-    gradient_function: GradientFactory = finite_differences_gradient,
-) -> CostFunction:
-    """Cost function used for evaluating QCBM.
-
-    Args:
-        ansatz: the ansatz used to construct the variational circuits
-        backend: backend used for QCBM evaluation
-        distance_measure: function used to calculate the distance measure
-        distance_measure_parameters: dictionary containing the relevant parameters
-            for the chosen distance measure
-        target_bitstring_distribution: bistring distribution which QCBM aims to learn
-        gradient_function: a function which returns a function used to compute
-            the gradient of the cost function
-            (see zquantum.core.gradients.finite_differences_gradient for reference)
-
-    Returns:
-        Callable CostFunction object that evaluates the parametrized circuit produced
-        by the ansatz with the given parameters and returns the distance between
-        the produced bitstring distribution and the target distribution
-    """
-
-    cost_function = _create_QCBM_cost_function(
-        ansatz,
-        backend,
-        n_samples,
-        distance_measure,
-        distance_measure_parameters,
-        target_bitstring_distribution,
-    )
-
-    return function_with_gradient(cost_function, gradient_function(cost_function))
-
-
 def QCBMCostFunction(
     ansatz: Ansatz,
     backend: QuantumBackend,
