@@ -1,7 +1,7 @@
 ################################################################################
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from orquestra.quantum.api.backend import QuantumBackend, QuantumSimulator
@@ -87,7 +87,7 @@ class CvarEstimator(EstimateExpectationValues):
             ]
         else:
             distributions_list = [
-                backend.get_bitstring_distribution(circuit, n_samples=n_shots)
+                backend.get_measurement_outcome_distribution(circuit, n_samples=n_shots)
                 for circuit, n_shots in zip(circuits, shots_per_circuit)
             ]
 
@@ -119,7 +119,7 @@ def _calculate_expectation_value_for_distribution(
         for i, bitstring in enumerate(distribution.distribution_dict.keys())
     }
     return _sum_expectation_values(
-        expectation_values_dict, distribution.distribution_dict, alpha
+        expectation_values_dict, distribution.distribution_dict, alpha  # type: ignore
     )
 
 
@@ -149,7 +149,7 @@ def _calculate_expectation_value_for_wavefunction(
 @overload
 def _sum_expectation_values(
     expectation_values_per_bitstring: Dict[Tuple[int, ...], float],
-    probability_per_bitstring: Dict[Tuple[int, ...], float],
+    probability_per_bitstring: Dict[Union[str, Tuple[int, ...]], float],
     alpha: float,
 ) -> float:
     """Variant for calculating expectation values from distribution."""

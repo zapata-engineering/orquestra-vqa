@@ -15,6 +15,7 @@ from orquestra.opt.api.optimizer import (
 )
 from orquestra.opt.history.recorder import HistoryEntry, RecorderFactory
 from orquestra.opt.history.recorder import recorder as _recorder
+from orquestra.opt.problems import solve_problem_by_exhaustive_search
 from orquestra.quantum.openfermion import (
     IsingOperator,
     QubitOperator,
@@ -22,7 +23,6 @@ from orquestra.quantum.openfermion import (
 )
 from orquestra.quantum.openfermion.utils import count_qubits
 from scipy.optimize import OptimizeResult
-from orquestra.opt.problems import solve_problem_by_exhaustive_search
 
 from ..api.ansatz import Ansatz
 

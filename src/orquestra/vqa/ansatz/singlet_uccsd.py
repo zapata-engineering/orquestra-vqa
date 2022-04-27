@@ -19,7 +19,7 @@ from orquestra.vqa.api.ansatz_utils import (
     invalidates_parametrized_circuit,
 )
 
-from .utils import build_hartree_fock_circuit, exponentiate_fermion_operator
+from ..utils import build_hartree_fock_circuit, exponentiate_fermion_operator
 
 
 class SingletUCCSDAnsatz(Ansatz):

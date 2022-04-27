@@ -6,24 +6,12 @@ import math
 import numpy as np
 import pytest
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.openfermion import (
-    FermionOperator,
-    InteractionRDM,
-    QubitOperator,
-    eigenspectrum,
-    get_interaction_operator,
-    jordan_wigner,
-)
-
-from orquestra.vqa.shot_allocation import estimate_nmeas_for_frames
+from orquestra.quantum.openfermion import InteractionRDM, QubitOperator
 
 from orquestra.vqa.grouping._grouping import (
     compute_group_variances,
-    get_expectation_values_from_rdms,
-    get_expectation_values_from_rdms_for_qubitoperator_list,
     group_comeasureable_terms_greedy,
     is_comeasureable,
-    reorder_fermionic_modes,
 )
 
 h2_hamiltonian = QubitOperator(
@@ -316,18 +304,6 @@ def test_compute_group_variances_fails_for_invalid_refs(groups, expecval, varian
             group_comeasureable_terms_greedy(h2_hamiltonian, False),
             ExpectationValues(np.repeat(0.5, 15)),
         ),
-        (
-            group_comeasureable_terms_greedy(h2_hamiltonian, False),
-            get_expectation_values_from_rdms(rdms, h2_hamiltonian, False),
-        ),
-        (
-            group_comeasureable_terms_greedy(h2_hamiltonian, True),
-            get_expectation_values_from_rdms(rdms, h2_hamiltonian, True),
-        ),
-        (
-            group_comeasureable_terms_greedy(QubitOperator("2[]"), True),
-            get_expectation_values_from_rdms(rdms, QubitOperator("2[]"), True),
-        ),
     ],
 )
 def test_compute_group_variances_without_ref(groups, expecval):
@@ -343,4 +319,3 @@ def test_compute_group_variances_without_ref(groups, expecval):
     assert math.isclose(
         test_ham_variance, ref_ham_variance
     )  # this is true as long as the groups do not overlap
-

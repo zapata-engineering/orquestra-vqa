@@ -306,13 +306,13 @@ class QCBMAnsatz(Ansatz):
         return dictionary
 
     @classmethod
-    def from_dict(cls, item: dict) -> Ansatz:
+    def from_dict(cls, item: dict) -> "QCBMAnsatz":
         """Creates a QCBM ansatz object from an input dictionary of values.
 
         Returns:
             QCBMAnsatz: the ansatz with a given number of layers, qubits, and topology
         """
-        return QCBMAnsatz(
+        return cls(
             number_of_layers=item["number_of_layers"],
             number_of_qubits=item["number_of_qubits"],
             topology=item["topology"],

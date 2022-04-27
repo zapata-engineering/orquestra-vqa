@@ -4,10 +4,10 @@
 import numpy as np
 import pytest
 from orquestra.quantum.api.estimation import EstimationTask
+from orquestra.quantum.api.estimator_contract import ESTIMATOR_CONTRACTS
 from orquestra.quantum.circuits import Circuit, H, X
 from orquestra.quantum.openfermion import IsingOperator, QubitOperator
-from zquantum.core.interfaces.estimator_contract import ESTIMATOR_CONTRACTS
-from zquantum.core.interfaces.mock_objects import MockQuantumBackend
+from orquestra.quantum.testing.mocks import MockQuantumBackend
 
 from orquestra.vqa.estimation.gibbs_objective import GibbsObjectiveEstimator
 

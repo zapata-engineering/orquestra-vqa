@@ -11,8 +11,7 @@ from orquestra.opt.api.optimizer import optimization_result
 from orquestra.opt.api.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
 from orquestra.opt.mock_objects import MockOptimizer
 from orquestra.quantum.api.estimation import EstimationTask
-from orquestra.quantum.estimation import (
-    allocate_shots_uniformly,
+from orquestra.quantum.estimation._estimation import (
     estimate_expectation_values_by_averaging,
 )
 from orquestra.quantum.openfermion import IsingOperator
@@ -20,6 +19,10 @@ from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
 from orquestra.vqa.api.ansatz import Ansatz
+from orquestra.vqa.cost_function.cost_function import (
+    create_cost_function,
+    substitution_based_estimation_tasks_factory,
+)
 from orquestra.vqa.opt.recursive_qaoa import (
     RecursiveQAOA,
     _create_default_qubit_map,
@@ -28,6 +31,7 @@ from orquestra.vqa.opt.recursive_qaoa import (
     _map_reduced_solutions_to_original_solutions,
     _update_qubit_map,
 )
+from orquestra.vqa.shot_allocation._shot_allocation import allocate_shots_uniformly
 
 
 class TestRQAOA:

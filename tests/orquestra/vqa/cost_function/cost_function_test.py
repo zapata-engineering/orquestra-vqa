@@ -7,10 +7,7 @@ from unittest import mock
 import numpy as np
 import pytest
 from orquestra.opt.gradients import finite_differences_gradient
-from orquestra.quantum.estimation._estimation
-
-import import (
-    allocate_shots_uniformly,
+from orquestra.quantum.estimation._estimation import (
     calculate_exact_expectation_values,
     estimate_expectation_values_by_averaging,
 )
@@ -19,7 +16,6 @@ from orquestra.quantum.openfermion import QubitOperator
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 from orquestra.quantum.utils import create_symbols_map
 from sympy import Symbol
-from zquantum.core.interfaces.mock_objects import MockAnsatz
 
 from orquestra.vqa.cost_function.cost_function import (
     AnsatzBasedCostFunction,
@@ -32,6 +28,8 @@ from orquestra.vqa.cost_function.cost_function import (
     substitution_based_estimation_tasks_factory,
     sum_expectation_values,
 )
+from orquestra.vqa.shot_allocation._shot_allocation import allocate_shots_uniformly
+from orquestra.vqa.testing.mock_objects import MockAnsatz
 
 RNGSEED = 1234
 

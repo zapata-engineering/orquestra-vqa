@@ -10,19 +10,19 @@ from orquestra.quantum.distributions import (
     compute_clipped_negative_log_likelihood,
     compute_mmd,
 )
-from zquantum.core.utils import create_object
+from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.ansatz.qcbm._qcbm import QCBMAnsatz
 from orquestra.vqa.cost_function.qcbm_cost_function import (
     QCBMCostFunction,
-    create_QCBM_cost_function,
+    _create_QCBM_cost_function,
 )
 
 number_of_layers = 1
 number_of_qubits = 4
 topology = "all"
 ansatz = QCBMAnsatz(number_of_layers, number_of_qubits, topology)
-target_bitstring_distribution = MeasurementOutcomeDistribution(
+target_distribution = MeasurementOutcomeDistribution(
     {
         "0000": 1.0,
         "0001": 0.0,
@@ -43,12 +43,7 @@ target_bitstring_distribution = MeasurementOutcomeDistribution(
     }
 )
 
-backend = create_object(
-    {
-        "module_name": "orquestra.quantum.symbolic_simulator",
-        "function_name": "SymbolicSimulator",
-    }
-)
+backend = SymbolicSimulator()
 
 n_samples = 1
 
@@ -61,12 +56,12 @@ def test_QCBMCostFunction_raises_deprecation_warning():
             n_samples,
             distance_measure=compute_clipped_negative_log_likelihood,
             distance_measure_parameters={"epsilon": 1e-6},
-            target_bitstring_distribution=target_bitstring_distribution,
+            target_distribution=target_distribution,
         )
 
 
 class TestQCBMCostFunction:
-    @pytest.fixture(params=[QCBMCostFunction, create_QCBM_cost_function])
+    @pytest.fixture(params=[QCBMCostFunction, _create_QCBM_cost_function])
     def cost_function_factory(self, request):
         return request.param
 
@@ -92,7 +87,7 @@ class TestQCBMCostFunction:
             backend,
             n_samples,
             **distance_measure_kwargs,
-            target_bitstring_distribution=target_bitstring_distribution,
+            target_distribution=target_distribution,
         )
 
         cost_function = recorder(cost_function)
@@ -114,7 +109,7 @@ class TestQCBMCostFunction:
             ({"gradient_type": "finite_difference"}, QCBMCostFunction),
             (
                 {"gradient_function": finite_differences_gradient},
-                create_QCBM_cost_function,
+                _create_QCBM_cost_function,
             ),
         ],
     )
@@ -125,7 +120,7 @@ class TestQCBMCostFunction:
             backend,
             n_samples,
             **distance_measure_kwargs,
-            target_bitstring_distribution=target_bitstring_distribution,
+            target_distribution=target_distribution,
             **gradient_kwargs,
         )
 
@@ -149,7 +144,7 @@ class TestQCBMCostFunction:
                     backend,
                     n_samples,
                     **distance_measure_kwargs,
-                    target_bitstring_distribution=target_bitstring_distribution,
+                    target_distribution=target_distribution,
                     gradient_type=gradient_type,
                 ),
             )
@@ -170,7 +165,7 @@ class TestQCBMCostFunction:
                     backend,
                     n_samples,
                     **distance_measure_kwargs,
-                    target_bitstring_distribution=target_bitstring_distribution,
+                    target_distribution=target_distribution,
                 ),
             )
             params = np.array([0, 0, 0, 0])

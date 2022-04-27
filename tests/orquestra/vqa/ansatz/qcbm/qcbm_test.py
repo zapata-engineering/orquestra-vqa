@@ -12,7 +12,7 @@ from orquestra.vqa.ansatz.qcbm._qcbm import (
     load_qcbm_ansatz_set,
     save_qcbm_ansatz_set,
 )
-from orquestra.vqa.ansatz.qcbm_qcbm_utils import get_entangling_layer
+from orquestra.vqa.ansatz.qcbm._qcbm_utils import get_entangling_layer
 from orquestra.vqa.api.ansatz_test import AnsatzTests
 
 

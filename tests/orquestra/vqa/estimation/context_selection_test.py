@@ -1,38 +1,15 @@
 ################################################################################
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
-from functools import partial
-
 import numpy as np
-import pytest
-import sympy
 from orquestra.quantum.api.estimation import EstimationTask
-from orquestra.quantum.circuits import RX, RY, RZ, Circuit, H, I, X
-from orquestra.quantum.estimation._estimation import (
-    calculate_exact_expectation_values,
-    estimate_expectation_values_by_averaging,
-    evaluate_estimation_circuits,
-    evaluate_non_measured_estimation_tasks,
-    split_estimation_tasks_to_measure,
-)
-from orquestra.quantum.measurements import ExpectationValues, Measurements
-from orquestra.quantum.openfermion import (
-    IsingOperator,
-    QubitOperator,
-    qubit_operator_sparse,
-)
+from orquestra.quantum.circuits import RX, RY, Circuit, X
+from orquestra.quantum.openfermion import QubitOperator, qubit_operator_sparse
 from orquestra.quantum.openfermion.zapata_utils._utils import change_operator_type
-from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.estimation.context_selection import (
     get_context_selection_circuit_for_group,
-    group_greedily,
-    group_individually,
     perform_context_selection,
-)
-from orquestra.vqa.shot_allocation._shot_allocation import (
-    allocate_shots_proportionally,
-    allocate_shots_uniformly,
 )
 
 

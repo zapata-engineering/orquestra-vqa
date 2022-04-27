@@ -28,7 +28,7 @@ def QCBMCostFunction(
     n_samples: int,
     distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
-    target_bitstring_distribution: MeasurementOutcomeDistribution,
+    target_distribution: MeasurementOutcomeDistribution,
     gradient_type: str = "finite_difference",
     gradient_kwargs: dict = None,
 ) -> CostFunction:
@@ -40,7 +40,7 @@ def QCBMCostFunction(
         distance_measure: function used to calculate the distance measure
         distance_measure_parameters: dictionary containing the relevant parameters
             for the chosen distance measure
-        target_bitstring_distribution: bistring distribution which QCBM aims to learn
+        target_distribution: bistring distribution which QCBM aims to learn
         gradient_type: parameter indicating which type of gradient should be used.
 
     Returns:
@@ -61,7 +61,7 @@ def QCBMCostFunction(
         n_samples,
         distance_measure,
         distance_measure_parameters,
-        target_bitstring_distribution,
+        target_distribution,
     )
 
     if gradient_kwargs is None:
@@ -84,11 +84,10 @@ def _create_QCBM_cost_function(
     n_samples: int,
     distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
-    target_bitstring_distribution: MeasurementOutcomeDistribution,
+    target_distribution: MeasurementOutcomeDistribution,
 ):
     assert (
-        int(target_bitstring_distribution.get_number_of_subsystems())
-        == ansatz.number_of_qubits
+        int(target_distribution.get_number_of_subsystems()) == ansatz.number_of_qubits
     )
 
     def cost_function(
@@ -108,16 +107,16 @@ def _create_QCBM_cost_function(
         # In case of questions ask mstechly.
         # circuit = ansatz.get_executable_circuit(parameters)
         circuit = ansatz._generate_circuit(parameters)
-        distribution = backend.get_bitstring_distribution(circuit, n_samples)
+        distribution = backend.get_measurement_outcome_distribution(circuit, n_samples)
         value = evaluate_distribution_distance(
-            target_bitstring_distribution,
+            target_distribution,
             distribution,
             distance_measure,
             distance_measure_parameters=distance_measure_parameters,
         )
 
         if store_artifact:
-            store_artifact("bitstring_distribution", distribution)
+            store_artifact("measurement_outcome_distribution", distribution)
 
         return ValueEstimate(value)
 
