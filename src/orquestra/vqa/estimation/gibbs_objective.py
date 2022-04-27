@@ -47,7 +47,7 @@ class GibbsObjectiveEstimator(EstimateExpectationValues):
             *[(e.circuit, e.operator, e.number_of_shots) for e in estimation_tasks]
         )
         distributions_list = [
-            backend.get_bitstring_distribution(circuit, n_samples=n_shots)
+            backend.get_measurement_outcome_distribution(circuit, n_samples=n_shots)
             for circuit, n_shots in zip(circuits, shots_per_circuit)
         ]
 
@@ -72,10 +72,10 @@ def _calculate_expectation_value_for_distribution(
     # Calculates expectation value per bitstring
     expectation_values_per_bitstring = {}
     for bitstring in distribution.distribution_dict:
-        expected_value = Measurements([bitstring]).get_expectation_values(
+        evals = Measurements([bitstring]).get_expectation_values(  # type: ignore
             operator, use_bessel_correction=False
         )
-        expectation_values_per_bitstring[bitstring] = np.sum(expected_value.values)
+        expectation_values_per_bitstring[bitstring] = np.sum(evals.values)
 
     cumulative_value = 0.0
     # Get total expectation value (mean of expectation values of all bitstrings

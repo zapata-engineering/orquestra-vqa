@@ -5,10 +5,9 @@ import numpy as np
 import pytest
 from orquestra.quantum.circuits import XX
 
-from orquestra.vqa.ansatz.qcbm._qcbm import (
-    QCBMAnsatz,
+from orquestra.vqa.ansatz.qcbm._qcbm import QCBMAnsatz, get_entangling_layer
+from orquestra.vqa.ansatz.qcbm._qcbm_utils import (
     adjacency_list_to_matrix,
-    get_entangling_layer,
     get_entangling_layer_all_topology,
     get_entangling_layer_graph_topology,
     get_entangling_layer_line_topology,

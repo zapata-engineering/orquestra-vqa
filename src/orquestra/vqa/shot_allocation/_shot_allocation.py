@@ -81,17 +81,17 @@ def estimate_nmeas_for_frames(
     frame_operators: List[QubitOperator],
     expecval: Optional[ExpectationValues] = None,
 ) -> Tuple[float, int, np.ndarray]:
-    r"""Calculates the number of measurements required for computing
+    """Calculates the number of measurements required for computing
     the expectation value of a qubit hamiltonian, where co-measurable terms
     are grouped in a single QubitOperator, and different groups are different
     members of the list.
 
     We are assuming the exact expectation values are provided
     (i.e. infinite number of measurements or simulations without noise)
-    M ~ (\sum_{i} prec(H_i)) ** 2.0 / (epsilon ** 2.0)
+    M ~ (sum_{i} prec(H_i)) ** 2.0 / (epsilon ** 2.0)
     where prec(H_i) is the precision (square root of the variance)
     for each group of co-measurable terms H_{i}. It is computed as
-    prec(H_{i}) = \sum{ab} |h_{a}^{i}||h_{b}^{i}| cov(O_{a}^{i}, O_{b}^{i})
+    prec(H_{i}) = sum{ab} |h_{a}^{i}||h_{b}^{i}| cov(O_{a}^{i}, O_{b}^{i})
     where h_{a}^{i} is the coefficient of the a-th operator, O_{a}^{i}, in the
     i-th group. Covariances are assumed to be zero for a != b:
     cov(O_{a}^{i}, O_{b}^{i}) = <O_{a}^{i} O_{b}^{i}> - <O_{a}^{i}> <O_{b}^{i}> = 0
