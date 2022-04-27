@@ -7,7 +7,9 @@ from unittest import mock
 import numpy as np
 import pytest
 from orquestra.opt.gradients import finite_differences_gradient
-from orquestra.quantum.estimation._estimationimport import (
+from orquestra.quantum.estimation._estimation
+
+import import (
     allocate_shots_uniformly,
     calculate_exact_expectation_values,
     estimate_expectation_values_by_averaging,
