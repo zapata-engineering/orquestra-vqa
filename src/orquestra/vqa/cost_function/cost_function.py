@@ -6,6 +6,7 @@ from typing import Any, Callable, Iterable, List, Optional, Union
 
 import numpy as np
 import sympy
+from orquestra.opt.api.cost_function import CostFunction, ParameterPreprocessor
 from orquestra.opt.api.functions import (
     FunctionWithGradient,
     FunctionWithGradientStoringArtifacts,
@@ -36,7 +37,6 @@ from orquestra.quantum.utils import ValueEstimate, create_symbols_map
 
 from ..api.ansatz import Ansatz
 from ..api.ansatz_utils import combine_ansatz_params
-from ..cost_function.cost_function import CostFunction, ParameterPreprocessor
 
 GradientFactory = Callable[[Callable], Callable[[np.ndarray], np.ndarray]]
 SymbolsSortKey = Callable[[sympy.Symbol], SupportsLessThan]

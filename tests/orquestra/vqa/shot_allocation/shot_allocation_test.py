@@ -15,20 +15,8 @@ from orquestra.quantum.estimation._estimation import (
     evaluate_non_measured_estimation_tasks,
     split_estimation_tasks_to_measure,
 )
-from orquestra.quantum.measurements import ExpectationValues, Measurements
-from orquestra.quantum.openfermion import (
-    IsingOperator,
-    QubitOperator,
-    qubit_operator_sparse,
-)
-from orquestra.quantum.openfermion.zapata_utils._utils import change_operator_type
-from orquestra.quantum.symbolic_simulator import SymbolicSimulator
-from zquantum.core.interfaces.mock_objects import MockQuantumBackend
-
 from orquestra.vqa.estimation.context_selection import (
     get_context_selection_circuit_for_group,
-    group_greedily,
-    group_individually,
     perform_context_selection,
 )
 from orquestra.vqa.shot_allocation._shot_allocation import (
