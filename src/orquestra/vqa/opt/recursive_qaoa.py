@@ -22,7 +22,7 @@ from orquestra.quantum.openfermion import (
 )
 from orquestra.quantum.openfermion.utils import count_qubits
 from scipy.optimize import OptimizeResult
-from zquantum.qaoa.problems import solve_problem_by_exhaustive_search
+from orquestra.opt.problems import solve_problem_by_exhaustive_search
 
 from ..api.ansatz import Ansatz
 

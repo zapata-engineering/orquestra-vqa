@@ -9,17 +9,13 @@ import pytest
 from orquestra.opt.api.cost_function import CostFunction
 from orquestra.opt.api.optimizer import optimization_result
 from orquestra.opt.api.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
-from orquestra.opt.cost_function.cost_function import (
-    create_cost_function,
-    substitution_based_estimation_tasks_factory,
-)
 from orquestra.opt.mock_objects import MockOptimizer
 from orquestra.quantum.api.estimation import EstimationTask
-from orquestra.quantum.estimation._estimationimport import (
+from orquestra.quantum.estimation import (
     allocate_shots_uniformly,
     estimate_expectation_values_by_averaging,
 )
-from orquestra.quantum.openfermion import IsingOperator, SymbolicOperator
+from orquestra.quantum.openfermion import IsingOperator
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
@@ -51,7 +47,7 @@ class TestRQAOA:
     @pytest.fixture()
     def cost_function_factory(self) -> Callable[[IsingOperator, Ansatz], CostFunction]:
         def _cf_factory(
-            target_operator: SymbolicOperator,
+            target_operator: IsingOperator,
             ansatz: Ansatz,
         ):
             # NOTE: Partial would be easier to use, but mypy doesn't work well
