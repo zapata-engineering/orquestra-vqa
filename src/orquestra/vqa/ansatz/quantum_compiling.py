@@ -105,7 +105,7 @@ class HEAQuantumCompilingAnsatz(Ansatz):
         return circuit_layer
 
     @overrides
-    def _generate_circuit(self, parameters: Optional[np.ndarray] = None) -> Circuit:
+    def _generate_circuit(self, params: Optional[np.ndarray] = None) -> Circuit:
         """Builds the ansatz circuit (based on: 2011.12245, Fig. 1)
 
         Args:
@@ -114,15 +114,15 @@ class HEAQuantumCompilingAnsatz(Ansatz):
         Returns:
             Circuit
         """
-        if parameters is None:
-            parameters = np.asarray(self.symbols, dtype=object)
+        if params is None:
+            params = np.asarray(self.symbols, dtype=object)
 
-        assert len(parameters) == self.number_of_params
+        assert len(params) == self.number_of_params
 
         circuit = Circuit()
         for layer_index in range(self.number_of_layers):
             circuit += self._build_circuit_layer(
-                parameters[
+                params[
                     layer_index
                     * self.number_of_params_per_layer : (layer_index + 1)
                     * self.number_of_params_per_layer

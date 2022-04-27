@@ -27,7 +27,7 @@ class MockAnsatz(Ansatz):
         return self.problem_size
 
     @overrides
-    def _generate_circuit(self, parameters: Optional[np.ndarray] = None):
+    def _generate_circuit(self, params: Optional[np.ndarray] = None) -> Circuit:
         circuit = Circuit()
         symbols = [
             sympy.Symbol(f"theta_{layer_index}")
@@ -36,7 +36,7 @@ class MockAnsatz(Ansatz):
         for theta in symbols:
             for qubit_index in range(self.number_of_qubits):
                 circuit += RX(theta)(qubit_index)
-        if parameters is not None:
-            symbols_map = create_symbols_map(symbols, parameters)
+        if params is not None:
+            symbols_map = create_symbols_map(symbols, params)
             circuit = circuit.bind(symbols_map)
         return circuit
