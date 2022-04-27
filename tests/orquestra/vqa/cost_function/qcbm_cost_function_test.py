@@ -15,7 +15,7 @@ from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 from orquestra.vqa.ansatz.qcbm._qcbm import QCBMAnsatz
 from orquestra.vqa.cost_function.qcbm_cost_function import (
     QCBMCostFunction,
-    _create_QCBM_cost_function,
+    create_QCBM_cost_function,
 )
 
 number_of_layers = 1
@@ -61,7 +61,7 @@ def test_QCBMCostFunction_raises_deprecation_warning():
 
 
 class TestQCBMCostFunction:
-    @pytest.fixture(params=[QCBMCostFunction, _create_QCBM_cost_function])
+    @pytest.fixture(params=[QCBMCostFunction, create_QCBM_cost_function])
     def cost_function_factory(self, request):
         return request.param
 
@@ -109,7 +109,7 @@ class TestQCBMCostFunction:
             ({"gradient_type": "finite_difference"}, QCBMCostFunction),
             (
                 {"gradient_function": finite_differences_gradient},
-                _create_QCBM_cost_function,
+                create_QCBM_cost_function,
             ),
         ],
     )

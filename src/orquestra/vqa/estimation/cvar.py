@@ -119,7 +119,7 @@ def _calculate_expectation_value_for_distribution(
         for i, bitstring in enumerate(distribution.distribution_dict.keys())
     }
     return _sum_expectation_values(
-        expectation_values_dict, distribution.distribution_dict, alpha  # type: ignore
+        expectation_values_dict, distribution.distribution_dict, alpha
     )
 
 
@@ -148,7 +148,7 @@ def _calculate_expectation_value_for_wavefunction(
 
 @overload
 def _sum_expectation_values(
-    expectation_values_per_bitstring: Dict[Tuple[int, ...], float],
+    expectation_values_per_bitstring: Dict[Union[str, Tuple[int, ...]], float],
     probability_per_bitstring: Dict[Union[str, Tuple[int, ...]], float],
     alpha: float,
 ) -> float:
