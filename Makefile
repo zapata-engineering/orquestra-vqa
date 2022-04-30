@@ -5,4 +5,4 @@ github_actions:
 		${VENV}/bin/python3 -m pip install --upgrade pip && \
 		${VENV}/bin/python3 -m pip install ./orquestra-quantum && \
 		${VENV}/bin/python3 -m pip install ./orquestra-opt && \
-		${VENV}/bin/python3 -m pip install -e '.[develop]'
+		${VENV}/bin/python3 -m pip install -e '.[dev]'
