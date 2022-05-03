@@ -177,7 +177,7 @@ class TestSumExpectationValues:
     def test_sum_expectation_values(self):
         expectation_values = ExpectationValues(np.array([5, -2, 1]))
         total = sum_expectation_values(expectation_values)
-        assert np.isclose(total.value, 4)
+        assert np.isclose(total, 4)
         assert total.precision is None
 
     def test_sum_expectation_values_with_covariances(self):
@@ -186,7 +186,7 @@ class TestSumExpectationValues:
         covariances = [correlations[0] / 10, correlations[1] / 10]
         expectation_values = ExpectationValues(values, correlations, covariances)
         total = sum_expectation_values(expectation_values)
-        assert np.isclose(total.value, 4)
+        assert np.isclose(total, 4)
         assert np.isclose(total.precision, np.sqrt((1 + 0.5 + 0.5 + 2 + 7) / 10))
 
 
