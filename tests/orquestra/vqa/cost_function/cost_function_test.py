@@ -149,7 +149,6 @@ class TestGroundStateCostFunction:
 
         # We only called our function once, therefore the following should be true
         parametrized_circuit.bind.assert_called_with(expected_symbols_map)
-        ### NOTE TO SELF: PROBABLY NEED TO ADD NOISE AS PREPROCESSOR MANUALLY ###
 
         # and if only everything went right, this only call should be of the form
         # noisy_ansatz.ansatz.get_executable_circuit(params+noise)
