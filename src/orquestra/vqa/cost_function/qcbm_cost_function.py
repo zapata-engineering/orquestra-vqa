@@ -1,7 +1,6 @@
 ################################################################################
 # © Copyright 2020-2021 Zapata Computing Inc.
 ################################################################################
-import warnings
 from numbers import Number
 from typing import Callable
 
@@ -58,62 +57,6 @@ def create_QCBM_cost_function(
     )
 
     return function_with_gradient(cost_function, gradient_function(cost_function))
-
-
-def QCBMCostFunction(
-    ansatz: Ansatz,
-    backend: QuantumBackend,
-    n_samples: int,
-    distance_measure: DistanceMeasure,
-    distance_measure_parameters: dict,
-    target_distribution: MeasurementOutcomeDistribution,
-    gradient_type: str = "finite_difference",
-    gradient_kwargs: dict = None,
-) -> CostFunction:
-    """Cost function used for evaluating QCBM.
-
-    Args:
-        ansatz: the ansatz used to construct the variational circuits
-        backend: backend used for QCBM evaluation
-        distance_measure: function used to calculate the distance measure
-        distance_measure_parameters: dictionary containing the relevant parameters
-            for the chosen distance measure
-        target_distribution: bistring distribution which QCBM aims to learn
-        gradient_type: parameter indicating which type of gradient should be used.
-
-    Returns:
-        Callable CostFunction object that evaluates the parametrized circuit produced
-            by the ansatz with the given
-        parameters and returns the distance between the produced bitstring distribution
-            and the target distribution
-    """
-
-    warnings.warn(
-        "QCBMCostFunction is deprecated in favour of create_QCBM_cost_function.",
-        DeprecationWarning,
-    )
-
-    cost_function = _create_QCBM_cost_function(
-        ansatz,
-        backend,
-        n_samples,
-        distance_measure,
-        distance_measure_parameters,
-        target_distribution,
-    )
-
-    if gradient_kwargs is None:
-        gradient_kwargs = {}
-
-    if gradient_type == "finite_difference":
-        cost_function = function_with_gradient(
-            cost_function,
-            finite_differences_gradient(cost_function, **gradient_kwargs),
-        )
-    else:
-        raise RuntimeError("Unsupported gradient type: ", gradient_type)
-
-    return cost_function
 
 
 def _create_QCBM_cost_function(
