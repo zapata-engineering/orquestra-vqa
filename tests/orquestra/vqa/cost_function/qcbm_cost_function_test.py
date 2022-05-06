@@ -4,7 +4,6 @@
 import numpy as np
 import pytest
 from orquestra.opt.gradients import finite_differences_gradient
-from orquestra.opt.history.recorder import recorder
 from orquestra.quantum.distributions import (
     MeasurementOutcomeDistribution,
     compute_clipped_negative_log_likelihood,
@@ -13,10 +12,7 @@ from orquestra.quantum.distributions import (
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.ansatz.qcbm._qcbm import QCBMAnsatz
-from orquestra.vqa.cost_function.qcbm_cost_function import (
-    QCBMCostFunction,
-    create_QCBM_cost_function,
-)
+from orquestra.vqa.cost_function.qcbm_cost_function import create_QCBM_cost_function
 
 number_of_layers = 1
 number_of_qubits = 4
@@ -48,23 +44,7 @@ backend = SymbolicSimulator()
 n_samples = 1
 
 
-def test_QCBMCostFunction_raises_deprecation_warning():
-    with pytest.deprecated_call():
-        QCBMCostFunction(
-            ansatz,
-            backend,
-            n_samples,
-            distance_measure=compute_clipped_negative_log_likelihood,
-            distance_measure_parameters={"epsilon": 1e-6},
-            target_distribution=target_distribution,
-        )
-
-
-class TestQCBMCostFunction:
-    @pytest.fixture(params=[QCBMCostFunction, create_QCBM_cost_function])
-    def cost_function_factory(self, request):
-        return request.param
-
+class Test_create_QCBM_cost_function:
     @pytest.fixture(
         params=[
             {
@@ -80,15 +60,16 @@ class TestQCBMCostFunction:
     def distance_measure_kwargs(self, request):
         return request.param
 
-    def test_evaluate_history(self, cost_function_factory, distance_measure_kwargs):
+    def test_evaluate_history(self, distance_measure_kwargs):
         # Given
-        cost_function = cost_function_factory(
+        cost_function = create_QCBM_cost_function(
             ansatz,
             backend,
             n_samples,
             **distance_measure_kwargs,
             target_distribution=target_distribution,
         )
+        from orquestra.opt.history.recorder import recorder
 
         cost_function = recorder(cost_function)
 
@@ -106,7 +87,6 @@ class TestQCBMCostFunction:
     @pytest.mark.parametrize(
         "gradient_kwargs, cf_factory",
         [
-            ({"gradient_type": "finite_difference"}, QCBMCostFunction),
             (
                 {"gradient_function": finite_differences_gradient},
                 create_QCBM_cost_function,
@@ -132,27 +112,8 @@ class TestQCBMCostFunction:
         # Then
         assert len(params) == len(gradient)
 
-    def test_error_raised_if_gradient_is_not_supported(self, distance_measure_kwargs):
-        # Given
-        gradient_type = "UNSUPPORTED GRADIENT TYPE"
-
-        # When/then
-        with pytest.raises(RuntimeError):
-            cost_function = (
-                QCBMCostFunction(
-                    ansatz,
-                    backend,
-                    n_samples,
-                    **distance_measure_kwargs,
-                    target_distribution=target_distribution,
-                    gradient_type=gradient_type,
-                ),
-            )
-            params = np.array([0, 0, 0, 0])
-            cost_function(params)
-
     def test_error_raised_if_target_distribution_and_ansatz_are_for_differing_number_of_qubits(  # noqa E501
-        self, cost_function_factory, distance_measure_kwargs
+        self, distance_measure_kwargs
     ):
         # Given
         ansatz.number_of_qubits = 5
@@ -160,7 +121,7 @@ class TestQCBMCostFunction:
         # When/Then
         with pytest.raises(AssertionError):
             cost_function = (
-                cost_function_factory(
+                create_QCBM_cost_function(
                     ansatz,
                     backend,
                     n_samples,

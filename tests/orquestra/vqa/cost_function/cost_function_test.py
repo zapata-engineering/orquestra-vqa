@@ -6,7 +6,6 @@ from unittest import mock
 
 import numpy as np
 import pytest
-from orquestra.opt.gradients import finite_differences_gradient
 from orquestra.quantum.estimation._estimation import (
     calculate_exact_expectation_values,
     estimate_expectation_values_by_averaging,
@@ -14,17 +13,14 @@ from orquestra.quantum.estimation._estimation import (
 from orquestra.quantum.measurements import ExpectationValues
 from orquestra.quantum.openfermion import QubitOperator
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
-from orquestra.quantum.utils import create_symbols_map
 from sympy import Symbol
 
 from orquestra.vqa.cost_function.cost_function import (
-    AnsatzBasedCostFunction,
     add_normal_noise,
     create_cost_function,
     dynamic_circuit_estimation_tasks_factory,
     expectation_value_estimation_tasks_factory,
     fix_parameters,
-    get_ground_state_cost_function,
     substitution_based_estimation_tasks_factory,
     sum_expectation_values,
 )
@@ -39,10 +35,6 @@ ESTIMATION_PREPROCESSORS = [partial(allocate_shots_uniformly, number_of_shots=1)
 
 
 class TestGroundStateCostFunction:
-    @pytest.fixture(params=["old", "new"])
-    def factory_type(self, request):
-        return request.param
-
     @pytest.fixture(
         params=[
             {
@@ -81,40 +73,30 @@ class TestGroundStateCostFunction:
             },
         ]
     )
-    def ground_state_cost_function(self, request, factory_type):
-        if factory_type == "old":
-            return get_ground_state_cost_function(
-                **request.param,
-                backend=BACKEND,
-                estimation_method=ESTIMATION_METHOD,
-                estimation_preprocessors=ESTIMATION_PREPROCESSORS,
-            )
-        elif factory_type == "new":
-            estimation_tasks_factory = expectation_value_estimation_tasks_factory(
-                request.param["target_operator"],
-                request.param["parametrized_circuit"],
-                ESTIMATION_PREPROCESSORS,
-            )
+    def ground_state_cost_function(self, request):
+        estimation_tasks_factory = expectation_value_estimation_tasks_factory(
+            request.param["target_operator"],
+            request.param["parametrized_circuit"],
+            ESTIMATION_PREPROCESSORS,
+        )
 
-            parameter_preprocessors = []
-            if "fixed_parameters" in request.param:
-                fix_params_preprocessor = fix_parameters(
-                    request.param["fixed_parameters"]
-                )
-                parameter_preprocessors.append(fix_params_preprocessor)
-            if "parameter_precision" in request.param:
-                noise_preprocessor = add_normal_noise(
-                    request.param["parameter_precision"],
-                    request.param["parameter_precision_seed"],
-                )
-                parameter_preprocessors.append(noise_preprocessor)
-
-            return create_cost_function(
-                BACKEND,
-                estimation_tasks_factory,
-                ESTIMATION_METHOD,
-                parameter_preprocessors,
+        parameter_preprocessors = []
+        if "fixed_parameters" in request.param:
+            fix_params_preprocessor = fix_parameters(request.param["fixed_parameters"])
+            parameter_preprocessors.append(fix_params_preprocessor)
+        if "parameter_precision" in request.param:
+            noise_preprocessor = add_normal_noise(
+                request.param["parameter_precision"],
+                request.param["parameter_precision_seed"],
             )
+            parameter_preprocessors.append(noise_preprocessor)
+
+        return create_cost_function(
+            BACKEND,
+            estimation_tasks_factory,
+            ESTIMATION_METHOD,
+            parameter_preprocessors,
+        )
 
     @pytest.mark.parametrize("param", [0.0, 0.42, 1.0, np.pi])
     def test_returns_value_between_plus_and_minus_one(
@@ -130,14 +112,23 @@ class TestGroundStateCostFunction:
             number_of_layers=2, problem_size=1
         ).parametrized_circuit
         parametrized_circuit.bind = mock.Mock(wraps=parametrized_circuit.bind)
-        noisy_ground_state_cost_function = get_ground_state_cost_function(
+
+        estimation_tasks_factory = expectation_value_estimation_tasks_factory(
             target_operator,
             parametrized_circuit,
-            BACKEND,
-            ESTIMATION_METHOD,
             ESTIMATION_PREPROCESSORS,
-            parameter_precision=1e-4,
-            parameter_precision_seed=RNGSEED,
+        )
+
+        noisy_ground_state_cost_function = create_cost_function(
+            BACKEND,
+            estimation_tasks_factory,
+            ESTIMATION_METHOD,
+            parameter_preprocessors=[
+                add_normal_noise(
+                    parameter_precision=1e-4,
+                    parameter_precision_seed=RNGSEED,
+                )
+            ],
         )
 
         generator = np.random.default_rng(RNGSEED)
@@ -177,7 +168,7 @@ class TestSumExpectationValues:
     def test_sum_expectation_values(self):
         expectation_values = ExpectationValues(np.array([5, -2, 1]))
         total = sum_expectation_values(expectation_values)
-        assert np.isclose(total.value, 4)
+        assert np.isclose(total, 4)
         assert total.precision is None
 
     def test_sum_expectation_values_with_covariances(self):
@@ -186,7 +177,7 @@ class TestSumExpectationValues:
         covariances = [correlations[0] / 10, correlations[1] / 10]
         expectation_values = ExpectationValues(values, correlations, covariances)
         total = sum_expectation_values(expectation_values)
-        assert np.isclose(total.value, 4)
+        assert np.isclose(total, 4)
         assert np.isclose(total.precision, np.sqrt((1 + 0.5 + 0.5 + 2 + 7) / 10))
 
 
@@ -236,102 +227,6 @@ class TestEstimationTasksFactory:
         )
 
         assert dynamic_cost_function(params) == substituion_cost_function(params)
-
-
-class TestAnsatzBasedCostFunction:
-    @pytest.fixture()
-    def old_ansatz_based_cost_function(self):
-        return AnsatzBasedCostFunction(
-            TARGET_OPERATOR,
-            ANSATZ,
-            BACKEND,
-            ESTIMATION_METHOD,
-            ESTIMATION_PREPROCESSORS,
-        )
-
-    @pytest.fixture(
-        params=[
-            {},
-            {
-                "parameter_preprocessors": [
-                    add_normal_noise(
-                        parameter_precision=1e-4,
-                        parameter_precision_seed=RNGSEED,
-                    )
-                ]
-            },
-            {"gradient_function": finite_differences_gradient},
-        ]
-    )
-    def ansatz_based_cost_function(self, request):
-        estimation_factory = substitution_based_estimation_tasks_factory(
-            TARGET_OPERATOR, ANSATZ, ESTIMATION_PREPROCESSORS
-        )
-
-        return create_cost_function(
-            BACKEND,
-            estimation_factory,
-            ESTIMATION_METHOD,
-            **request.param,
-        )
-
-    @pytest.mark.parametrize("param", [0.0, 0.42, 1.0, np.pi])
-    def test_ansatz_based_cost_function_returns_value_between_plus_and_minus_one(
-        self, param, ansatz_based_cost_function, old_ansatz_based_cost_function
-    ):
-        params = np.array([param])
-
-        value = ansatz_based_cost_function(params)
-        assert -1 <= value <= 1
-
-        value = old_ansatz_based_cost_function(params)
-        assert -1 <= value <= 1
-
-    @pytest.fixture()
-    def noisy_ansatz_cost_function_with_ansatz(self):
-        ansatz = MockAnsatz(number_of_layers=2, problem_size=1)
-        estimation_method = mock.Mock(wraps=calculate_exact_expectation_values)
-        return (
-            AnsatzBasedCostFunction(
-                TARGET_OPERATOR,
-                ansatz,
-                BACKEND,
-                estimation_method,
-                parameter_precision=1e-4,
-                parameter_precision_seed=RNGSEED,
-            ),
-            ansatz,
-        )
-
-    def test_old_ansatz_based_cost_function_adds_noise_to_parameters(
-        self, noisy_ansatz_cost_function_with_ansatz
-    ):
-        noisy_ansatz_cost_function = noisy_ansatz_cost_function_with_ansatz[0]
-        ansatz = noisy_ansatz_cost_function_with_ansatz[1]
-        generator = np.random.default_rng(RNGSEED)
-
-        # We expect the below to get added to parameters
-        noise = generator.normal(0, 1e-4, 2)
-
-        params = np.array([0.1, 2.3])
-
-        # ansatz based cost function may modify params in place
-        # and we need original ones - therefore we pass a copy
-        noisy_ansatz_cost_function(np.array(params))
-
-        # We only called our function once, therefore the following should be true
-        noisy_ansatz_cost_function.estimation_method.assert_called_once()
-
-        # Here, we make the expected executable circuit with the noisy parameters
-        noisy_symbols_map = create_symbols_map(
-            ansatz.parametrized_circuit.free_symbols, noise + params
-        )
-        expected_noisy_circuit = ansatz.parametrized_circuit.bind(noisy_symbols_map)
-
-        assert (
-            noisy_ansatz_cost_function.estimation_method.call_args[0][1][0].circuit
-            == expected_noisy_circuit
-        )
 
 
 class TestFixParametersPreprocessor:
