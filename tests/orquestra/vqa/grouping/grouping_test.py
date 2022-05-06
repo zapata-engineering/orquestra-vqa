@@ -8,7 +8,7 @@ import pytest
 from orquestra.quantum.measurements import ExpectationValues
 from orquestra.quantum.openfermion import InteractionRDM, QubitOperator
 
-from orquestra.vqa.grouping._grouping import (
+from orquestra.vqa.grouping import (
     compute_group_variances,
     group_comeasureable_terms_greedy,
     is_comeasureable,
