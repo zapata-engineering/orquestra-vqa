@@ -1,5 +1,5 @@
 ################################################################################
-#© Copyright 2022 Zapata Computing Inc.
+# © Copyright 2022 Zapata Computing Inc.
 ################################################################################
 from typing import Any, Dict, Optional
 

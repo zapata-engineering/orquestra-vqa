@@ -1,5 +1,5 @@
 ################################################################################
-#© Copyright 2022 Zapata Computing Inc.
+# © Copyright 2022 Zapata Computing Inc.
 ################################################################################
 """Test case prototypes that can be used in other projects.
 
