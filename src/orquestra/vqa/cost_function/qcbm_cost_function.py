@@ -1,5 +1,5 @@
 ################################################################################
-# © Copyright 2020-2021 Zapata Computing Inc.
+#© Copyright 2022 Zapata Computing Inc.
 ################################################################################
 from numbers import Number
 from typing import Callable
