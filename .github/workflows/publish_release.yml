@@ -41,6 +41,7 @@ jobs:
         with:
           repository: zapatacomputing/orquestra-opt
           path: orquestra-opt
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
 
       - name: Run publish release action
