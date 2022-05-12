@@ -40,7 +40,7 @@ def create_QCBM_cost_function(
         target_bitstring_distribution: bistring distribution which QCBM aims to learn
         gradient_function: a function which returns a function used to compute
             the gradient of the cost function
-            (see zquantum.core.gradients.finite_differences_gradient for reference)
+            (see orquestra.opt.gradients.finite_differences_gradient for reference)
     Returns:
         Callable CostFunction object that evaluates the parametrized circuit produced
         by the ansatz with the given parameters and returns the distance between

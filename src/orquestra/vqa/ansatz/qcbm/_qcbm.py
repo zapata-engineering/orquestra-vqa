@@ -335,7 +335,7 @@ def save_qcbm_ansatz_set(qcbm_ansatz_set: List[QCBMAnsatz], filename: str) -> No
 
 
 def load_qcbm_ansatz_set(file: str) -> List[QCBMAnsatz]:
-    """Load a list of qcbm_ansatz from a json file using a schema.
+    """Load a list of qcbm_ansatz from a json file.
 
     Arguments:
         file (str): the name of the file

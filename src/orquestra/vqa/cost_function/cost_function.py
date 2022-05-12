@@ -312,7 +312,7 @@ def dynamic_circuit_estimation_tasks_factory(
         # TODO: In some ansatzes, `ansatz._generate_circuit(parameters)` does not
         # produce an executable circuit, but rather, they ignore the parameters and
         # returns a parametrized circuit with sympy symbols.
-        # (Ex. see ansatzes in z-quantum-qaoa)
+        # (Ex. see ansatzes in orquestra-vqa)
         #
         # Combined with how this is a private method, we will probably have to somewhat
         # refactor the ansatz class.
