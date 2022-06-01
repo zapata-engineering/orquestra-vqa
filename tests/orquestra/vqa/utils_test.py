@@ -2,7 +2,8 @@
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
 from orquestra.quantum.circuits import Circuit, X
-from orquestra.quantum.vqe_utils import build_hartree_fock_circuit
+
+from orquestra.vqa.utils import build_hartree_fock_circuit
 
 
 class TestVQEUtils:
