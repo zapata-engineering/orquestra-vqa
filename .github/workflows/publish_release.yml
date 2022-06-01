@@ -26,22 +26,18 @@ jobs:
       # in repo settings.
       # ------------------------------------------------------------------------
       - uses: ./subtrees/z_quantum_actions/actions/ssh_setup
-        with:
-          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Get orquestra-quantum
         uses: actions/checkout@v2
         with:
           repository: zapatacomputing/orquestra-quantum
           path: orquestra-quantum
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Get orquestra-opt
         uses: actions/checkout@v2
         with:
           repository: zapatacomputing/orquestra-opt
           path: orquestra-opt
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
 
       - name: Run publish release action
