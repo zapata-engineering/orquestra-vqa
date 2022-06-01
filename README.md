@@ -24,9 +24,33 @@ from orquestra.vqa.cost_function.qcbm_cost_function import create_QCBM_cost_func
 from orquestra.vqa.ansatz.qcbm import QCBMAnsatz
 from orquestra.opt.history.recorder import recorder
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.distributions import compute_mmd
+from orquestra.quantum.distributions import MeasurementOutcomeDistribution
+from orquestra.opt.optimizers.scipy_optimizer import ScipyOptimizer
+import numpy as np
 
+target_distribution = MeasurementOutcomeDistribution(
+    {
+        "0000": 1.0,
+        "0001": 0.0,
+        "0010": 0.0,
+        "0011": 1.0,
+        "0100": 0.0,
+        "0101": 1.0,
+        "0110": 0.0,
+        "0111": 0.0,
+        "1000": 0.0,
+        "1001": 0.0,
+        "1010": 1.0,
+        "1011": 0.0,
+        "1100": 1.0,
+        "1101": 0.0,
+        "1110": 0.0,
+        "1111": 1.0,
+    }
+)
 
-def orquestra_vqa_example_function()
+def orquestra_vqa_example_function():
     ansatz = QCBMAnsatz(1, 4, "all")
     backend = SymbolicSimulator()
     distance_measure_kwargs = {
@@ -38,6 +62,7 @@ def orquestra_vqa_example_function()
         backend,
         10,
         **distance_measure_kwargs,
+        target_distribution=target_distribution
     )
 
     optimizer = ScipyOptimizer(method="L-BFGS-B")
@@ -45,6 +70,8 @@ def orquestra_vqa_example_function()
     opt_results = optimizer.minimize(cost_function, initial_params)
 
     return opt_results
+
+orquestra_vqa_example_function()
 ```
 
 ## Development and Contribution
