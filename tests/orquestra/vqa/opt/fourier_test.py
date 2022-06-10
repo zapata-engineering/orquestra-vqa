@@ -89,6 +89,15 @@ def inner_optimizer():
     return inner_optimizer
 
 
+@pytest.fixture(scope="class")
+def deterministic_randomness():
+    rng_state = np.random.get_state()
+    np.random.seed(358)
+    yield
+    np.random.set_state(rng_state)
+
+
+@pytest.mark.usefixtures("deterministic_randomness")
 class TestFourier:
     @pytest.mark.parametrize("contract", NESTED_OPTIMIZER_CONTRACTS)
     def test_if_satisfies_contracts(
@@ -271,6 +280,7 @@ class TestFourier:
         optimizer.minimize(cost_function_without_gradients_factory, np.ones(2))
 
 
+@pytest.mark.usefixtures("deterministic_randomness")
 class TestPerturbations:
     def test_finds_best_params_from_list(self, ansatz, inner_optimizer):
         params_list = [np.array([i]) for i in [-5, -4, -3, 2, 3, 4, 7, 9]]
