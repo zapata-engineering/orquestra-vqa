@@ -1,7 +1,7 @@
 ################################################################################
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, overload
 
 import numpy as np
 from orquestra.quantum.api.backend import QuantumBackend, QuantumSimulator
@@ -11,7 +11,6 @@ from orquestra.quantum.measurements import ExpectationValues, check_parity_of_ve
 from orquestra.quantum.openfermion import IsingOperator
 from orquestra.quantum.utils import dec2bin
 from orquestra.quantum.wavefunction import Wavefunction
-from typing_extensions import overload
 
 PROBABILITY_CUTOFF = 1e-8
 
