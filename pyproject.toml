@@ -44,3 +44,7 @@ exclude_lines = [
 
 [tool.pytest.ini_options]
 log_level="INFO"
+
+[tool.flake8]
+ignore = ['E203', 'E266', 'F401', 'W605']
+max-line-length = 88
