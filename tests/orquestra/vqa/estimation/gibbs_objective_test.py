@@ -3,13 +3,57 @@
 ################################################################################
 import numpy as np
 import pytest
-from orquestra.quantum.api.estimation import EstimationTask
-from orquestra.quantum.api.estimator_contract import ESTIMATOR_CONTRACTS
-from orquestra.quantum.circuits import Circuit, H, X
+from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
+from orquestra.quantum.api.estimator_contract import (
+    ESTIMATOR_CONTRACTS,
+    _validate_expectation_value_includes_coefficients,
+)
+from orquestra.quantum.circuits import RX, Circuit, H, X
 from orquestra.quantum.openfermion import IsingOperator, QubitOperator
+from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 from orquestra.quantum.testing.mocks import MockQuantumBackend
 
 from orquestra.vqa.estimation.gibbs_objective import GibbsObjectiveEstimator
+
+
+# The gibbs objective estimator exponentiates the expectation value of each outcome,
+# sums the results, and takes the negative log of the sum. This does not scale linearly
+# with the coefficient. We check expectation value includes coefficient differently
+def _validate_expectation_value_includes_coefficients_for_gibbs_estimator(
+    estimator: EstimateExpectationValues,
+):
+    backend = SymbolicSimulator(seed=1997)
+    term_coefficient = 30
+    estimation_tasks = [
+        EstimationTask(IsingOperator("Z0"), Circuit([RX(np.pi / 3)(0)]), 10000),
+        EstimationTask(
+            IsingOperator("Z0", term_coefficient), Circuit([RX(np.pi / 3)(0)]), 10000
+        ),
+    ]
+
+    expectation_values = estimator(
+        backend=backend,
+        estimation_tasks=estimation_tasks,
+    )
+
+    # For a sufficiently large coefficient, the exponential should become
+    # much larger (greater than linear scaling)
+    # Note that we take the negative exponential here because the gibbs
+    # estimator takes the negative log
+    return np.all(
+        np.greater(
+            np.exp(-expectation_values[1].values) / term_coefficient,
+            np.exp(-expectation_values[0].values),
+        )
+    )
+
+
+# Remove the test that assumes expectation value scales linearly with coefficient
+# and add the new test defined above
+ESTIMATOR_CONTRACTS.remove(_validate_expectation_value_includes_coefficients)
+ESTIMATOR_CONTRACTS += [
+    _validate_expectation_value_includes_coefficients_for_gibbs_estimator
+]
 
 
 @pytest.mark.parametrize("contract", ESTIMATOR_CONTRACTS)
