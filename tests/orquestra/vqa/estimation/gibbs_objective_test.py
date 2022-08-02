@@ -9,7 +9,6 @@ from orquestra.quantum.api.estimator_contract import (
     _validate_expectation_value_includes_coefficients,
 )
 from orquestra.quantum.circuits import RX, Circuit, H, X
-from orquestra.quantum.openfermion import IsingOperator, QubitOperator
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 from orquestra.quantum.testing.mocks import MockQuantumBackend
 from orquestra.quantum.wip.operators import PauliTerm
@@ -26,9 +25,9 @@ def _validate_expectation_value_includes_coefficients_for_gibbs_estimator(
     backend = SymbolicSimulator(seed=1997)
     term_coefficient = 30
     estimation_tasks = [
-        EstimationTask(IsingOperator("Z0"), Circuit([RX(np.pi / 3)(0)]), 10000),
+        EstimationTask(PauliTerm("Z0"), Circuit([RX(np.pi / 3)(0)]), 10000),
         EstimationTask(
-            IsingOperator("Z0", term_coefficient), Circuit([RX(np.pi / 3)(0)]), 10000
+            PauliTerm("Z0", term_coefficient), Circuit([RX(np.pi / 3)(0)]), 10000
         ),
     ]
 
