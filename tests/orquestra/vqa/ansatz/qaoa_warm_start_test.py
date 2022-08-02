@@ -5,12 +5,8 @@ import numpy as np
 import pytest
 import sympy
 from orquestra.quantum.circuits import RY, RZ, Circuit
-from orquestra.quantum.openfermion import (
-    IsingOperator,
-    QubitOperator,
-    change_operator_type,
-)
 from orquestra.quantum.utils import compare_unitary
+from orquestra.quantum.wip.operators import PauliSum, PauliTerm
 
 from orquestra.vqa.ansatz.qaoa_warm_start import (
     WarmStartQAOAAnsatz,
@@ -72,7 +68,7 @@ class TestWarmStartQAOAAnsatz(AnsatzTests):
 
     @pytest.fixture
     def ansatz(self, thetas, number_of_layers):
-        cost_hamiltonian = QubitOperator((0, "Z")) + QubitOperator((1, "Z"))
+        cost_hamiltonian = PauliSum("Z0+Z1")
         return WarmStartQAOAAnsatz(
             number_of_layers=number_of_layers,
             cost_hamiltonian=cost_hamiltonian,
@@ -81,7 +77,7 @@ class TestWarmStartQAOAAnsatz(AnsatzTests):
 
     def test_set_cost_hamiltonian(self, ansatz):
         # Given
-        new_cost_hamiltonian = QubitOperator((0, "Z")) - QubitOperator((1, "Z"))
+        new_cost_hamiltonian = PauliSum("Z0 + -1*Z1")
 
         # When
         ansatz.cost_hamiltonian = new_cost_hamiltonian
@@ -91,7 +87,7 @@ class TestWarmStartQAOAAnsatz(AnsatzTests):
 
     def test_set_cost_hamiltonian_invalidates_circuit(self, ansatz):
         # Given
-        new_cost_hamiltonian = QubitOperator((0, "Z")) - QubitOperator((1, "Z"))
+        new_cost_hamiltonian = PauliSum("Z0 + -1*Z1")
 
         # When
         ansatz.cost_hamiltonian = new_cost_hamiltonian
@@ -121,9 +117,7 @@ class TestWarmStartQAOAAnsatz(AnsatzTests):
 
     def test_get_number_of_qubits(self, ansatz):
         # Given
-        new_cost_hamiltonian = (
-            QubitOperator((0, "Z")) + QubitOperator((1, "Z")) + QubitOperator((2, "Z"))
-        )
+        new_cost_hamiltonian = PauliSum("Z0+Z1+Z2")
         target_number_of_qubits = 3
 
         # When
@@ -132,12 +126,9 @@ class TestWarmStartQAOAAnsatz(AnsatzTests):
         # Then
         assert ansatz.number_of_qubits == target_number_of_qubits
 
-    def test_get_number_of_qubits_with_ising_hamiltonian(self, ansatz):
+    def test_get_number_of_qubits_with_pauli_term(self, ansatz):
         # Given
-        new_cost_hamiltonian = (
-            QubitOperator((0, "Z")) + QubitOperator((1, "Z")) + QubitOperator((2, "Z"))
-        )
-        new_cost_hamiltonian = change_operator_type(new_cost_hamiltonian, IsingOperator)
+        new_cost_hamiltonian = PauliTerm("Z0*Z1*Z2")
         target_number_of_qubits = 3
 
         # When
@@ -167,17 +158,32 @@ class TestWarmStartQAOAAnsatz(AnsatzTests):
         # Then
         assert compare_unitary(final_unitary, target_unitary, tol=1e-10)
 
-    def test_generate_circuit_with_ising_operator(
-        self, ansatz, number_of_layers, thetas
-    ):
+    def test_generate_circuit_with_pauli_term(self, ansatz, number_of_layers):
+        # Given
+        thetas = np.array([0.5])
+
+        def create_1_qubit_target_unitary(thetas, number_of_layers):
+            target_circuit = Circuit()
+            target_circuit += RY(thetas[0])(0)
+            betas = create_betas(number_of_layers)
+            gammas = create_gammas(number_of_layers)
+            symbols_map = create_symbols_map(number_of_layers)
+            for layer_id in range(number_of_layers):
+                beta = betas[layer_id]
+                gamma = gammas[layer_id]
+                target_circuit += RZ(2.0 * gamma)(0)
+                target_circuit += RY(-thetas[0])(0)
+                target_circuit += RZ(-2.0 * beta)(0)
+                target_circuit += RY(thetas[0])(0)
+
+            return target_circuit.bind(symbols_map).to_unitary()
+
         # When
-        ansatz.cost_hamiltonian = change_operator_type(
-            ansatz.cost_hamiltonian, IsingOperator
-        )
+        ansatz = WarmStartQAOAAnsatz(number_of_layers, PauliTerm("Z0"), thetas)
 
         parametrized_circuit = ansatz._generate_circuit()
         symbols_map = create_symbols_map(number_of_layers)
-        target_unitary = create_target_unitary(thetas, number_of_layers)
+        target_unitary = create_1_qubit_target_unitary(thetas, number_of_layers)
         evaluated_circuit = parametrized_circuit.bind(symbols_map)
         final_unitary = evaluated_circuit.to_unitary()
 
