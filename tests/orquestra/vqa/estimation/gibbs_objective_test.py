@@ -6,8 +6,8 @@ import pytest
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.api.estimator_contract import ESTIMATOR_CONTRACTS
 from orquestra.quantum.circuits import Circuit, H, X
-from orquestra.quantum.openfermion import IsingOperator, QubitOperator
 from orquestra.quantum.testing.mocks import MockQuantumBackend
+from orquestra.quantum.wip.operators import PauliTerm
 
 from orquestra.vqa.estimation.gibbs_objective import GibbsObjectiveEstimator
 
@@ -29,7 +29,7 @@ class TestGibbsEstimator:
 
     @pytest.fixture()
     def operator(self):
-        return IsingOperator("Z0")
+        return PauliTerm("Z0")
 
     @pytest.fixture()
     def estimation_tasks(self, operator, circuit):
@@ -43,7 +43,7 @@ class TestGibbsEstimator:
         self, estimator, backend, circuit
     ):
         # Given
-        estimation_tasks = [EstimationTask(QubitOperator("X0"), circuit, 10)]
+        estimation_tasks = [EstimationTask(PauliTerm("X0"), circuit, 10)]
         with pytest.raises(TypeError):
             estimator(
                 backend=backend,

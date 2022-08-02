@@ -11,8 +11,8 @@ from orquestra.quantum.estimation._estimation import (
     estimate_expectation_values_by_averaging,
 )
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.openfermion import QubitOperator
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.wip.operators import PauliTerm
 from sympy import Symbol
 
 from orquestra.vqa.cost_function.cost_function import (
@@ -38,26 +38,26 @@ class TestGroundStateCostFunction:
     @pytest.fixture(
         params=[
             {
-                "target_operator": QubitOperator("Z0"),
+                "target_operator": PauliTerm("Z0"),
                 "parametrized_circuit": MockAnsatz(
                     number_of_layers=1, problem_size=1
                 ).parametrized_circuit,
             },
             {
-                "target_operator": QubitOperator("Z0 Z1"),
+                "target_operator": PauliTerm("Z0*Z1"),
                 "parametrized_circuit": MockAnsatz(
                     number_of_layers=1, problem_size=2
                 ).parametrized_circuit,
             },
             {
-                "target_operator": QubitOperator("Z0 Z1"),
+                "target_operator": PauliTerm("Z0*Z1"),
                 "parametrized_circuit": MockAnsatz(
                     number_of_layers=2, problem_size=2
                 ).parametrized_circuit,
                 "fixed_parameters": [1.2],
             },
             {
-                "target_operator": QubitOperator("Z0 Z1"),
+                "target_operator": PauliTerm("Z0*Z1"),
                 "parametrized_circuit": MockAnsatz(
                     number_of_layers=2, problem_size=2
                 ).parametrized_circuit,
@@ -66,7 +66,7 @@ class TestGroundStateCostFunction:
                 "parameter_precision_seed": RNGSEED,
             },
             {
-                "target_operator": QubitOperator("Z0"),
+                "target_operator": PauliTerm("Z0"),
                 "parametrized_circuit": MockAnsatz(
                     number_of_layers=1, problem_size=1
                 ).parametrized_circuit,
@@ -107,7 +107,7 @@ class TestGroundStateCostFunction:
         assert -1 <= value <= 1
 
     def test_adds_noise_to_parameters(self):
-        target_operator = QubitOperator("Z0")
+        target_operator = PauliTerm("Z0")
         parametrized_circuit = MockAnsatz(
             number_of_layers=2, problem_size=1
         ).parametrized_circuit
@@ -181,7 +181,7 @@ class TestSumExpectationValues:
         assert np.isclose(total.precision, np.sqrt((1 + 0.5 + 0.5 + 2 + 7) / 10))
 
 
-TARGET_OPERATOR = QubitOperator("Z0")
+TARGET_OPERATOR = PauliTerm("Z0")
 ANSATZ = MockAnsatz(number_of_layers=1, problem_size=1)
 
 

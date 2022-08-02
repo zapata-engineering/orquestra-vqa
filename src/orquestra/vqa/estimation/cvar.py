@@ -8,9 +8,9 @@ from orquestra.quantum.api.backend import QuantumBackend, QuantumSimulator
 from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
 from orquestra.quantum.distributions import MeasurementOutcomeDistribution
 from orquestra.quantum.measurements import ExpectationValues, check_parity_of_vector
-from orquestra.quantum.openfermion import IsingOperator
 from orquestra.quantum.utils import dec2bin
 from orquestra.quantum.wavefunction import Wavefunction
+from orquestra.quantum.wip.operators import PauliRepresentation
 
 PROBABILITY_CUTOFF = 1e-8
 
@@ -105,7 +105,9 @@ class CvarEstimator(EstimateExpectationValues):
 
 
 def _calculate_expectation_value_for_distribution(
-    distribution: MeasurementOutcomeDistribution, operator: IsingOperator, alpha: float
+    distribution: MeasurementOutcomeDistribution,
+    operator: PauliRepresentation,
+    alpha: float,
 ) -> float:
     # Calculates expectation value per bitstring
     expectation_values = _calculate_expectation_values(
@@ -123,7 +125,7 @@ def _calculate_expectation_value_for_distribution(
 
 
 def _calculate_expectation_value_for_wavefunction(
-    wavefunction: Wavefunction, operator: IsingOperator, alpha: float
+    wavefunction: Wavefunction, operator: PauliRepresentation, alpha: float
 ) -> float:
     n_qubits = wavefunction.amplitudes.shape[0].bit_length() - 1
 
@@ -200,16 +202,16 @@ def _sum_expectation_values(
 
 
 def _calculate_expectation_values(
-    bitstrings: np.ndarray, operator: IsingOperator
+    bitstrings: np.ndarray, operator: PauliRepresentation
 ) -> np.ndarray:
     """Calculates expectation values for each bitstring in the given array"""
 
-    if not isinstance(operator, IsingOperator):
-        raise TypeError("Input operator not openfermion.IsingOperator")
+    if not operator.is_ising:
+        raise TypeError("Input operator is not ising.")
 
     expectation_values_list = [
-        coefficient
-        * (check_parity_of_vector(bitstrings, [op[0] for op in term]) * 2 - 1)
-        for term, coefficient in operator.terms.items()
+        term.coefficient
+        * (check_parity_of_vector(bitstrings, term._ops.keys()) * 2 - 1)
+        for term in operator.terms
     ]
     return np.array(np.array(expectation_values_list).sum(axis=0))

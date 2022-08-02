@@ -8,7 +8,7 @@ from orquestra.quantum.api.backend import QuantumBackend
 from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
 from orquestra.quantum.distributions import MeasurementOutcomeDistribution
 from orquestra.quantum.measurements import ExpectationValues, Measurements
-from orquestra.quantum.openfermion import IsingOperator
+from orquestra.quantum.wip.operators import PauliRepresentation
 
 
 class GibbsObjectiveEstimator(EstimateExpectationValues):
@@ -66,7 +66,9 @@ class GibbsObjectiveEstimator(EstimateExpectationValues):
 
 
 def _calculate_expectation_value_for_distribution(
-    distribution: MeasurementOutcomeDistribution, operator: IsingOperator, alpha: float
+    distribution: MeasurementOutcomeDistribution,
+    operator: PauliRepresentation,
+    alpha: float,
 ) -> float:
 
     # Calculates expectation value per bitstring
