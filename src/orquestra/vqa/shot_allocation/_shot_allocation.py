@@ -2,12 +2,13 @@
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
 
-from typing import List, Optional, Tuple, cast
+from typing import List, Optional, Tuple
 
 import numpy as np
+import warnings
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.openfermion import QubitOperator
+from orquestra.quantum.wip.operators import PauliRepresentation
 from orquestra.quantum.utils import scale_and_discretize
 
 from orquestra.vqa.grouping._grouping import compute_group_variances
@@ -52,10 +53,7 @@ def allocate_shots_proportionally(
     if total_n_shots <= 0:
         raise ValueError("total_n_shots must be positive.")
 
-    frame_operators = [
-        cast(QubitOperator, estimation_task.operator)
-        for estimation_task in estimation_tasks
-    ]
+    frame_operators = [estimation_task.operator for estimation_task in estimation_tasks]
 
     _, _, relative_measurements_per_frame = estimate_nmeas_for_frames(
         frame_operators, prior_expectation_values
@@ -78,12 +76,12 @@ def allocate_shots_proportionally(
 
 
 def estimate_nmeas_for_frames(
-    frame_operators: List[QubitOperator],
+    frame_operators: List[PauliRepresentation],
     expecval: Optional[ExpectationValues] = None,
 ) -> Tuple[float, int, np.ndarray]:
     """Calculates the number of measurements required for computing
     the expectation value of a qubit hamiltonian, where co-measurable terms
-    are grouped in a single QubitOperator, and different groups are different
+    are grouped in a single pauli operator, and different groups are different
     members of the list.
 
     We are assuming the exact expectation values are provided
@@ -97,7 +95,7 @@ def estimate_nmeas_for_frames(
     cov(O_{a}^{i}, O_{b}^{i}) = <O_{a}^{i} O_{b}^{i}> - <O_{a}^{i}> <O_{b}^{i}> = 0
 
     Args:
-        frame_operators (List[QubitOperator]): A list of QubitOperator objects, where
+        frame_operators (List[PauliRepresentation]): A list of pauli operators, where
             each element in the list is a group of co-measurable terms.
         expecval (Optional[ExpectationValues]): An ExpectationValues object containing
             the expectation values of all operators in frame_operators. If absent,
@@ -112,6 +110,12 @@ def estimate_nmeas_for_frames(
         frame_meas (np.array): Number of optimal measurements per group
     """
     frame_variances = compute_group_variances(frame_operators, expecval)
+    if (np.real(frame_variances) != frame_variances).any():
+        warnings.warn(
+            "Complex numbers detected in group variances. "
+            "The imaginary part will be discarded."
+        )
+    frame_variances = np.real(frame_variances)
     sqrt_lambda = sum(np.sqrt(frame_variances))
     frame_meas = sqrt_lambda * np.sqrt(frame_variances)
     K2 = sum(frame_meas)
