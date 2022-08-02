@@ -9,8 +9,8 @@ from orquestra.opt.api.optimizer import optimization_result
 from orquestra.opt.api.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
 from orquestra.opt.mock_objects import MockOptimizer, mock_cost_function
 from orquestra.quantum.estimation._estimation import calculate_exact_expectation_values
-from orquestra.quantum.openfermion import IsingOperator
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.wip.operators import PauliTerm
 
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
 from orquestra.vqa.api.ansatz import Ansatz
@@ -33,10 +33,10 @@ def initial_params():
 @pytest.fixture
 def hamiltonian():
     return (
-        IsingOperator("Z0 Z1", 5)
-        + IsingOperator("Z0 Z3", 2)
-        + IsingOperator("Z1 Z2", 0.5)
-        + IsingOperator("Z2 Z3", 0.6)
+        PauliTerm("Z0*Z1", 5)
+        + PauliTerm("Z0*Z3", 2)
+        + PauliTerm("Z1*Z2", 0.5)
+        + PauliTerm("Z2*Z3", 0.6)
     )
 
 

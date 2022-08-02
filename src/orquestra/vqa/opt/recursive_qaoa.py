@@ -16,12 +16,8 @@ from orquestra.opt.api.optimizer import (
 from orquestra.opt.history.recorder import HistoryEntry, RecorderFactory
 from orquestra.opt.history.recorder import recorder as _recorder
 from orquestra.opt.problems import solve_problem_by_exhaustive_search
-from orquestra.quantum.openfermion import (
-    IsingOperator,
-    QubitOperator,
-    change_operator_type,
-)
 from orquestra.quantum.openfermion.utils import count_qubits
+from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum, PauliTerm
 from scipy.optimize import OptimizeResult
 
 from ..api.ansatz import Ansatz
@@ -39,7 +35,7 @@ class RecursiveQAOA(NestedOptimizer):
     def __init__(
         self,
         n_c: int,
-        cost_hamiltonian: IsingOperator,
+        cost_hamiltonian: PauliRepresentation,
         ansatz: Ansatz,
         inner_optimizer: Optimizer,
         recorder: RecorderFactory = _recorder,
@@ -62,7 +58,7 @@ class RecursiveQAOA(NestedOptimizer):
                 recursion of RQAOA.
             recorder: recorder object defining how to store the optimization history.
         """
-        n_qubits = count_qubits(change_operator_type(cost_hamiltonian, QubitOperator))
+        n_qubits = count_qubits(cost_hamiltonian)
 
         if n_c >= n_qubits or n_c <= 0:
             raise ValueError(
@@ -77,7 +73,7 @@ class RecursiveQAOA(NestedOptimizer):
 
     def _minimize(
         self,
-        cost_function_factory: Callable[[IsingOperator, Ansatz], CostFunction],
+        cost_function_factory: Callable[[PauliRepresentation, Ansatz], CostFunction],
         initial_params: np.ndarray,
         keep_history: bool = False,
     ) -> OptimizeResult:
@@ -94,9 +90,7 @@ class RecursiveQAOA(NestedOptimizer):
                     QAOA as a list of tuples; each tuple is a tuple of bits.
         """
 
-        n_qubits = count_qubits(
-            change_operator_type(self._cost_hamiltonian, QubitOperator)
-        )
+        n_qubits = count_qubits(self._cost_hamiltonian)
         qubit_map = _create_default_qubit_map(n_qubits)
 
         histories: Dict[str, List[HistoryEntry]] = defaultdict(list)
@@ -168,28 +162,21 @@ class RecursiveQAOA(NestedOptimizer):
 
         # Check new cost hamiltonian has correct amount of qubits
         assert (
-            count_qubits(change_operator_type(reduced_cost_hamiltonian, QubitOperator))
-            == count_qubits(change_operator_type(cost_hamiltonian, QubitOperator)) - 1
+            count_qubits(reduced_cost_hamiltonian) == count_qubits(cost_hamiltonian) - 1
             # If we have 1 qubit, the reduced cost hamiltonian would be empty and say
             # it has 0 qubits.
-            or count_qubits(
-                change_operator_type(reduced_cost_hamiltonian, QubitOperator)
-            )
-            == 0
-            and count_qubits(change_operator_type(cost_hamiltonian, QubitOperator)) == 2
+            or count_qubits(reduced_cost_hamiltonian) == 0
+            and count_qubits(cost_hamiltonian) == 2
             and self._n_c == 1
         )
 
         # Check qubit map has correct amount of qubits
         assert (
-            count_qubits(change_operator_type(cost_hamiltonian, QubitOperator)) - 1
+            count_qubits(cost_hamiltonian) - 1
             == max([qubit_indices[0] for qubit_indices in new_qubit_map.values()]) + 1
         )
 
-        if (
-            count_qubits(change_operator_type(reduced_cost_hamiltonian, QubitOperator))
-            > self._n_c
-        ):
+        if count_qubits(reduced_cost_hamiltonian) > self._n_c:
             # If we didn't reach threshold `n_c`, we repeat the the above with the
             # reduced cost hamiltonian.
             return self._recursive_minimize(
@@ -205,7 +192,7 @@ class RecursiveQAOA(NestedOptimizer):
 
         else:
             best_value, reduced_solutions = solve_problem_by_exhaustive_search(
-                change_operator_type(reduced_cost_hamiltonian, QubitOperator)
+                reduced_cost_hamiltonian
             )
 
             solutions = _map_reduced_solutions_to_original_solutions(
@@ -233,11 +220,11 @@ def _create_default_qubit_map(n_qubits: int) -> Dict[int, List[int]]:
 
 
 def _find_term_with_strongest_correlation(
-    hamiltonian: IsingOperator,
+    hamiltonian: PauliRepresentation,
     ansatz: Ansatz,
     optimal_params: np.ndarray,
-    cost_function_factory: Callable[[IsingOperator, Ansatz], CostFunction],
-) -> Tuple[IsingOperator, float]:
+    cost_function_factory: Callable[[PauliRepresentation, Ansatz], CostFunction],
+) -> Tuple[PauliTerm, float]:
     """Find term Z_i Z_j maximizing <psi(beta, gamma) | Z_i Z_j | psi(beta, gamma)>.
 
     The idea is that the term with largest expectation value also has the largest
@@ -257,9 +244,9 @@ def _find_term_with_strongest_correlation(
     """
     largest_expval = 0.0
 
-    for term in hamiltonian:
+    for term in hamiltonian.terms:
         # If term is a constant term, don't calculate expectation value.
-        if () not in term.terms:
+        if not term.is_constant:
 
             # Calculate expectation value of term
             cost_function_of_term = cost_function_factory(term, ansatz)
@@ -274,7 +261,7 @@ def _find_term_with_strongest_correlation(
 
 def _update_qubit_map(
     qubit_map: Dict[int, List[int]],
-    term_with_largest_expval: IsingOperator,
+    term_with_largest_expval: PauliTerm,
     largest_expval: float,
 ) -> Dict[int, List[int]]:
     """Update the qubit map according to equation (15) in the original paper.
@@ -303,11 +290,9 @@ def _update_qubit_map(
                     opposite value of qubit 2, and the original qubit 1 is now
                     represented by the value of qubit 3.
     """
-    assert len(term_with_largest_expval.terms.keys()) == 1
-
     new_qubit_map = deepcopy(qubit_map)
 
-    qubit_to_get_rid_of: int = [*term_with_largest_expval.terms][0][1][0]
+    qubit_to_get_rid_of = [*term_with_largest_expval._ops.keys()][-1]
 
     # i is original qubit, qubit_map[i][0] is current equivalent of original qubit.
     for i in range(len(new_qubit_map)):
@@ -321,11 +306,9 @@ def _update_qubit_map(
 
 
 def _get_new_qubit_indice(
-    old_indice: int, operator_with_largest_expval: IsingOperator
+    old_indice: int, operator_with_largest_expval: PauliTerm
 ) -> int:
-    assert len(operator_with_largest_expval.terms.keys()) == 1
-
-    term_with_largest_expval = [*operator_with_largest_expval.terms][0]
+    term_with_largest_expval = [*operator_with_largest_expval._ops.items()]
     # term_with_largest_expval is now a subscriptable tuple like ((0, 'Z'), (1, 'Z'))
 
     qubit_to_get_rid_of: int = term_with_largest_expval[1][0]
@@ -344,10 +327,10 @@ def _get_new_qubit_indice(
 
 
 def _create_reduced_hamiltonian(
-    hamiltonian: IsingOperator,
-    term_with_largest_expval: IsingOperator,
+    hamiltonian: PauliRepresentation,
+    term_with_largest_expval: PauliTerm,
     largest_expval: float,
-) -> IsingOperator:
+) -> PauliSum:
     """Reduce the cost hamiltonian accordinmg to eq. (15) in the original paper.
 
     Reduction is done by substituting one qubit of the term with the largest
@@ -362,39 +345,33 @@ def _create_reduced_hamiltonian(
     Returns:
         Reduced hamiltonian.
     """
-    assert len(term_with_largest_expval.terms.keys()) == 1
+    reduced_hamiltonian = PauliSum()
 
-    reduced_hamiltonian = IsingOperator()
+    qubit_to_get_rid_of = [*term_with_largest_expval._ops.keys()][-1]
 
-    qubit_to_get_rid_of: int = [*term_with_largest_expval.terms][0][1][0]
-
-    for (term, coefficient) in hamiltonian.terms.items():
-        # term is tuple representing one term of IsingOperator, example
-        # ((2, 'Z'), (3, 'Z'))
-        if term not in term_with_largest_expval.terms:
+    for term in hamiltonian.terms:
+        coefficient = term.coefficient
+        if term != term_with_largest_expval:
             # If term is not the term_with_largest_expval
-            new_term: Tuple = ()
-            for qubit in term:
-                # qubit is a component of qubit operator on 1 qubit ex. (2, 'Z')
-                qubit_indice: int = qubit[0]
+            new_term_strs = []
+            for qubit_indice in term._ops.keys():
 
                 # Map the new cost hamiltonian onto reduced qubits
                 new_qubit_indice = _get_new_qubit_indice(
                     qubit_indice, term_with_largest_expval
                 )
-                new_qubit = (new_qubit_indice, "Z")
-                new_term += (new_qubit,)
+                new_term_strs.append(f"Z{new_qubit_indice}")
 
                 if qubit_indice == qubit_to_get_rid_of:
                     coefficient *= np.sign(largest_expval)
 
-            reduced_hamiltonian += IsingOperator(new_term, coefficient)
+            reduced_hamiltonian += PauliTerm("*".join(new_term_strs), coefficient)
 
     return reduced_hamiltonian
 
 
 def _map_reduced_solutions_to_original_solutions(
-    reduced_solutions: List[Tuple[int]], qubit_map: Dict[int, List[int]]
+    reduced_solutions: List[Tuple[int, ...]], qubit_map: Dict[int, List[int]]
 ):
     """Map the answer of the reduced Hamiltonian back to the original number of qubits.
 
