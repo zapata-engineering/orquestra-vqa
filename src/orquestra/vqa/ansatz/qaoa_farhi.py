@@ -2,7 +2,6 @@
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
 from typing import List, Optional, Union
-from cirq import PauliSum
 
 import numpy as np
 import sympy
