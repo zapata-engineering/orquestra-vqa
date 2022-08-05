@@ -2,14 +2,14 @@
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
 
+import warnings
 from typing import List, Optional, Tuple
 
 import numpy as np
-import warnings
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.wip.operators import PauliRepresentation
 from orquestra.quantum.utils import scale_and_discretize
+from orquestra.quantum.wip.operators import PauliRepresentation
 
 from orquestra.vqa.grouping._grouping import compute_group_variances
 

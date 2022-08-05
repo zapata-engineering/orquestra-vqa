@@ -6,9 +6,7 @@ from typing import Callable, Iterable, List, Union
 import numpy as np
 import sympy
 from orquestra.opt.api.cost_function import CostFunction, ParameterPreprocessor
-from orquestra.opt.api.functions import (
-    function_with_gradient,
-)
+from orquestra.opt.api.functions import function_with_gradient
 from orquestra.opt.gradients import finite_differences_gradient
 from orquestra.quantum.api.backend import QuantumBackend
 from orquestra.quantum.api.estimation import (
