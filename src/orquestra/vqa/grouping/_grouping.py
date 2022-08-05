@@ -138,6 +138,12 @@ def group_comeasureable_terms_greedy(
     return groups
 
 
+def _group_comeasureable_terms_greedy_sorted(
+    qubit_operator: PauliRepresentation,
+) -> List[PauliRepresentation]:
+    return group_comeasureable_terms_greedy(qubit_operator, True)
+
+
 def _calculate_variance_upper_bound(group: PauliRepresentation) -> float:
     coefficients = np.array([term.coefficient for term in group.terms])
     return np.sum(coefficients**2)
