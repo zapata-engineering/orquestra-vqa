@@ -210,8 +210,7 @@ def _calculate_expectation_values(
         raise TypeError("Input operator is not ising.")
 
     expectation_values_list = [
-        term.coefficient
-        * (check_parity_of_vector(bitstrings, term.qubits) * 2 - 1)
+        term.coefficient * (check_parity_of_vector(bitstrings, term.qubits) * 2 - 1)
         for term in operator.terms
     ]
     return np.array(np.array(expectation_values_list).sum(axis=0))
