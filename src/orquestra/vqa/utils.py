@@ -1,15 +1,18 @@
 ################################################################################
 # © Copyright 2020-2022 Zapata Computing Inc.
 ################################################################################
-from typing import Optional, Union
+import operator
+from functools import reduce
+from typing import Iterable, Optional, Union
 
 import numpy as np
 import sympy
-from orquestra.quantum.circuits import Circuit, X
-from orquestra.quantum.evolution import time_evolution
+from orquestra.quantum import circuits
+from orquestra.quantum.circuits import CNOT, RX, RZ, Circuit, H, X
 from orquestra.quantum.openfermion import (
     FermionOperator,
     InteractionOperator,
+    QubitOperator,
     bravyi_kitaev,
     get_fermion_operator,
     jordan_wigner,
@@ -59,7 +62,9 @@ def exponentiate_fermion_operator(
     qubit_generator.compress()
 
     # Quantum circuit implementing the excitation operators
-    circuit = time_evolution(qubit_generator, 1, method="Trotter", trotter_order=1)
+    circuit = _time_evolution_for_qubit_operator(
+        qubit_generator, 1, method="Trotter", trotter_order=1
+    )
 
     return circuit
 
@@ -113,4 +118,92 @@ def build_hartree_fock_circuit(
     for op in term[0]:
         if op[1] != "Z":
             circuit += X(op[0])
+    return circuit
+
+
+def _time_evolution_for_qubit_operator(
+    hamiltonian: QubitOperator,
+    time: Union[float, sympy.Expr],
+    method: str = "Trotter",
+    trotter_order: int = 1,
+) -> circuits.Circuit:
+    """This method is a duplicate of orquestra.quantum.evolution.time_evolution. It
+    performs the same functionality but for a QubitOperator.
+
+    This is needed here because singlet uccsd ansatz uses qubit operators with symbolic
+    coefficients through the exponentiate_fermion_operator function. This is a temporary
+    solution until we implement support for symbolic coefficients in the orquestra
+    pauli operator classes.
+
+    See docstring of orquestra.quantum.evolution.time_evolution for more information
+    about time evolution.
+    """
+    if method != "Trotter":
+        raise ValueError(f"Currently the method {method} is not supported.")
+
+    terms: Iterable = list(hamiltonian.get_operators())
+
+    return reduce(
+        operator.add,
+        (
+            _time_evolution_for_qubit_operator_term(term, time / trotter_order)
+            for _index_order in range(trotter_order)
+            for term in terms
+        ),
+    )
+
+
+def _time_evolution_for_qubit_operator_term(
+    term: QubitOperator, time: Union[float, sympy.Expr]
+) -> circuits.Circuit:
+    """This method is a duplicate of orquestra.quantum.evolution.time_evolution_for_term
+    It performs the same functionality but for a QubitOperator.
+
+    See docstring of `_time_evolution_for_qubit_operator`
+    """
+
+    if len(term.terms) != 1:
+        raise ValueError("This function works only on a single term.")
+    term_components = list(term.terms.keys())[0]
+    base_changes = []
+    base_reversals = []
+    cnot_gates = []
+    central_gate: Optional[circuits.GateOperation] = None
+    term_types = [component[1] for component in term_components]
+    qubit_indices = [component[0] for component in term_components]
+    coefficient = list(term.terms.values())[0]
+
+    circuit = circuits.Circuit()
+
+    # If constant term, return empty circuit.
+    if not term_components:
+        return circuit
+
+    for i, (term_type, qubit_id) in enumerate(zip(term_types, qubit_indices)):
+        if term_type == "X":
+            base_changes.append(H(qubit_id))
+            base_reversals.append(H(qubit_id))
+        elif term_type == "Y":
+            base_changes.append(RX(np.pi / 2)(qubit_id))
+            base_reversals.append(RX(-np.pi / 2)(qubit_id))
+        if i == len(term_components) - 1:
+            central_gate = RZ(2 * time * coefficient)(qubit_id)
+        else:
+            cnot_gates.append(CNOT(qubit_id, qubit_indices[i + 1]))
+
+    for gate in base_changes:
+        circuit += gate
+
+    for gate in cnot_gates:
+        circuit += gate
+
+    if central_gate is not None:
+        circuit += central_gate
+
+    for gate in reversed(cnot_gates):
+        circuit += gate
+
+    for gate in base_reversals:
+        circuit += gate
+
     return circuit
