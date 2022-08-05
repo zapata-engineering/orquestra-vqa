@@ -292,7 +292,8 @@ def _update_qubit_map(
     """
     new_qubit_map = deepcopy(qubit_map)
 
-    qubit_to_get_rid_of = [*term_with_largest_expval._ops.keys()][-1]
+    # Get rid of the larger qubit in the term.
+    qubit_to_get_rid_of = sorted(term_with_largest_expval.qubits)[-1]
 
     # i is original qubit, qubit_map[i][0] is current equivalent of original qubit.
     for i in range(len(new_qubit_map)):
@@ -308,11 +309,12 @@ def _update_qubit_map(
 def _get_new_qubit_indice(
     old_indice: int, operator_with_largest_expval: PauliTerm
 ) -> int:
-    term_with_largest_expval = [*operator_with_largest_expval._ops.items()]
+    qubits = sorted(operator_with_largest_expval.qubits)
     # term_with_largest_expval is now a subscriptable tuple like ((0, 'Z'), (1, 'Z'))
+    # In order of increasing qubit number
 
-    qubit_to_get_rid_of: int = term_with_largest_expval[1][0]
-    qubit_itll_be_replaced_with: int = term_with_largest_expval[0][0]
+    qubit_to_get_rid_of: int = qubits[1]  # the larger qubit number
+    qubit_itll_be_replaced_with: int = qubits[0]  # the smaller qubit number
 
     new_indice = old_indice
 
@@ -347,14 +349,15 @@ def _create_reduced_hamiltonian(
     """
     reduced_hamiltonian = PauliSum()
 
-    qubit_to_get_rid_of = [*term_with_largest_expval._ops.keys()][-1]
+    # Get rid of the larger qubit in the term.
+    qubit_to_get_rid_of = sorted(term_with_largest_expval.qubits)[-1]
 
     for term in hamiltonian.terms:
         coefficient = term.coefficient
         if term != term_with_largest_expval:
             # If term is not the term_with_largest_expval
             new_term_strs = []
-            for qubit_indice in term._ops.keys():
+            for qubit_indice in term.qubits:
 
                 # Map the new cost hamiltonian onto reduced qubits
                 new_qubit_indice = _get_new_qubit_indice(

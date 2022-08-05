@@ -211,7 +211,7 @@ def _calculate_expectation_values(
 
     expectation_values_list = [
         term.coefficient
-        * (check_parity_of_vector(bitstrings, term._ops.keys()) * 2 - 1)
+        * (check_parity_of_vector(bitstrings, term.qubits) * 2 - 1)
         for term in operator.terms
     ]
     return np.array(np.array(expectation_values_list).sum(axis=0))

@@ -70,8 +70,8 @@ def is_comeasureable(term_1: PauliTerm, term_2: PauliTerm) -> bool:
     Returns:
         bool: True if the terms are co-measureable.
     """
-    for qubit_1, operator_1 in term_1._ops.items():
-        for qubit_2, operator_2 in term_2._ops.items():
+    for qubit_1, operator_1 in term_1.operations:
+        for qubit_2, operator_2 in term_2.operations:
 
             # Check if the two Pauli operators act on the same qubit
             if qubit_1 == qubit_2:

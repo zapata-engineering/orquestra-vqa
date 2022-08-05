@@ -24,7 +24,7 @@ def get_context_selection_circuit_for_group(
 
     for term in qubit_operator.terms:
         term_operator = PauliTerm.identity()
-        for qubit, operator in term._ops.items():
+        for qubit, operator in term.operations:
             for existing_qubit, existing_operator in context:
                 if existing_qubit == qubit and existing_operator != operator:
                     raise ValueError("Terms are not co-measurable")
