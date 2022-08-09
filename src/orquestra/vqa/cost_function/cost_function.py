@@ -1,18 +1,12 @@
 ################################################################################
 # © Copyright 2020-2022 Zapata Computing Inc.
 ################################################################################
-import warnings
-from typing import Any, Callable, Iterable, List, Optional, Union
+from typing import Callable, Iterable, List, Union
 
 import numpy as np
 import sympy
 from orquestra.opt.api.cost_function import CostFunction, ParameterPreprocessor
-from orquestra.opt.api.functions import (
-    FunctionWithGradient,
-    FunctionWithGradientStoringArtifacts,
-    StoreArtifact,
-    function_with_gradient,
-)
+from orquestra.opt.api.functions import function_with_gradient
 from orquestra.opt.gradients import finite_differences_gradient
 from orquestra.quantum.api.backend import QuantumBackend
 from orquestra.quantum.api.estimation import (
@@ -31,9 +25,9 @@ from orquestra.quantum.measurements import (
     concatenate_expectation_values,
     expectation_values_to_real,
 )
-from orquestra.quantum.openfermion import SymbolicOperator
 from orquestra.quantum.typing import SupportsLessThan
 from orquestra.quantum.utils import ValueEstimate, create_symbols_map
+from orquestra.quantum.wip.operators import PauliRepresentation
 
 from ..api.ansatz import Ansatz
 from ..api.ansatz_utils import combine_ansatz_params
@@ -197,7 +191,7 @@ def create_cost_function(
 
 
 def expectation_value_estimation_tasks_factory(
-    target_operator: SymbolicOperator,
+    target_operator: PauliRepresentation,
     parametrized_circuit: Circuit,
     estimation_preprocessors: List[EstimationPreprocessor] = None,
     symbols_sort_key: SymbolsSortKey = str,
@@ -252,7 +246,7 @@ def expectation_value_estimation_tasks_factory(
 
 
 def substitution_based_estimation_tasks_factory(
-    target_operator: SymbolicOperator,
+    target_operator: PauliRepresentation,
     ansatz: Ansatz,
     estimation_preprocessors: List[EstimationPreprocessor] = None,
 ) -> EstimationTasksFactory:
@@ -284,7 +278,7 @@ def substitution_based_estimation_tasks_factory(
 
 
 def dynamic_circuit_estimation_tasks_factory(
-    target_operator: SymbolicOperator,
+    target_operator: PauliRepresentation,
     ansatz: Ansatz,
     estimation_preprocessors: List[EstimationPreprocessor] = None,
 ) -> EstimationTasksFactory:

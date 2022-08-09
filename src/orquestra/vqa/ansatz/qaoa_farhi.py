@@ -8,12 +8,8 @@ import sympy
 from orquestra.quantum.circuits import Circuit, H, create_layer_of_gates
 from orquestra.quantum.circuits.symbolic import natural_key_fixed_names_order
 from orquestra.quantum.evolution import time_evolution
-from orquestra.quantum.openfermion import (
-    IsingOperator,
-    QubitOperator,
-    change_operator_type,
-)
 from orquestra.quantum.openfermion.utils import count_qubits
+from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum
 from overrides import overrides
 
 from orquestra.vqa.api.ansatz import Ansatz, SymbolsSortKey, ansatz_property
@@ -30,8 +26,8 @@ class QAOAFarhiAnsatz(Ansatz):
     def __init__(
         self,
         number_of_layers: int,
-        cost_hamiltonian: Union[QubitOperator, IsingOperator],
-        mixer_hamiltonian: Optional[QubitOperator] = None,
+        cost_hamiltonian: PauliRepresentation,
+        mixer_hamiltonian: Optional[PauliRepresentation] = None,
     ):
         """Ansatz class representing Farhi QAOA ansatz
 
@@ -64,7 +60,7 @@ class QAOAFarhiAnsatz(Ansatz):
     @property
     def number_of_qubits(self):
         """Returns number of qubits used for the ansatz circuit."""
-        return count_qubits(change_operator_type(self._cost_hamiltonian, QubitOperator))
+        return count_qubits(self._cost_hamiltonian)
 
     @property
     def number_of_params(self) -> int:
@@ -89,10 +85,7 @@ class QAOAFarhiAnsatz(Ansatz):
         circuit += create_layer_of_gates(self.number_of_qubits, H)
 
         # Add time evolution layers
-        cost_circuit = time_evolution(
-            change_operator_type(self._cost_hamiltonian, QubitOperator),
-            sympy.Symbol("gamma"),
-        )
+        cost_circuit = time_evolution(self._cost_hamiltonian, sympy.Symbol("gamma"))
         mixer_circuit = time_evolution(self._mixer_hamiltonian, sympy.Symbol("beta"))
         for i in range(self.number_of_layers):
             circuit += cost_circuit.bind(
@@ -106,14 +99,14 @@ class QAOAFarhiAnsatz(Ansatz):
 
 
 def create_farhi_qaoa_circuits(
-    hamiltonians: List[QubitOperator], number_of_layers: Union[int, List[int]]
+    hamiltonians: List[PauliRepresentation], number_of_layers: Union[int, List[int]]
 ):
     """Creates parameterizable quantum circuits based on the farhi qaoa ansatz for each
     hamiltonian in the input list using the set number of layers.
 
     Args:
-        hamiltonians (List[QubitOperator]): List of hamiltonians for constructing the
-            circuits
+        hamiltonians (List[PauliRepresentation]): List of hamiltonians for constructing
+            the circuits
         number_of_layers (Union[int, List[int]]): The number of layers of the ansatz in
             the circuit. If an int is passed in, the same number of layers is used for
             every ansatz circuit, however, if a list of ints is passed in, the number
@@ -136,7 +129,4 @@ def create_farhi_qaoa_circuits(
 
 
 def create_all_x_mixer_hamiltonian(number_of_qubits):
-    mixer_hamiltonian = QubitOperator()
-    for i in range(number_of_qubits):
-        mixer_hamiltonian += QubitOperator((i, "X"))
-    return mixer_hamiltonian
+    return PauliSum("+".join([f"X{i}" for i in range(number_of_qubits)]))

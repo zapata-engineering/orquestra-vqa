@@ -4,8 +4,8 @@
 import numpy as np
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.circuits import RX, RY, Circuit, X
-from orquestra.quantum.openfermion import QubitOperator, qubit_operator_sparse
-from orquestra.quantum.openfermion.zapata_utils._utils import change_operator_type
+from orquestra.quantum.openfermion import get_sparse_operator
+from orquestra.quantum.wip.operators import PauliTerm
 
 from orquestra.vqa.estimation.context_selection import (
     get_context_selection_circuit_for_group,
@@ -15,16 +15,13 @@ from orquestra.vqa.estimation.context_selection import (
 
 class TestEstimatorUtils:
     def test_get_context_selection_circuit_for_group(self):
-        group = QubitOperator("X0 Y1") - 0.5 * QubitOperator((1, "Y"))
+        group = PauliTerm("X0*Y1") - 0.5 * PauliTerm("Y1")
         circuit, ising_operator = get_context_selection_circuit_for_group(group)
 
-        # Need to convert to QubitOperator in order to get matrix representation
-        qubit_operator = change_operator_type(ising_operator, QubitOperator)
-
-        target_unitary = qubit_operator_sparse(group)
+        target_unitary = get_sparse_operator(group)
         transformed_unitary = (
             circuit.to_unitary().conj().T
-            @ qubit_operator_sparse(qubit_operator)
+            @ get_sparse_operator(ising_operator)
             @ circuit.to_unitary()
         )
 
@@ -32,16 +29,16 @@ class TestEstimatorUtils:
 
     def test_perform_context_selection(self):
         target_operators = []
-        target_operators.append(10.0 * QubitOperator("Z0"))
-        target_operators.append(-3 * QubitOperator("Y0"))
-        target_operators.append(1 * QubitOperator("X0"))
-        target_operators.append(20 * QubitOperator(""))
+        target_operators.append(10.0 * PauliTerm("Z0"))
+        target_operators.append(-3 * PauliTerm("Y0"))
+        target_operators.append(1 * PauliTerm("X0"))
+        target_operators.append(20 * PauliTerm.identity())
 
         expected_operators = []
-        expected_operators.append(10.0 * QubitOperator("Z0"))
-        expected_operators.append(-3 * QubitOperator("Z0"))
-        expected_operators.append(1 * QubitOperator("Z0"))
-        expected_operators.append(20 * QubitOperator(""))
+        expected_operators.append(10.0 * PauliTerm("Z0"))
+        expected_operators.append(-3 * PauliTerm("Z0"))
+        expected_operators.append(1 * PauliTerm("Z0"))
+        expected_operators.append(20 * PauliTerm.identity())
 
         base_circuit = Circuit([X(0)])
         x_term_circuit = Circuit([RY(-np.pi / 2)(0)])

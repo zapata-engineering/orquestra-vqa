@@ -1,18 +1,14 @@
 ################################################################################
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
 import sympy
 from orquestra.quantum.circuits import RY, RZ, Circuit, create_layer_of_gates
 from orquestra.quantum.evolution import time_evolution
-from orquestra.quantum.openfermion import (
-    IsingOperator,
-    QubitOperator,
-    change_operator_type,
-)
 from orquestra.quantum.openfermion.utils import count_qubits
+from orquestra.quantum.wip.operators import PauliRepresentation
 from overrides import overrides
 
 from orquestra.vqa.api.ansatz import Ansatz, ansatz_property
@@ -27,7 +23,7 @@ class WarmStartQAOAAnsatz(Ansatz):
     def __init__(
         self,
         number_of_layers: int,
-        cost_hamiltonian: Union[QubitOperator, IsingOperator],
+        cost_hamiltonian: PauliRepresentation,
         thetas: np.ndarray,
     ):
         """Implementation of the warm-start QAOA Ansatz.
@@ -57,7 +53,7 @@ class WarmStartQAOAAnsatz(Ansatz):
     @property
     def number_of_qubits(self):
         """Returns number of qubits used for the ansatz circuit."""
-        return count_qubits(change_operator_type(self._cost_hamiltonian, QubitOperator))
+        return count_qubits(self._cost_hamiltonian)
 
     @property
     def number_of_params(self) -> int:
@@ -82,10 +78,7 @@ class WarmStartQAOAAnsatz(Ansatz):
         )
 
         # Add time evolution layers
-        cost_circuit = time_evolution(
-            change_operator_type(self._cost_hamiltonian, QubitOperator),
-            sympy.Symbol("gamma"),
-        )
+        cost_circuit = time_evolution(self._cost_hamiltonian, sympy.Symbol("gamma"))
         for i in range(self.number_of_layers):
             circuit += cost_circuit.bind(
                 {sympy.Symbol("gamma"): sympy.Symbol(f"gamma_{i}")}

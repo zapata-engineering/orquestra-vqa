@@ -6,7 +6,8 @@ import math
 import numpy as np
 import pytest
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.openfermion import InteractionRDM, QubitOperator
+from orquestra.quantum.openfermion import InteractionRDM
+from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum, PauliTerm
 
 from orquestra.vqa.grouping import (
     compute_group_variances,
@@ -14,22 +15,22 @@ from orquestra.vqa.grouping import (
     is_comeasureable,
 )
 
-h2_hamiltonian = QubitOperator(
-    """-0.0420789769629383 [] +
--0.04475014401986127 [X0 X1 Y2 Y3] +
-0.04475014401986127 [X0 Y1 Y2 X3] +
-0.04475014401986127 [Y0 X1 X2 Y3] +
--0.04475014401986127 [Y0 Y1 X2 X3] +
-0.17771287459806312 [Z0] +
-0.1705973832722407 [Z0 Z1] +
-0.12293305054268083 [Z0 Z2] +
-0.1676831945625421 [Z0 Z3] +
-0.17771287459806312 [Z1] +
-0.1676831945625421 [Z1 Z2] +
-0.12293305054268083 [Z1 Z3] +
--0.24274280496459985 [Z2] +
-0.17627640802761105 [Z2 Z3] +
--0.24274280496459985 [Z3]"""
+h2_hamiltonian = PauliSum(
+    """-0.0420789769629383 +
+-0.04475014401986127 * X0 * X1 * Y2 * Y3 +
+0.04475014401986127 * X0 * Y1 * Y2 * X3 +
+0.04475014401986127 * Y0 * X1 * X2 * Y3 +
+-0.04475014401986127 * Y0 * Y1 * X2 * X3 +
+0.17771287459806312 * Z0 +
+0.1705973832722407 * Z0 * Z1 +
+0.12293305054268083 * Z0 * Z2 +
+0.1676831945625421 * Z0 * Z3 +
+0.17771287459806312 * Z1 +
+0.1676831945625421 * Z1 * Z2 +
+0.12293305054268083 * Z1 * Z3 +
+-0.24274280496459985 * Z2 +
+0.17627640802761105 * Z2 * Z3 +
+-0.24274280496459985 * Z3"""
 )
 
 rdm1 = np.array(
@@ -156,9 +157,9 @@ rdms = InteractionRDM(rdm1, rdm2)
 @pytest.mark.parametrize(
     "term1,term2,expected_result",
     [
-        (((0, "Y"),), ((0, "X"),), False),
-        (((0, "Y"),), ((1, "X"),), True),
-        (((0, "Y"), (1, "X")), (), True),
+        (PauliTerm("Y0"), PauliTerm("X0"), False),
+        (PauliTerm("Y0"), PauliTerm("X1"), True),
+        (PauliTerm("Y0*X1"), PauliTerm.identity(), True),
     ],
 )
 def test_is_comeasureable(term1, term2, expected_result):
@@ -169,21 +170,14 @@ def test_is_comeasureable(term1, term2, expected_result):
     "qubit_operator,expected_groups",
     [
         (
-            QubitOperator("2[Z0 Z1] + [X0 X1] + [Z0] + [X0]"),
-            [QubitOperator("2[Z0 Z1] + [Z0]"), QubitOperator("[X0 X1] + [X0]")],
+            PauliSum("2*Z0*Z1 + X0*X1 + Z0 + X0"),
+            [PauliSum("2*Z0*Z1 + Z0"), PauliSum("X0*X1 + X0")],
         ),
         (
-            QubitOperator("[Z0 Z1] + [X0 X1] + [Z0] + []"),
-            [
-                QubitOperator("[Z0 Z1] + [Z0]"),
-                QubitOperator("[X0 X1]"),
-                QubitOperator("[]"),
-            ],
+            PauliSum("Z0*Z1 + X0*X1 + Z0 + 1"),
+            [PauliSum("Z0*Z1 + Z0"), PauliSum("X0*X1"), PauliSum("1")],
         ),
-        (
-            QubitOperator("-3[]"),
-            [QubitOperator("-3[]")],
-        ),
+        (PauliSum("-3"), [PauliSum("-3")]),
     ],
 )
 def test_group_comeasureable_terms_greedy(qubit_operator, expected_groups):
@@ -195,19 +189,19 @@ def test_group_comeasureable_terms_greedy(qubit_operator, expected_groups):
     "qubit_operator,sort_terms,expected_groups",
     [
         (
-            QubitOperator("[Z0 Z1] + [X0 X1] + [Z0] + [X0]"),
+            PauliSum("Z0*Z1 + X0*X1 + Z0 + X0"),
             True,
-            [QubitOperator("[Z0 Z1] + [Z0]"), QubitOperator("[X0 X1] + [X0]")],
+            [PauliSum("Z0*Z1 + Z0"), PauliSum("X0*X1 + X0")],
         ),
         (
-            QubitOperator("[X0] + 2 [X0 Y1] + 3 [X0 Z1]"),
+            PauliSum("X0 + 2*X0*Y1 + 3*X0*Z1"),
             True,
-            [QubitOperator("[X0] + 3 [X0 Z1]"), QubitOperator("2 [X0 Y1]")],
+            [PauliSum("X0 + 3*X0*Z1"), PauliSum("2*X0*Y1")],
         ),
         (
-            QubitOperator("[X0] + 2 [X0 Y1] + 3 [X0 Z1]"),
+            PauliSum("X0 + 2*X0*Y1 + 3*X0*Z1"),
             False,
-            [QubitOperator("[X0] + 2 [X0 Y1]"), QubitOperator("3 [X0 Z1]")],
+            [PauliSum("X0 + 2*X0*Y1"), PauliSum("3*X0*Z1")],
         ),
     ],
 )
@@ -222,37 +216,30 @@ def test_group_comeasureable_terms_greedy_sorted(
     "groups, expecval, variances",
     [
         (
-            [QubitOperator("[Z0 Z1] + [Z0]"), QubitOperator("[X0 X1] + [X0]")],
+            [PauliSum("Z0*Z1 + Z0"), PauliSum("X0*X1 + X0")],
             None,
             np.array([2.0, 2.0]),
         ),
         (
-            [
-                QubitOperator("[Z0 Z1] + [Z0] + []"),
-                QubitOperator("[X0 X1] + [X0] + 5 []"),
-            ],
+            [PauliSum("Z0*Z1 + Z0 + 1"), PauliSum("X0*X1 + X0 + 5")],
             None,
             np.array([2.0, 2.0]),
         ),
         (
-            [QubitOperator("[Z0 Z1] + [Z0]"), QubitOperator("[X0 X1] + [X0]")],
+            [PauliSum("Z0*Z1 + Z0"), PauliSum("X0*X1 + X0")],
             ExpectationValues(np.zeros(4)),
             np.array([2.0, 2.0]),
         ),
         (
-            [QubitOperator("2 [Z0 Z1] + 3 [Z0]"), QubitOperator("[X0 X1] + [X0]")],
+            [PauliSum("2*Z0*Z1 + 3*Z0"), PauliSum("X0*X1 + X0")],
             ExpectationValues(np.zeros(4)),
             np.array([13.0, 2.0]),
         ),
-        (
-            [QubitOperator("2[]")],
-            ExpectationValues(np.array([1])),
-            np.array([0.0]),
-        ),
+        ([PauliSum("2")], ExpectationValues(np.array([1])), np.array([0.0])),
         (
             [
-                QubitOperator("2 [Z0 Z1] + 3 [Z0] + 8[]"),
-                QubitOperator("[X0 X1] + [X0] + []"),
+                PauliSum("2*Z0*Z1 + 3*Z0 + 8"),
+                PauliSum("X0*X1 + X0 + 1"),
             ],
             ExpectationValues(np.asarray([0.0, 0.0, 1.0, 0, 0, 1.0])),
             np.array([13.0, 2.0]),
@@ -268,17 +255,17 @@ def test_compute_group_variances_with_ref(groups, expecval, variances):
     "groups, expecval, variances",
     [
         (
-            [QubitOperator("[Z0 Z1] + [Z0]"), QubitOperator("[X0 X1] + [X0]")],
+            [PauliSum("Z0*Z1 + Z0"), PauliSum("X0*X1 + X0")],
             ExpectationValues(np.array([-1.5, 0, 0, 0])),
             np.array([2.0, 2.0]),
         ),
         (
-            [QubitOperator("2 [Z0 Z1] + 3 [Z0]"), QubitOperator("[X0 X1] + [X0]")],
+            [PauliSum("2*Z0*Z1 + 3*Z0"), PauliSum("X0*X1 + X0")],
             ExpectationValues(np.array([1.5, 0, 0, 0])),
             np.array([13.0, 2.0]),
         ),
         (
-            [QubitOperator("2 [Z0 Z1] + 3 [Z0]"), QubitOperator("[X0 X1] + [X0]")],
+            [PauliSum("2*Z0*Z1 + 3*Z0"), PauliSum("X0*X1 + X0")],
             ExpectationValues(np.array([1.5, 0, 0, 0])),
             np.array([13.0, 2.0]),
         ),
@@ -310,10 +297,10 @@ def test_compute_group_variances_without_ref(groups, expecval):
     test_variances = compute_group_variances(groups, expecval)
     test_ham_variance = np.sum(test_variances)
     # Assemble H and compute its variances independently
-    ham = QubitOperator()
+    ham = PauliSum([])
     for g in groups:
         ham += g
-    ham_coeff = np.array(list(ham.terms.values()))
+    ham_coeff = np.array([term.coefficient for term in ham.terms])
     pauli_var = 1.0 - expecval.values**2
     ref_ham_variance = np.sum(ham_coeff**2 * pauli_var)
     assert math.isclose(

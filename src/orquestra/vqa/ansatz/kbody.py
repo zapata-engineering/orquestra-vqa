@@ -8,7 +8,7 @@ import numpy as np
 import sympy
 from orquestra.quantum.circuits import Circuit
 from orquestra.quantum.evolution import time_evolution
-from orquestra.quantum.openfermion import QubitOperator
+from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum, PauliTerm
 from overrides import overrides
 
 from orquestra.vqa.api.ansatz import Ansatz, ansatz_property
@@ -115,20 +115,19 @@ def _create_circuit(k_body_depth: int, number_of_qubits: int, type: str) -> Circ
     for k in range(k_body_depth):
         A = combinations(range(0, number_of_qubits), k + 1)
         for S in list(A):
-            H_j = QubitOperator(" ".join([f"X{i}" for i in S]))
+            H_j = PauliTerm("*".join([f"X{i}" for i in S]))
             circuit += time_evolution(H_j, sympy.Symbol(f"theta_{j}"))
 
             j += 1
 
             if type != "X":
+                H_k: PauliRepresentation
                 if type == "XZ1":
                     # See figure 4(a) in the original paper
-                    H_k = QubitOperator(" ".join([f"Z{i}" for i in S]))
+                    H_k = PauliTerm("*".join([f"Z{i}" for i in S]))
                 elif type == "XZ2":
                     # See figure 4(b) in the original paper
-                    H_k = QubitOperator()
-                    for i in range(number_of_qubits):
-                        H_k += QubitOperator((i, "Z"))
+                    H_k = PauliSum("+".join([f"Z{i}" for i in range(number_of_qubits)]))
 
                 circuit += time_evolution(H_k, sympy.Symbol(f"theta_{j}"))
                 j += 1

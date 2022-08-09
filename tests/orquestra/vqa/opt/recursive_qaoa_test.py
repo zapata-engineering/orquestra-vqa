@@ -1,5 +1,5 @@
 ################################################################################
-# © Copyright 2021-2022 Zapata Computing Inc.
+# © Copyright 2021-2022*Zapata Computing Inc.
 ################################################################################
 from functools import wraps
 from typing import Callable, List, Tuple
@@ -14,8 +14,8 @@ from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.estimation._estimation import (
     estimate_expectation_values_by_averaging,
 )
-from orquestra.quantum.openfermion import IsingOperator
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.wip.operators import PauliRepresentation, PauliTerm
 
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
 from orquestra.vqa.api.ansatz import Ansatz
@@ -38,10 +38,10 @@ class TestRQAOA:
     @pytest.fixture()
     def hamiltonian(self):
         return (
-            IsingOperator("Z0 Z1", 5)
-            + IsingOperator("Z0 Z3", 2)
-            + IsingOperator("Z1 Z2", 0.5)
-            + IsingOperator("Z2 Z3", 0.6)
+            PauliTerm("Z0*Z1", 5)
+            + PauliTerm("Z0*Z3", 2)
+            + PauliTerm("Z1*Z2", 0.5)
+            + PauliTerm("Z2*Z3", 0.6)
         )
 
     @pytest.fixture()
@@ -49,9 +49,11 @@ class TestRQAOA:
         return QAOAFarhiAnsatz(1, hamiltonian)
 
     @pytest.fixture()
-    def cost_function_factory(self) -> Callable[[IsingOperator, Ansatz], CostFunction]:
+    def cost_function_factory(
+        self,
+    ) -> Callable[[PauliRepresentation, Ansatz], CostFunction]:
         def _cf_factory(
-            target_operator: IsingOperator,
+            target_operator: PauliRepresentation,
             ansatz: Ansatz,
         ):
             # NOTE: Partial would be easier to use, but mypy doesn't work well
@@ -177,7 +179,7 @@ class TestRQAOA:
             opt_params,
             cost_function_factory,
         )
-        assert term_with_largest_expval == IsingOperator("Z0 Z1", 5)
+        assert term_with_largest_expval == PauliTerm("Z0*Z1", 5)
         assert np.sign(largest_expval) == -1
 
     @pytest.mark.parametrize(
@@ -185,30 +187,30 @@ class TestRQAOA:
         [
             (
                 # suppose we want to get rid of qubit 1 and replace it with qubit 0.
-                IsingOperator("Z0 Z1", 5.0),
+                PauliTerm("Z0*Z1", 5.0),
                 10,
                 (
-                    IsingOperator("Z0 Z2", 2.0)
-                    + IsingOperator("Z0 Z1", 0.5)
-                    + IsingOperator("Z1 Z2", 0.6)
+                    PauliTerm("Z0*Z2", 2.0)
+                    + PauliTerm("Z0*Z1", 0.5)
+                    + PauliTerm("Z1*Z2", 0.6)
                 ),
             ),
             (
-                IsingOperator("Z0 Z1", 5.0),
+                PauliTerm("Z0*Z1", 5.0),
                 -10,
                 (
-                    IsingOperator("Z0 Z2", 2.0)
-                    + IsingOperator("Z0 Z1", -0.5)
-                    + IsingOperator("Z1 Z2", 0.6)
+                    PauliTerm("Z0*Z2", 2.0)
+                    + PauliTerm("Z0*Z1", -0.5)
+                    + PauliTerm("Z1*Z2", 0.6)
                 ),
             ),
             (
-                IsingOperator("Z0 Z3", 2),
+                PauliTerm("Z0*Z3", 2),
                 -10,
                 (
-                    IsingOperator("Z0 Z1", 5)
-                    + IsingOperator("Z1 Z2", 0.5)
-                    + IsingOperator("Z2 Z0", -0.6)
+                    PauliTerm("Z0*Z1", 5)
+                    + PauliTerm("Z1*Z2", 0.5)
+                    + PauliTerm("Z2*Z0", -0.6)
                 ),
             ),
         ],
@@ -230,17 +232,17 @@ class TestRQAOA:
         [
             (
                 # suppose we want to get rid of qubit 1 and replace it with qubit 0.
-                IsingOperator("Z0 Z1", 5.0),
+                PauliTerm("Z0*Z1", 5.0),
                 10,
                 {0: [0, 1], 1: [0, 1], 2: [1, 1], 3: [2, 1]},
             ),
             (
-                IsingOperator("Z0 Z1", 5.0),
+                PauliTerm("Z0*Z1", 5.0),
                 -10,
                 {0: [0, 1], 1: [0, -1], 2: [1, 1], 3: [2, 1]},
             ),
             (
-                IsingOperator("Z0 Z3", 2),
+                PauliTerm("Z0*Z3", 2),
                 -10,
                 {0: [0, 1], 1: [1, 1], 2: [2, 1], 3: [0, -1]},
             ),
@@ -262,7 +264,7 @@ class TestRQAOA:
     def test_update_qubit_map_works_properly_on_subsequent_recursions(self):
         # (This test is for when the qubit map to be updated is not the default one)
         qubit_map = {0: [0, 1], 1: [1, 1], 2: [1, -1], 3: [2, 1], 4: [1, 1]}
-        term_with_largest_expval = IsingOperator("Z0 Z1")
+        term_with_largest_expval = PauliTerm("Z0*Z1")
         largest_expval = -42
 
         # How the expected_new_qubit_map is calculated:

@@ -10,7 +10,7 @@ import sympy
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.circuits import RX, RY, Circuit
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.openfermion import IsingOperator, QubitOperator
+from orquestra.quantum.wip.operators import PauliSum, PauliTerm
 
 from orquestra.vqa.shot_allocation._shot_allocation import (
     allocate_shots_proportionally,
@@ -19,22 +19,22 @@ from orquestra.vqa.shot_allocation._shot_allocation import (
 )
 
 h2_hamiltonian_grouped = [
-    QubitOperator("-0.0420789769629383 []"),
-    QubitOperator("-0.04475014401986127 [X0 X1 Y2 Y3]"),
-    QubitOperator("0.04475014401986127 [X0 Y1 Y2 X3]"),
-    QubitOperator("0.04475014401986127 [Y0 X1 X2 Y3]"),
-    QubitOperator("-0.04475014401986127 [Y0 Y1 X2 X3]"),
-    QubitOperator(
-        """0.17771287459806312 [Z0] +
-         0.1705973832722407 [Z0 Z1] +
-         0.12293305054268083 [Z0 Z2] +
-         0.1676831945625421 [Z0 Z3] +
-         0.17771287459806312 [Z1] +
-         0.1676831945625421 [Z1 Z2] +
-         0.12293305054268083 [Z1 Z3] +
-         -0.24274280496459985 [Z2] +
-         0.17627640802761105 [Z2 Z3] +
-         -0.24274280496459985 [Z3]"""
+    PauliSum("-0.0420789769629383"),
+    PauliSum("-0.04475014401986127*X0*X1*Y2*Y3"),
+    PauliSum("0.04475014401986127*X0*Y1*Y2*X3"),
+    PauliSum("0.04475014401986127*Y0*X1*X2*Y3"),
+    PauliSum("-0.04475014401986127*Y0*Y1*X2*X3"),
+    PauliSum(
+        """0.17771287459806312*Z0 +
+         0.1705973832722407*Z0*Z1 +
+         0.12293305054268083*Z0*Z2 +
+         0.1676831945625421*Z0*Z3 +
+         0.17771287459806312*Z1 +
+         0.1676831945625421*Z1*Z2 +
+         0.12293305054268083*Z1*Z3 +
+         -0.24274280496459985*Z2 +
+         0.17627640802761105*Z2*Z3 +
+         -0.24274280496459985*Z3"""
     ),
 ]
 
@@ -43,9 +43,9 @@ class TestShotAllocation:
     @pytest.fixture()
     def frame_operators(self):
         operators = [
-            2.0 * IsingOperator((1, "Z")) * IsingOperator((2, "Z")),
-            1.0 * IsingOperator((3, "Z")) * IsingOperator((0, "Z")),
-            -1.0 * IsingOperator((2, "Z")),
+            PauliTerm("Z1*Z2", 2.0),
+            PauliTerm("Z3*Z0", 1.0),
+            PauliTerm("Z2", -1.0),
         ]
 
         return operators
