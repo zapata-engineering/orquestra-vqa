@@ -7,9 +7,7 @@ from typing import Iterable, Optional, Union
 
 import numpy as np
 import sympy
-from orquestra.quantum import circuits
-from orquestra.quantum.circuits import CNOT, RX, RZ, Circuit, H, X
-from orquestra.quantum.openfermion import (
+from openfermion import (
     FermionOperator,
     InteractionOperator,
     QubitOperator,
@@ -17,6 +15,8 @@ from orquestra.quantum.openfermion import (
     get_fermion_operator,
     jordan_wigner,
 )
+from orquestra.quantum import circuits
+from orquestra.quantum.circuits import CNOT, RX, RZ, Circuit, H, X
 
 
 def exponentiate_fermion_operator(

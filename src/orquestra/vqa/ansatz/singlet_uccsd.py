@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 import numpy as np
 import sympy
 from orquestra.quantum.circuits import Circuit
-from orquestra.quantum.openfermion import (
+from openfermion import (
     FermionOperator,
     uccsd_singlet_generator,
     uccsd_singlet_paramsize,

@@ -27,7 +27,7 @@ from orquestra.quantum.measurements import (
 )
 from orquestra.quantum.typing import SupportsLessThan
 from orquestra.quantum.utils import ValueEstimate, create_symbols_map
-from orquestra.quantum.wip.operators import PauliRepresentation
+from orquestra.quantum.operators import PauliRepresentation
 
 from ..api.ansatz import Ansatz
 from ..api.ansatz_utils import combine_ansatz_params

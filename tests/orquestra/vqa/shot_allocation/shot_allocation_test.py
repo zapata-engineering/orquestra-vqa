@@ -10,7 +10,7 @@ import sympy
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.circuits import RX, RY, Circuit
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.wip.operators import PauliSum, PauliTerm
+from orquestra.quantum.operators import PauliSum, PauliTerm
 
 from orquestra.vqa.shot_allocation._shot_allocation import (
     allocate_shots_proportionally,

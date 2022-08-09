@@ -10,7 +10,7 @@ from orquestra.quantum.distributions import MeasurementOutcomeDistribution
 from orquestra.quantum.measurements import ExpectationValues, check_parity_of_vector
 from orquestra.quantum.utils import dec2bin
 from orquestra.quantum.wavefunction import Wavefunction
-from orquestra.quantum.wip.operators import PauliRepresentation
+from orquestra.quantum.operators import PauliRepresentation
 
 PROBABILITY_CUTOFF = 1e-8
 

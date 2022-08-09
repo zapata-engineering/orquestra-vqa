@@ -6,7 +6,7 @@ from typing import List, Tuple
 import numpy as np
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.circuits import RX, RY, Circuit
-from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum, PauliTerm
+from orquestra.quantum.operators import PauliRepresentation, PauliSum, PauliTerm
 
 
 def get_context_selection_circuit_for_group(

@@ -15,7 +15,7 @@ from orquestra.quantum.estimation._estimation import (
     estimate_expectation_values_by_averaging,
 )
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
-from orquestra.quantum.wip.operators import PauliRepresentation, PauliTerm
+from orquestra.quantum.operators import PauliRepresentation, PauliTerm
 
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
 from orquestra.vqa.api.ansatz import Ansatz

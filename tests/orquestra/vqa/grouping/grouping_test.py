@@ -5,9 +5,9 @@ import math
 
 import numpy as np
 import pytest
+from openfermion import InteractionRDM
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.openfermion import InteractionRDM
-from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum, PauliTerm
+from orquestra.quantum.operators import PauliSum, PauliTerm
 
 from orquestra.vqa.grouping import (
     compute_group_variances,

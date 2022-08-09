@@ -7,7 +7,7 @@ from typing import Iterable, List
 import numpy as np
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.measurements import ExpectationValues, expectation_values_to_real
-from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum, PauliTerm
+from orquestra.quantum.operators import PauliRepresentation, PauliSum, PauliTerm
 
 
 def group_individually(estimation_tasks: List[EstimationTask]) -> List[EstimationTask]:

@@ -8,7 +8,7 @@ from orquestra.quantum.api.backend import QuantumBackend
 from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
 from orquestra.quantum.distributions import MeasurementOutcomeDistribution
 from orquestra.quantum.measurements import ExpectationValues, Measurements
-from orquestra.quantum.wip.operators import PauliRepresentation
+from orquestra.quantum.operators import PauliRepresentation
 
 
 class GibbsObjectiveEstimator(EstimateExpectationValues):
