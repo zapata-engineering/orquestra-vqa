@@ -41,4 +41,10 @@ jobs:
           repository: zapatacomputing/orquestra-opt
           path: orquestra-opt
 
+      - name: Get orquestra-cirq
+        uses: actions/checkout@v2
+        with:
+          repository: zapatacomputing/orquestra-cirq
+          path: orquestra-cirq
+
       - uses: ./subtrees/z_quantum_actions/actions/coverage

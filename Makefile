@@ -8,4 +8,5 @@ github_actions:
 		${VENV_NAME}/bin/python3 -m pip install --upgrade pip && \
 		${VENV_NAME}/bin/python3 -m pip install ./orquestra-quantum && \
 		${VENV_NAME}/bin/python3 -m pip install ./orquestra-opt && \
+		${VENV_NAME}/bin/python3 -m pip install ./orquestra-cirq && \
 		${VENV_NAME}/bin/python3 -m pip install -e '.[dev]'
