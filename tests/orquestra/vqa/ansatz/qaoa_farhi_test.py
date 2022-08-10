@@ -4,8 +4,8 @@
 import pytest
 import sympy
 from orquestra.quantum.circuits import RX, RZ, Circuit, H
-from orquestra.quantum.utils import compare_unitary
 from orquestra.quantum.operators import PauliSum, PauliTerm
+from orquestra.quantum.utils import compare_unitary
 
 from orquestra.vqa.ansatz.qaoa_farhi import (
     QAOAFarhiAnsatz,

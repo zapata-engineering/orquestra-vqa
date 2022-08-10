@@ -8,8 +8,8 @@ from typing import List, Optional, Tuple
 import numpy as np
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.measurements import ExpectationValues
-from orquestra.quantum.utils import scale_and_discretize
 from orquestra.quantum.operators import PauliRepresentation
+from orquestra.quantum.utils import scale_and_discretize
 
 from orquestra.vqa.grouping._grouping import compute_group_variances
 

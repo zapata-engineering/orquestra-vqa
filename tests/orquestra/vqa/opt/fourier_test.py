@@ -9,8 +9,8 @@ from orquestra.opt.api.optimizer import optimization_result
 from orquestra.opt.api.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
 from orquestra.opt.mock_objects import MockOptimizer, mock_cost_function
 from orquestra.quantum.estimation._estimation import calculate_exact_expectation_values
-from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 from orquestra.quantum.operators import PauliTerm
+from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
 from orquestra.vqa.api.ansatz import Ansatz

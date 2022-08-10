@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 import sympy
 from orquestra.quantum.circuits import RY, RZ, Circuit
-from orquestra.quantum.utils import compare_unitary
 from orquestra.quantum.operators import PauliSum, PauliTerm
+from orquestra.quantum.utils import compare_unitary
 
 from orquestra.vqa.ansatz.qaoa_warm_start import (
     WarmStartQAOAAnsatz,

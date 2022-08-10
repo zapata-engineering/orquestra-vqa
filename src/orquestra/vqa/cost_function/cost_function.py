@@ -25,9 +25,9 @@ from orquestra.quantum.measurements import (
     concatenate_expectation_values,
     expectation_values_to_real,
 )
+from orquestra.quantum.operators import PauliRepresentation
 from orquestra.quantum.typing import SupportsLessThan
 from orquestra.quantum.utils import ValueEstimate, create_symbols_map
-from orquestra.quantum.operators import PauliRepresentation
 
 from ..api.ansatz import Ansatz
 from ..api.ansatz_utils import combine_ansatz_params
