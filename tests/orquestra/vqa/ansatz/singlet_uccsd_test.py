@@ -3,7 +3,7 @@
 ################################################################################
 import numpy as np
 import pytest
-from openfermion import FermionOperator
+from openfermion import FermionOperator  # type: ignore
 from orquestra.quantum.circuits import Circuit
 
 from orquestra.vqa.ansatz.singlet_uccsd import SingletUCCSDAnsatz

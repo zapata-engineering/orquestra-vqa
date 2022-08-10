@@ -7,7 +7,7 @@ from typing import Iterable, Optional, Union
 
 import numpy as np
 import sympy
-from openfermion import (
+from openfermion import (  # type: ignore
     FermionOperator,
     InteractionOperator,
     QubitOperator,

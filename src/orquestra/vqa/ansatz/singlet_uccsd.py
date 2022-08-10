@@ -5,12 +5,12 @@ from typing import Optional, Tuple
 
 import numpy as np
 import sympy
-from orquestra.quantum.circuits import Circuit
-from openfermion import (
+from openfermion import (  # type: ignore
     FermionOperator,
     uccsd_singlet_generator,
     uccsd_singlet_paramsize,
 )
+from orquestra.quantum.circuits import Circuit
 from overrides import overrides
 
 from orquestra.vqa.api.ansatz import Ansatz
