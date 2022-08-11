@@ -20,42 +20,45 @@ def _extract_relevant_objects(args, relevant_types):
     return res
 
 
-def adapter(func):
-    """Wrapper around openfermion functions that contain QubitOperator or IsingOperator,
-    to make them compatible with orquestra PauliSum and PauliTerm.
-    """
+def adapter(operatorType=openfermion.QubitOperator):
+    def adapter(func):
+        """Wrapper around openfermion functions that contain QubitOperator or IsingOperator,
+        to make them compatible with orquestra PauliSum and PauliTerm.
+        """
 
-    @functools.wraps(func)
-    def wrapper_decorator(*args, **kwargs):
-        # cast orquestra objects to openfermion objects
-        orquestra_objects_to_cast = _extract_relevant_objects(
-            args, relevant_orquestra_types
-        )
+        @functools.wraps(func)
+        def wrapper_decorator(*args, **kwargs):
+            # cast orquestra objects to openfermion objects
+            orquestra_objects_to_cast = _extract_relevant_objects(
+                args, relevant_orquestra_types
+            )
 
-        args = list(args)
+            args = list(args)
 
-        for object, idx in orquestra_objects_to_cast:
-            cast_object = to_openfermion(object)
-            args[idx] = cast_object
+            for object, idx in orquestra_objects_to_cast:
+                cast_object = to_openfermion(object, operatorType)
+                args[idx] = cast_object
 
-        value = func(*args, **kwargs)
+            value = func(*args, **kwargs)
 
-        is_not_originally_seq = False
-        if not isinstance(value, Sequence):
-            value = [value]
-            is_not_originally_seq = True
-        else:
-            seq_type = type(value)
-            value = list(value)
+            is_not_originally_seq = False
+            if not isinstance(value, Sequence):
+                value = [value]
+                is_not_originally_seq = True
+            else:
+                seq_type = type(value)
+                value = list(value)
 
-        cloned_objects_to_cast = _extract_relevant_objects(
-            value, relevant_openfermion_types
-        )
+            cloned_objects_to_cast = _extract_relevant_objects(
+                value, relevant_openfermion_types
+            )
 
-        for object, idx in cloned_objects_to_cast:
-            cast_object = from_openfermion(object)
-            value[idx] = cast_object
+            for object, idx in cloned_objects_to_cast:
+                cast_object = from_openfermion(object)
+                value[idx] = cast_object
 
-        return value[0] if is_not_originally_seq else seq_type(value)
+            return value[0] if is_not_originally_seq else seq_type(value)
 
-    return wrapper_decorator
+        return wrapper_decorator
+
+    return adapter
