@@ -7,8 +7,7 @@ import numpy as np
 import sympy
 from orquestra.quantum.circuits import RY, RZ, Circuit, create_layer_of_gates
 from orquestra.quantum.evolution import time_evolution
-from orquestra.quantum.openfermion.utils import count_qubits
-from orquestra.quantum.wip.operators import PauliRepresentation
+from orquestra.quantum.operators import PauliRepresentation
 from overrides import overrides
 
 from orquestra.vqa.api.ansatz import Ansatz, ansatz_property
@@ -53,7 +52,7 @@ class WarmStartQAOAAnsatz(Ansatz):
     @property
     def number_of_qubits(self):
         """Returns number of qubits used for the ansatz circuit."""
-        return count_qubits(self._cost_hamiltonian)
+        return self._cost_hamiltonian.n_qubits
 
     @property
     def number_of_params(self) -> int:

@@ -6,14 +6,14 @@
 
 `orquestra-vqa` provides:
 
-- interfaces for implementing ansatzes including qaoa and qcbm.
-- optimizers and cost functions tailored to vqa
-- misc functions such as grouping, qaoa interpolation, and estimators
+-   interfaces for implementing ansatzes including qaoa and qcbm.
+-   optimizers and cost functions tailored to vqa
+-   misc functions such as grouping, qaoa interpolation, and estimators
 
 ## Installation
 
-Even though it's intended to be used with Orquestra, `orquestra-quantum` can be also used as a Python module.
-To install it, make to install its dependencies: `orquestra-quantum` and `orquestra-opt`. Then you just need to run `pip install .` from the main directory.
+Even though it's intended to be used with Orquestra, `orquestra-vqa` can be also used as a Python module.
+To install it, make to install its dependencies: `orquestra-quantum`, `orquestra-opt` and `orquestra-cirq`. Then you just need to run `pip install .` from the main directory.
 
 ## Usage
 

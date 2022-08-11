@@ -16,8 +16,7 @@ from orquestra.opt.api.optimizer import (
 from orquestra.opt.history.recorder import HistoryEntry, RecorderFactory
 from orquestra.opt.history.recorder import recorder as _recorder
 from orquestra.opt.problems import solve_problem_by_exhaustive_search
-from orquestra.quantum.openfermion.utils import count_qubits
-from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum, PauliTerm
+from orquestra.quantum.operators import PauliRepresentation, PauliSum, PauliTerm
 from scipy.optimize import OptimizeResult
 
 from ..api.ansatz import Ansatz
@@ -58,7 +57,7 @@ class RecursiveQAOA(NestedOptimizer):
                 recursion of RQAOA.
             recorder: recorder object defining how to store the optimization history.
         """
-        n_qubits = count_qubits(cost_hamiltonian)
+        n_qubits = cost_hamiltonian.n_qubits
 
         if n_c >= n_qubits or n_c <= 0:
             raise ValueError(
@@ -90,7 +89,7 @@ class RecursiveQAOA(NestedOptimizer):
                     QAOA as a list of tuples; each tuple is a tuple of bits.
         """
 
-        n_qubits = count_qubits(self._cost_hamiltonian)
+        n_qubits = self._cost_hamiltonian.n_qubits
         qubit_map = _create_default_qubit_map(n_qubits)
 
         histories: Dict[str, List[HistoryEntry]] = defaultdict(list)
@@ -162,21 +161,21 @@ class RecursiveQAOA(NestedOptimizer):
 
         # Check new cost hamiltonian has correct amount of qubits
         assert (
-            count_qubits(reduced_cost_hamiltonian) == count_qubits(cost_hamiltonian) - 1
+            reduced_cost_hamiltonian.n_qubits == cost_hamiltonian.n_qubits - 1
             # If we have 1 qubit, the reduced cost hamiltonian would be empty and say
             # it has 0 qubits.
-            or count_qubits(reduced_cost_hamiltonian) == 0
-            and count_qubits(cost_hamiltonian) == 2
+            or reduced_cost_hamiltonian.n_qubits == 0
+            and cost_hamiltonian.n_qubits == 2
             and self._n_c == 1
         )
 
         # Check qubit map has correct amount of qubits
         assert (
-            count_qubits(cost_hamiltonian) - 1
+            cost_hamiltonian.n_qubits - 1
             == max([qubit_indices[0] for qubit_indices in new_qubit_map.values()]) + 1
         )
 
-        if count_qubits(reduced_cost_hamiltonian) > self._n_c:
+        if reduced_cost_hamiltonian.n_qubits > self._n_c:
             # If we didn't reach threshold `n_c`, we repeat the the above with the
             # reduced cost hamiltonian.
             return self._recursive_minimize(

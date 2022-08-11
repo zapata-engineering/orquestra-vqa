@@ -8,8 +8,7 @@ import sympy
 from orquestra.quantum.circuits import Circuit, H, create_layer_of_gates
 from orquestra.quantum.circuits.symbolic import natural_key_fixed_names_order
 from orquestra.quantum.evolution import time_evolution
-from orquestra.quantum.openfermion.utils import count_qubits
-from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum
+from orquestra.quantum.operators import PauliRepresentation, PauliSum
 from overrides import overrides
 
 from orquestra.vqa.api.ansatz import Ansatz, SymbolsSortKey, ansatz_property
@@ -60,7 +59,7 @@ class QAOAFarhiAnsatz(Ansatz):
     @property
     def number_of_qubits(self):
         """Returns number of qubits used for the ansatz circuit."""
-        return count_qubits(self._cost_hamiltonian)
+        return self._cost_hamiltonian.n_qubits
 
     @property
     def number_of_params(self) -> int:

@@ -4,8 +4,7 @@
 import numpy as np
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.circuits import RX, RY, Circuit, X
-from orquestra.quantum.openfermion import get_sparse_operator
-from orquestra.quantum.wip.operators import PauliTerm
+from orquestra.quantum.operators import PauliTerm, get_sparse_operator
 
 from orquestra.vqa.estimation.context_selection import (
     get_context_selection_circuit_for_group,

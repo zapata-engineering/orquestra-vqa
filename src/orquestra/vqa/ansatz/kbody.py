@@ -8,7 +8,7 @@ import numpy as np
 import sympy
 from orquestra.quantum.circuits import Circuit
 from orquestra.quantum.evolution import time_evolution
-from orquestra.quantum.wip.operators import PauliRepresentation, PauliSum, PauliTerm
+from orquestra.quantum.operators import PauliRepresentation, PauliSum, PauliTerm
 from overrides import overrides
 
 from orquestra.vqa.api.ansatz import Ansatz, ansatz_property
