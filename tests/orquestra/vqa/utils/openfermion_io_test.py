@@ -5,7 +5,7 @@ import os
 import unittest
 
 import numpy as np
-from openfermion import (
+from openfermion import (  # type: ignore
     FermionOperator,
     InteractionRDM,
     get_interaction_operator,
