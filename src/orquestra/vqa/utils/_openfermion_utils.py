@@ -210,7 +210,7 @@ def get_polynomial_tensor(fermion_operator, n_qubits=None):
     return PolynomialTensor(tensor_dict)
 
 
-@adapter
+@adapter()
 def get_ground_state_rdm_from_qubit_op(
     qubit_operator: QubitOperator, n_particles: int
 ) -> InteractionRDM:
