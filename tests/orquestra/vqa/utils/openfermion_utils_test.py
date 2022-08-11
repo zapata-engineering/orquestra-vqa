@@ -6,13 +6,13 @@ import unittest
 import numpy as np
 import pkg_resources
 import pytest
-from openfermion import fermi_hubbard  # type: ignore
-from openfermion.linalg import (  # type: ignore
+from openfermion import fermi_hubbard
+from openfermion.linalg import (
     get_sparse_operator,
     jw_get_ground_state_at_particle_number,
 )
-from openfermion.ops import FermionOperator  # type: ignore
-from openfermion.transforms import (  # type: ignore
+from openfermion.ops import FermionOperator
+from openfermion.transforms import (
     get_fermion_operator,
     get_interaction_operator,
     jordan_wigner,

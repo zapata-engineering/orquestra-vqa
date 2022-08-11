@@ -1,4 +1,4 @@
-from openfermion import IsingOperator, QubitOperator  # type: ignore
+from openfermion import IsingOperator, QubitOperator
 from orquestra.quantum.operators import PauliSum, PauliTerm
 
 from orquestra.vqa.utils import adapter

@@ -1,7 +1,7 @@
 import functools
 from typing import Sequence
 
-import openfermion  # type: ignore
+import openfermion
 from orquestra.integrations.cirq.conversions import from_openfermion, to_openfermion
 from orquestra.quantum.operators import PauliSum, PauliTerm
 

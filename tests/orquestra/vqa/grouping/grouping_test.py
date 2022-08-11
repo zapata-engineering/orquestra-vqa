@@ -5,7 +5,7 @@ import math
 
 import numpy as np
 import pytest
-from openfermion import InteractionRDM  # type: ignore
+from openfermion import InteractionRDM
 from orquestra.quantum.measurements import ExpectationValues
 from orquestra.quantum.operators import PauliSum, PauliTerm
 

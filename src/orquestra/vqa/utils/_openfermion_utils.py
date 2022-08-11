@@ -8,7 +8,7 @@ import itertools
 from typing import Iterable
 
 import numpy as np
-from openfermion import (  # type: ignore
+from openfermion import (
     FermionOperator,
     InteractionOperator,
     InteractionRDM,

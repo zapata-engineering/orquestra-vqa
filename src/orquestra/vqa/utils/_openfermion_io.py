@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 import numpy as np
 import rapidjson as json
-from openfermion import InteractionOperator, InteractionRDM  # type: ignore
+from openfermion import InteractionOperator, InteractionRDM
 from orquestra.quantum.typing import AnyPath, LoadSource
 from orquestra.quantum.utils import convert_array_to_dict, convert_dict_to_array
 

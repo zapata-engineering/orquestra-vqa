@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 import sympy
-from openfermion import (  # type: ignore
+from openfermion import (
     FermionOperator,
     uccsd_singlet_generator,
     uccsd_singlet_paramsize,
