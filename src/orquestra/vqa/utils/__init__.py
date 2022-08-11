@@ -12,6 +12,7 @@ from ._openfermion_io import (
 from ._openfermion_utils import (
     get_diagonal_component,
     get_fermion_number_operator,
+    get_ground_state_rdm_from_qubit_op,
     get_polynomial_tensor,
     hf_rdm,
     remove_inactive_orbitals,
