@@ -24,7 +24,7 @@ from openfermion import (
     number_operator,
 )
 
-from ._openfermion_adapter import adapter
+from ._openfermion_adapter import openfermion_adapter
 
 
 def get_fermion_number_operator(n_qubits, n_particles=None):
@@ -210,7 +210,7 @@ def get_polynomial_tensor(fermion_operator, n_qubits=None):
     return PolynomialTensor(tensor_dict)
 
 
-@adapter()
+@openfermion_adapter()
 def get_ground_state_rdm_from_qubit_op(
     qubit_operator: QubitOperator, n_particles: int
 ) -> InteractionRDM:

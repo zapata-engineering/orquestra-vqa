@@ -1,16 +1,16 @@
 from openfermion import IsingOperator, QubitOperator
 from orquestra.quantum.operators import PauliSum, PauliTerm
 
-from orquestra.vqa.utils import adapter
+from orquestra.vqa.utils import openfermion_adapter
 
 
-@adapter()
+@openfermion_adapter()
 def function(op):
     assert isinstance(op, QubitOperator)
     return op
 
 
-@adapter(operatorType=IsingOperator)
+@openfermion_adapter(operatorType=IsingOperator)
 def function_ising(op):
     assert isinstance(op, IsingOperator)
     return op

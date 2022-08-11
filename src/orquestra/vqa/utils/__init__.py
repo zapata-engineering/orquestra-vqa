@@ -1,4 +1,4 @@
-from ._openfermion_adapter import adapter
+from ._openfermion_adapter import openfermion_adapter
 from ._openfermion_io import (
     convert_dict_to_interaction_op,
     convert_dict_to_interaction_rdm,

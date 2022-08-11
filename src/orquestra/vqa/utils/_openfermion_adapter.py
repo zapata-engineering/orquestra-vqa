@@ -20,7 +20,7 @@ def _extract_relevant_objects(args, relevant_types):
     return res
 
 
-def adapter(operatorType=openfermion.QubitOperator):
+def openfermion_adapter(operatorType=openfermion.QubitOperator):
     def adapter(func):
         """Wrapper around openfermion functions that contain QubitOperator or IsingOperator,
         to make them compatible with orquestra PauliSum and PauliTerm.
