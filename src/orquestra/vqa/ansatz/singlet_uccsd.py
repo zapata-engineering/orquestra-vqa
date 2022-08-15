@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 import sympy
-from openfermion import (  # type: ignore
+from openfermion import (
     FermionOperator,
     uccsd_singlet_generator,
     uccsd_singlet_paramsize,
@@ -19,7 +19,7 @@ from orquestra.vqa.api.ansatz_utils import (
     invalidates_parametrized_circuit,
 )
 
-from ..utils import build_hartree_fock_circuit, exponentiate_fermion_operator
+from ..openfermion import build_hartree_fock_circuit, exponentiate_fermion_operator
 
 
 class SingletUCCSDAnsatz(Ansatz):

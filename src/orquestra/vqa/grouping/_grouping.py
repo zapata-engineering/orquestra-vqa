@@ -122,13 +122,13 @@ def group_comeasureable_terms_greedy(
                 for term_to_compare in groups[i].terms
             ):
                 # Add the term to the group
-                groups[i] += PauliTerm(term._ops, term.coefficient)
+                groups[i] += term.copy()
                 assigned = True
                 break
 
         # If term was not co-measureable with any group, it gets to start its own group!
         if not assigned:
-            groups.append(PauliTerm(term._ops, term.coefficient))
+            groups.append(term.copy())
 
     # Constant term is handled as separate term to make it easier to exclude it
     # from calculations or execution if that's needed.

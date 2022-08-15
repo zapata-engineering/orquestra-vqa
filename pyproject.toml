@@ -25,7 +25,8 @@ module = [
     'scipy.*',
     'sympy.*',
     'rapidjson',
-    'overrides.*'
+    'overrides.*',
+    'openfermion.*'
 ]
 ignore_missing_imports = true
 
