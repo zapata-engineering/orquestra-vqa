@@ -18,12 +18,12 @@ from openfermion.transforms import (
     jordan_wigner,
 )
 
-from orquestra.vqa.utils import load_interaction_operator
+from orquestra.vqa.openfermion import load_interaction_operator
 
 
 class TestFermionOperator(unittest.TestCase):
     def test_get_fermion_number_operator(self):
-        from orquestra.vqa.utils import get_fermion_number_operator
+        from orquestra.vqa.openfermion import get_fermion_number_operator
 
         # Given
         n_qubits = 4
@@ -70,7 +70,10 @@ class TestFermionOperator(unittest.TestCase):
 
 class TestOtherUtils(unittest.TestCase):
     def test_get_diagonal_component_polynomial_tensor(self):
-        from orquestra.vqa.utils import get_diagonal_component, get_polynomial_tensor
+        from orquestra.vqa.openfermion import (
+            get_diagonal_component,
+            get_polynomial_tensor,
+        )
 
         fermion_op = FermionOperator("0^ 1^ 2^ 0 1 2", 1.0)
         fermion_op += FermionOperator("0^ 1^ 2^ 0 1 3", 2.0)
@@ -92,7 +95,7 @@ class TestOtherUtils(unittest.TestCase):
             self.assertFalse(is_diagonal)
 
     def test_get_diagonal_component_interaction_op(self):
-        from orquestra.vqa.utils import get_diagonal_component
+        from orquestra.vqa.openfermion import get_diagonal_component
 
         fermion_op = FermionOperator("1^ 1", 0.5)
         fermion_op += FermionOperator("2^ 2", 0.5)
@@ -117,7 +120,7 @@ class TestOtherUtils(unittest.TestCase):
         self.assertFalse(is_diagonal)
 
     def test_get_ground_state_rdm_from_qubit_op(self):
-        from orquestra.vqa.utils import get_ground_state_rdm_from_qubit_op
+        from orquestra.vqa.openfermion import get_ground_state_rdm_from_qubit_op
 
         # Given
         n_sites = 2
@@ -148,7 +151,7 @@ class TestOtherUtils(unittest.TestCase):
         self.assertAlmostEqual(e, rdm.expectation(fhm_int))
 
     def test_remove_inactive_orbitals(self):
-        from orquestra.vqa.utils import hf_rdm, remove_inactive_orbitals
+        from orquestra.vqa.openfermion import hf_rdm, remove_inactive_orbitals
 
         fermion_ham = load_interaction_operator(
             pkg_resources.resource_filename(
@@ -189,7 +192,7 @@ class TestOtherUtils(unittest.TestCase):
     ],
 )
 def test_hf_rdm_energy(hamiltonian, ref_energy, nalpha):
-    from orquestra.vqa.utils import hf_rdm
+    from orquestra.vqa.openfermion import hf_rdm
 
     rdm = hf_rdm(nalpha, 1, 2)
     assert np.isclose(ref_energy, rdm.expectation(hamiltonian))

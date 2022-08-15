@@ -1,7 +1,7 @@
 from openfermion import IsingOperator, QubitOperator
 from orquestra.quantum.operators import PauliSum, PauliTerm
 
-from orquestra.vqa.utils import openfermion_adapter
+from orquestra.vqa.openfermion import openfermion_adapter
 
 
 @openfermion_adapter()

@@ -3,7 +3,7 @@
 ################################################################################
 from orquestra.quantum.circuits import Circuit, X
 
-from orquestra.vqa.utils import build_hartree_fock_circuit
+from orquestra.vqa.openfermion import build_hartree_fock_circuit
 
 
 class TestVQEUtils:

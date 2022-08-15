@@ -13,7 +13,7 @@ from openfermion import (
 )
 from orquestra.quantum.utils import convert_dict_to_array
 
-from orquestra.vqa.utils._openfermion_io import (
+from orquestra.vqa.openfermion._openfermion_io import (
     convert_dict_to_interaction_op,
     convert_dict_to_interaction_rdm,
     convert_interaction_op_to_dict,
