@@ -1,3 +1,6 @@
+################################################################################
+# © Copyright 2022 Zapata Computing Inc.
+################################################################################
 from openfermion import IsingOperator, QubitOperator
 from orquestra.quantum.operators import PauliSum, PauliTerm
 
