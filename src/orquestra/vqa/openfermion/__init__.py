@@ -1,3 +1,6 @@
+################################################################################
+# © Copyright 2022 Zapata Computing Inc.
+################################################################################
 from ._openfermion_adapter import openfermion_adapter
 from ._openfermion_io import (
     convert_dict_to_interaction_op,
