@@ -96,7 +96,7 @@ class TestShotAllocation:
         [
             (400, None, [200, 100, 100]),
             (400, ExpectationValues(np.array([0, 0, 0])), [200, 100, 100]),
-            (400, ExpectationValues(np.array([1, 0.3, 0.3])), [0, 200, 200]),
+            (400, ExpectationValues(np.array([2, 0.3, 0.3])), [0, 200, 200]),
         ],
     )
     def test_allocate_shots_proportionally(
