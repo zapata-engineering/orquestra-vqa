@@ -185,7 +185,8 @@ def compute_group_variances(
             ]
             if (np.abs(real_expecval_for_group) > np.abs(coeffs)).any():
                 raise ValueError(
-                    "Absolute value of expectation value exceeds absolute value of Pauli term coefficient."
+                    "Absolute value of expectation value exceeds absolute value of"
+                    "Pauli term coefficient."
                 )
 
             frame_variances.append(np.sum(coeffs**2 - real_expecval_for_group**2))
