@@ -153,15 +153,17 @@ def compute_group_variances(
     """Computes the variances of each frame in a grouped operator.
 
     If expectation values are provided, use variances from there,
-    otherwise assume variances are 1 (upper bound). Correlation information
+    otherwise assume the upper bound for variances. Correlation information
     is ignored in the current implementation, covariances are assumed to be 0.
 
     Args:
-        groups:  A list of pauli operators that defines a (grouped) operator
+        groups:  A list of Pauli terms that defines a (grouped) operator
         expecval: An ExpectationValues object containing the expectation
-            values of the operators.
+            values of each Pauli term. The term coefficients should be
+            included in the expectation values, e.g. the expectation value of
+            2*Z0 should be between -2 and 2.
     Returns:
-        frame_variances: A Numpy array of the computed variances for each frame
+        frame_variances: Computed variances for each frame.
     """
 
     if expecval is None:
