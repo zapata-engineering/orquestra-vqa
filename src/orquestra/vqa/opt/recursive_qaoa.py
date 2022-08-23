@@ -243,6 +243,8 @@ def _find_term_with_strongest_correlation(
     """
     largest_expval = 0.0
 
+    term_with_largest_expval = hamiltonian.terms[0]
+
     for term in hamiltonian.terms:
         # If term is a constant term, don't calculate expectation value.
         if not term.is_constant:
