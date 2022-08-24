@@ -235,13 +235,13 @@ def test_group_comeasureable_terms_greedy_sorted(
             ExpectationValues(np.zeros(4)),
             np.array([13.0, 2.0]),
         ),
-        ([PauliSum("2")], ExpectationValues(np.array([1])), np.array([0.0])),
+        ([PauliSum("2")], ExpectationValues(np.array([2])), np.array([0.0])),
         (
             [
                 PauliSum("2*Z0*Z1 + 3*Z0 + 8"),
                 PauliSum("X0*X1 + X0 + 1"),
             ],
-            ExpectationValues(np.asarray([0.0, 0.0, 1.0, 0, 0, 1.0])),
+            ExpectationValues(np.asarray([0.0, 0.0, 8.0, 0, 0, 1.0])),
             np.array([13.0, 2.0]),
         ),
     ],
@@ -261,12 +261,7 @@ def test_compute_group_variances_with_ref(groups, expecval, variances):
         ),
         (
             [PauliSum("2*Z0*Z1 + 3*Z0"), PauliSum("X0*X1 + X0")],
-            ExpectationValues(np.array([1.5, 0, 0, 0])),
-            np.array([13.0, 2.0]),
-        ),
-        (
-            [PauliSum("2*Z0*Z1 + 3*Z0"), PauliSum("X0*X1 + X0")],
-            ExpectationValues(np.array([1.5, 0, 0, 0])),
+            ExpectationValues(np.array([3, 0, 0, 0])),
             np.array([13.0, 2.0]),
         ),
     ],
@@ -276,20 +271,22 @@ def test_compute_group_variances_fails_for_invalid_refs(groups, expecval, varian
         _ = compute_group_variances(groups, expecval)
 
 
+h2_groups = group_comeasureable_terms_greedy(h2_hamiltonian, False)
+h2_coefficients = np.array(
+    [term.coefficient for group in h2_groups for term in group.terms]
+)
+
+
 @pytest.mark.parametrize(
     "groups, expecval",
     [
         (
-            group_comeasureable_terms_greedy(h2_hamiltonian, False),
-            ExpectationValues(np.ones(15)),
+            h2_groups,
+            ExpectationValues(h2_coefficients),
         ),
         (
-            group_comeasureable_terms_greedy(h2_hamiltonian, False),
-            ExpectationValues(np.zeros(15)),
-        ),
-        (
-            group_comeasureable_terms_greedy(h2_hamiltonian, False),
-            ExpectationValues(np.repeat(0.5, 15)),
+            h2_groups,
+            ExpectationValues(h2_coefficients / 2),
         ),
     ],
 )
@@ -301,8 +298,7 @@ def test_compute_group_variances_without_ref(groups, expecval):
     for g in groups:
         ham += g
     ham_coeff = np.array([term.coefficient for term in ham.terms])
-    pauli_var = 1.0 - expecval.values**2
-    ref_ham_variance = np.sum(ham_coeff**2 * pauli_var)
+    ref_ham_variance = np.sum(ham_coeff**2 - expecval.values**2)
     assert math.isclose(
         test_ham_variance, ref_ham_variance
     )  # this is true as long as the groups do not overlap

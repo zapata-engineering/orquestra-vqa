@@ -153,15 +153,17 @@ def compute_group_variances(
     """Computes the variances of each frame in a grouped operator.
 
     If expectation values are provided, use variances from there,
-    otherwise assume variances are 1 (upper bound). Correlation information
+    otherwise assume the upper bound for variances. Correlation information
     is ignored in the current implementation, covariances are assumed to be 0.
 
     Args:
-        groups:  A list of pauli operators that defines a (grouped) operator
+        groups:  A list of Pauli terms that defines a (grouped) operator
         expecval: An ExpectationValues object containing the expectation
-            values of the operators.
+            values of each Pauli term. The term coefficients should be
+            included in the expectation values, e.g. the expectation value of
+            2*Z0 should be between -2 and 2.
     Returns:
-        frame_variances: A Numpy array of the computed variances for each frame
+        frame_variances: Computed variances for each frame.
     """
 
     if expecval is None:
@@ -174,19 +176,19 @@ def compute_group_variances(
                 "Number of expectation values should be the same as number of terms."
             )
         real_expecval = expectation_values_to_real(expecval)
-        if not np.logical_and(
-            real_expecval.values >= -1, real_expecval.values <= 1
-        ).all():
-            raise ValueError("Expectation values should have values between -1 and 1.")
-
-        pauli_variances = 1.0 - real_expecval.values**2
         frame_variances = []
         for i, group in enumerate(groups):
             coeffs = np.array([term.coefficient for term in group.terms])
             offset = 0 if i == 0 else np.sum(group_sizes[:i])
-            pauli_variances_for_group = pauli_variances[
+            real_expecval_for_group = real_expecval.values[
                 offset : offset + group_sizes[i]
             ]
-            frame_variances.append(np.sum(coeffs**2 * pauli_variances_for_group))
+            if (np.abs(real_expecval_for_group) > np.abs(coeffs)).any():
+                raise ValueError(
+                    "Absolute value of expectation value exceeds absolute value of"
+                    "Pauli term coefficient."
+                )
+
+            frame_variances.append(np.sum(coeffs**2 - real_expecval_for_group**2))
 
     return np.array(frame_variances)

@@ -99,7 +99,10 @@ def estimate_nmeas_for_frames(
             each element in the list is a group of co-measurable terms.
         expecval (Optional[ExpectationValues]): An ExpectationValues object containing
             the expectation values of all operators in frame_operators. If absent,
-            variances are assumed to be maximal, i.e. 1.
+            variances are assumed to be maximal (i.e. equal to the square of the
+            term's coefficient). Note that the term coefficients should be
+            included in the expectation values, e.g. the expectation value of
+            2*Z0 should be between -2 and 2.
             NOTE: YOU HAVE TO MAKE SURE THAT THE ORDER OF EXPECTATION VALUES MATCHES
             THE ORDER OF THE TERMS IN THE *GROUPED* TARGET QUBIT OPERATOR, OTHERWISE
             THIS FUNCTION WILL NOT RETURN THE CORRECT RESULT.
