@@ -6,13 +6,13 @@ from unittest import mock
 
 import numpy as np
 import pytest
+from orquestra.quantum.backends import SymbolicSimulator
 from orquestra.quantum.estimation._estimation import (
     calculate_exact_expectation_values,
     estimate_expectation_values_by_averaging,
 )
 from orquestra.quantum.measurements import ExpectationValues
 from orquestra.quantum.operators import PauliTerm
-from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 from sympy import Symbol
 
 from orquestra.vqa.cost_function.cost_function import (
