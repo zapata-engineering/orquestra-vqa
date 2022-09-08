@@ -4,10 +4,9 @@
 import pytest
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.api.estimator_contract import ESTIMATOR_CONTRACTS
-from orquestra.quantum.backends import SymbolicSimulator
+from orquestra.quantum.backends import SymbolicBackend, SymbolicSimulator
 from orquestra.quantum.circuits import Circuit, H, X
 from orquestra.quantum.operators import PauliTerm
-from orquestra.quantum.testing.mocks import MockQuantumBackend
 
 from orquestra.vqa.estimation.cvar import CvarEstimator
 
@@ -118,7 +117,7 @@ class TestCvarEstimator:
         self, circuit
     ):
         # Given
-        backend = MockQuantumBackend()
+        backend = SymbolicBackend()
         estimation_tasks = [EstimationTask(PauliTerm("X0"), circuit, 10)]
         estimator = CvarEstimator(use_exact_expectation_values=True, alpha=0.5)
         with pytest.raises(TypeError):
