@@ -15,7 +15,7 @@ from orquestra.quantum.distributions import (
 )
 from orquestra.quantum.utils import ValueEstimate
 
-from orquestra.vqa.api.ansatz import Ansatz
+from ..api.ansatz import Ansatz
 
 GradientFactory = Callable[[Callable], Callable[[np.ndarray], np.ndarray]]
 DistanceMeasure = Callable[..., Number]

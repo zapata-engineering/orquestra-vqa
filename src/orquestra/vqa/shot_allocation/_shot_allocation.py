@@ -11,7 +11,7 @@ from orquestra.quantum.measurements import ExpectationValues
 from orquestra.quantum.operators import PauliRepresentation
 from orquestra.quantum.utils import scale_and_discretize
 
-from orquestra.vqa.grouping._grouping import compute_group_variances
+from ..grouping._grouping import compute_group_variances
 
 
 def allocate_shots_uniformly(

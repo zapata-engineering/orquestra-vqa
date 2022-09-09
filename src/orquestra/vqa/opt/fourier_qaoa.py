@@ -15,7 +15,7 @@ from orquestra.opt.history.recorder import AnyRecorder, HistoryEntry, RecorderFa
 from orquestra.opt.history.recorder import recorder as _recorder
 from scipy.optimize import OptimizeResult
 
-from orquestra.vqa.api.ansatz import Ansatz
+from ..api.ansatz import Ansatz
 
 
 class FourierOptimizer(NestedOptimizer):

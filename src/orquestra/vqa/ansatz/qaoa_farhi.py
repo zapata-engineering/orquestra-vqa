@@ -11,7 +11,7 @@ from orquestra.quantum.evolution import time_evolution
 from orquestra.quantum.operators import PauliRepresentation, PauliSum
 from overrides import overrides
 
-from orquestra.vqa.api.ansatz import Ansatz, SymbolsSortKey, ansatz_property
+from ..api.ansatz import Ansatz, SymbolsSortKey, ansatz_property
 
 _SYMBOL_SORT_KEY = natural_key_fixed_names_order(["gamma", "beta"])
 

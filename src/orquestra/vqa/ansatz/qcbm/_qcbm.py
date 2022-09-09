@@ -9,9 +9,8 @@ import sympy
 from orquestra.quantum.circuits import RX, RZ, XX, Circuit, create_layer_of_gates
 from overrides import overrides
 
-from orquestra.vqa.api.ansatz import Ansatz
-from orquestra.vqa.api.ansatz_utils import ansatz_property
-
+from ...api.ansatz import Ansatz
+from ...api.ansatz_utils import ansatz_property
 from ._qcbm_utils import get_entangling_layer
 
 
