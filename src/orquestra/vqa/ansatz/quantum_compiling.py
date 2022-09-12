@@ -8,8 +8,8 @@ import sympy
 from orquestra.quantum.circuits import CNOT, RX, RZ, Circuit
 from overrides import overrides
 
-from orquestra.vqa.api.ansatz import Ansatz
-from orquestra.vqa.api.ansatz_utils import ansatz_property
+from ..api.ansatz import Ansatz
+from ..api.ansatz_utils import ansatz_property
 
 
 class HEAQuantumCompilingAnsatz(Ansatz):

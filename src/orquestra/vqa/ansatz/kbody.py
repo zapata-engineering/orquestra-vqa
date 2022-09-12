@@ -11,7 +11,7 @@ from orquestra.quantum.evolution import time_evolution
 from orquestra.quantum.operators import PauliRepresentation, PauliSum, PauliTerm
 from overrides import overrides
 
-from orquestra.vqa.api.ansatz import Ansatz, ansatz_property
+from ..api.ansatz import Ansatz, ansatz_property
 
 
 class XAnsatz(Ansatz):

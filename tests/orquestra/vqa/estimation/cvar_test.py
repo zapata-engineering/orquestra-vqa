@@ -4,10 +4,10 @@
 import pytest
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.api.estimator_contract import ESTIMATOR_CONTRACTS
+from orquestra.quantum.backends import SymbolicSimulator
 from orquestra.quantum.circuits import Circuit, H, X
 from orquestra.quantum.operators import PauliTerm
-from orquestra.quantum.symbolic_simulator import SymbolicSimulator
-from orquestra.quantum.testing.mocks import MockQuantumBackend
+from orquestra.quantum.testing import MockQuantumBackend
 
 from orquestra.vqa.estimation.cvar import CvarEstimator
 

@@ -13,12 +13,8 @@ from openfermion import (
 from orquestra.quantum.circuits import Circuit
 from overrides import overrides
 
-from orquestra.vqa.api.ansatz import Ansatz
-from orquestra.vqa.api.ansatz_utils import (
-    ansatz_property,
-    invalidates_parametrized_circuit,
-)
-
+from ..api.ansatz import Ansatz
+from ..api.ansatz_utils import ansatz_property, invalidates_parametrized_circuit
 from ..openfermion import build_hartree_fock_circuit, exponentiate_fermion_operator
 
 
