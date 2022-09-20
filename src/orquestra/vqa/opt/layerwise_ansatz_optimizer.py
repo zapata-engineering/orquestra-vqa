@@ -6,16 +6,13 @@ from collections import defaultdict
 from typing import Callable, Dict, cast
 
 import numpy as np
+from orquestra.opt.api import CostFunction, NestedOptimizer, Optimizer
+from orquestra.opt.api.optimizer import extend_histories
+from orquestra.opt.history.recorder import AnyRecorder, RecorderFactory
+from orquestra.opt.history.recorder import recorder as _recorder
 from scipy.optimize import OptimizeResult
-from zquantum.core.history.recorder import recorder as _recorder
-from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.cost_function import CostFunction
-from zquantum.core.interfaces.optimizer import (
-    NestedOptimizer,
-    Optimizer,
-    extend_histories,
-)
-from zquantum.core.typing import AnyRecorder, RecorderFactory
+
+from orquestra.vqa.api.ansatz import Ansatz
 
 
 def append_random_params(target_size: int, params: np.ndarray) -> np.ndarray:

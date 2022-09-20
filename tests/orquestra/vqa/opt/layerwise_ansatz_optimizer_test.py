@@ -5,13 +5,14 @@ from unittest import mock
 
 import numpy as np
 import pytest
-from zquantum.core.interfaces.mock_objects import MockAnsatz
-from zquantum.core.interfaces.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
-from zquantum.optimizers.layerwise_ansatz_optimizer import (
+from orquestra.opt.api.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
+from orquestra.opt.optimizers.scipy_optimizer import ScipyOptimizer
+
+from orquestra.vqa.opt.layerwise_ansatz_optimizer import (
     LayerwiseAnsatzOptimizer,
     append_random_params,
 )
-from zquantum.optimizers.scipy_optimizer import ScipyOptimizer
+from orquestra.vqa.testing.mock_objects import MockAnsatz
 
 
 @pytest.fixture
