@@ -13,7 +13,7 @@
 ## Installation
 
 Even though it's intended to be used with Orquestra, `orquestra-vqa` can be also used as a Python module.
-To install it, make to install its dependencies: `orquestra-quantum`, `orquestra-opt` and `orquestra-cirq`. Then you just need to run `pip install .` from the main directory.
+To install it you need to run `pip install orquestra-vqa` or `pip install .` from the main directory. This installation will install its dependencies: `orquestra-quantum`, `orquestra-opt` and `orquestra-cirq`.
 
 ## Usage
 
