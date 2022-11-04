@@ -4,7 +4,7 @@
 from typing import List
 
 import numpy as np
-from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.api.circuit_runner import BaseCircuitRunner
 from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
 from orquestra.quantum.distributions import MeasurementOutcomeDistribution
 from orquestra.quantum.measurements import ExpectationValues, Measurements
@@ -29,7 +29,7 @@ class GibbsObjectiveEstimator(EstimateExpectationValues):
         self.alpha = alpha
 
     def __call__(
-        self, backend: QuantumBackend, estimation_tasks: List[EstimationTask]
+        self, backend: BaseCircuitRunner, estimation_tasks: List[EstimationTask]
     ) -> List[ExpectationValues]:
         """Calculate expectation values using Gibbs objective function.
 

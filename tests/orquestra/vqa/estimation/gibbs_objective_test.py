@@ -8,9 +8,9 @@ from orquestra.quantum.api.estimator_contract import (
     ESTIMATOR_CONTRACTS,
     _validate_expectation_value_includes_coefficients,
 )
-from orquestra.quantum.backends import SymbolicSimulator
 from orquestra.quantum.circuits import RX, Circuit, H, X
 from orquestra.quantum.operators import PauliTerm
+from orquestra.quantum.symbolic_simulator import SymbolicSimulator
 from orquestra.quantum.testing import MockQuantumBackend
 
 from orquestra.vqa.estimation.gibbs_objective import GibbsObjectiveEstimator

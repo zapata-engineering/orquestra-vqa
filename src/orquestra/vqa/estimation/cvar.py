@@ -4,8 +4,9 @@
 from typing import Dict, List, Optional, Tuple, Union, overload
 
 import numpy as np
-from orquestra.quantum.api.backend import QuantumBackend, QuantumSimulator
+from orquestra.quantum.api.circuit_runner import BaseCircuitRunner
 from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
+from orquestra.quantum.api.wavefunction_simulator import BaseWavefunctionSimulator
 from orquestra.quantum.distributions import MeasurementOutcomeDistribution
 from orquestra.quantum.measurements import ExpectationValues, check_parity_of_vector
 from orquestra.quantum.operators import PauliRepresentation
@@ -45,7 +46,7 @@ class CvarEstimator(EstimateExpectationValues):
         self.use_exact_expectation_values = use_exact_expectation_values
 
     def __call__(
-        self, backend: QuantumBackend, estimation_tasks: List[EstimationTask]
+        self, backend: BaseCircuitRunner, estimation_tasks: List[EstimationTask]
     ) -> List[ExpectationValues]:
         """Compute expectation value using CVaR method.
 
@@ -62,7 +63,7 @@ class CvarEstimator(EstimateExpectationValues):
         )
 
         if self.use_exact_expectation_values:
-            if not isinstance(backend, QuantumSimulator):
+            if not isinstance(backend, BaseWavefunctionSimulator):
                 raise TypeError(
                     "In order to use exact expectation values "
                     "you need to use QuantumSimulator."
