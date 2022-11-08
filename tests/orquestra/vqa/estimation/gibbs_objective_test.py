@@ -11,7 +11,7 @@ from orquestra.quantum.api.estimator_contract import (
 from orquestra.quantum.circuits import RX, Circuit, H, X
 from orquestra.quantum.operators import PauliTerm
 from orquestra.quantum.symbolic_simulator import SymbolicSimulator
-from orquestra.quantum.testing import MockQuantumBackend
+from orquestra.quantum.testing import MockCircuitRunner
 
 from orquestra.vqa.estimation.gibbs_objective import GibbsObjectiveEstimator
 
@@ -22,7 +22,7 @@ from orquestra.vqa.estimation.gibbs_objective import GibbsObjectiveEstimator
 def _validate_expectation_value_includes_coefficients_for_gibbs_estimator(
     estimator: EstimateExpectationValues,
 ):
-    backend = SymbolicSimulator(seed=1997)
+    runner = SymbolicSimulator(seed=1997)
     term_coefficient = 30
     estimation_tasks = [
         EstimationTask(PauliTerm("Z0"), Circuit([RX(np.pi / 3)(0)]), 10000),
@@ -32,7 +32,7 @@ def _validate_expectation_value_includes_coefficients_for_gibbs_estimator(
     ]
 
     expectation_values = estimator(
-        backend=backend,
+        runner=runner,
         estimation_tasks=estimation_tasks,
     )
 
@@ -80,32 +80,32 @@ class TestGibbsEstimator:
         return [EstimationTask(operator, circuit, 10)]
 
     @pytest.fixture()
-    def backend(self):
-        return MockQuantumBackend()
+    def runner(self):
+        return MockCircuitRunner()
 
     def test_raises_exception_if_operator_is_not_ising(
-        self, estimator, backend, circuit
+        self, estimator, runner, circuit
     ):
         # Given
         estimation_tasks = [EstimationTask(PauliTerm("X0"), circuit, 10)]
         with pytest.raises(TypeError):
             estimator(
-                backend=backend,
+                runner=runner,
                 estimation_tasks=estimation_tasks,
             )
 
     @pytest.mark.parametrize("alpha", [-1, 0])
     def test_gibbs_estimator_raises_exception_if_alpha_less_than_or_equal_to_0(
-        self, estimator, backend, estimation_tasks, alpha
+        self, estimator, runner, estimation_tasks, alpha
     ):
         estimator.alpha = alpha
         with pytest.raises(ValueError):
             estimator(
-                backend=backend,
+                runner=runner,
                 estimation_tasks=estimation_tasks,
             )
 
-    def test_gibbs_estimator_returns_correct_values(self, estimator, backend, operator):
+    def test_gibbs_estimator_returns_correct_values(self, estimator, runner, operator):
         # Given
         estimation_tasks = [EstimationTask(operator, Circuit([H(0)]), 10000)]
 
@@ -118,7 +118,7 @@ class TestGibbsEstimator:
 
         # When
         expectation_values = estimator(
-            backend=backend,
+            runner=runner,
             estimation_tasks=estimation_tasks,
         )
 

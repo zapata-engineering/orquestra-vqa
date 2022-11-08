@@ -4,7 +4,7 @@
 from typing import Dict, List, Optional, Tuple, Union, overload
 
 import numpy as np
-from orquestra.quantum.api.circuit_runner import BaseCircuitRunner
+from orquestra.quantum.api.circuit_runner import CircuitRunner
 from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
 from orquestra.quantum.api.wavefunction_simulator import BaseWavefunctionSimulator
 from orquestra.quantum.distributions import MeasurementOutcomeDistribution
@@ -46,12 +46,12 @@ class CvarEstimator(EstimateExpectationValues):
         self.use_exact_expectation_values = use_exact_expectation_values
 
     def __call__(
-        self, backend: BaseCircuitRunner, estimation_tasks: List[EstimationTask]
+        self, runner: CircuitRunner, estimation_tasks: List[EstimationTask]
     ) -> List[ExpectationValues]:
         """Compute expectation value using CVaR method.
 
         Args:
-            backend: the backend that will be used to run the circuits
+            runner: the runner that will be used to run the circuits
             estimation_tasks: the estimation tasks defining the problem. Each task
                 consist of target operator, circuit and number of shots.
         """
@@ -63,14 +63,14 @@ class CvarEstimator(EstimateExpectationValues):
         )
 
         if self.use_exact_expectation_values:
-            if not isinstance(backend, BaseWavefunctionSimulator):
+            if not isinstance(runner, BaseWavefunctionSimulator):
                 raise TypeError(
                     "In order to use exact expectation values "
                     "you need to use QuantumSimulator."
                 )
 
             wavefunctions_list = [
-                backend.get_wavefunction(circuit) for circuit in circuits
+                runner.get_wavefunction(circuit) for circuit in circuits
             ]
 
             return [
@@ -87,7 +87,7 @@ class CvarEstimator(EstimateExpectationValues):
             ]
         else:
             distributions_list = [
-                backend.get_measurement_outcome_distribution(circuit, n_samples=n_shots)
+                runner.get_measurement_outcome_distribution(circuit, n_samples=n_shots)
                 for circuit, n_shots in zip(circuits, shots_per_circuit)
             ]
 

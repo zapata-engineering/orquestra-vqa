@@ -212,6 +212,7 @@ class TestEstimationTasksFactory:
 
     @pytest.mark.parametrize("param", [0.0, 0.42, 1.0, np.pi])
     def test_evaluates_to_same_cost_function(self, param):
+
         params = np.array([param])
         dynamic_estimation_factory = dynamic_circuit_estimation_tasks_factory(
             TARGET_OPERATOR, ANSATZ
@@ -225,7 +226,6 @@ class TestEstimationTasksFactory:
         substituion_cost_function = create_cost_function(
             BACKEND, substitution_estimation_factory, calculate_exact_expectation_values
         )
-        breakpoint()
 
         assert dynamic_cost_function(params) == substituion_cost_function(params)
 
