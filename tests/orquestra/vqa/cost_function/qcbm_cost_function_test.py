@@ -9,7 +9,7 @@ from orquestra.quantum.distributions import (
     compute_clipped_negative_log_likelihood,
     compute_mmd,
 )
-from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.runners import SymbolicSimulator
 
 from orquestra.vqa.ansatz.qcbm._qcbm import QCBMAnsatz
 from orquestra.vqa.cost_function.qcbm_cost_function import create_QCBM_cost_function

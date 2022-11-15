@@ -12,7 +12,7 @@ from orquestra.quantum.estimation._estimation import (
 )
 from orquestra.quantum.measurements import ExpectationValues
 from orquestra.quantum.operators import PauliTerm
-from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.runners import SymbolicSimulator
 from sympy import Symbol
 
 from orquestra.vqa.cost_function.cost_function import (

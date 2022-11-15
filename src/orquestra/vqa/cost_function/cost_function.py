@@ -8,7 +8,7 @@ import sympy
 from orquestra.opt.api.cost_function import CostFunction, ParameterPreprocessor
 from orquestra.opt.api.functions import function_with_gradient
 from orquestra.opt.gradients import finite_differences_gradient
-from orquestra.quantum.api.circuit_runner import BaseCircuitRunner
+from orquestra.quantum.api.circuit_runner import CircuitRunner
 from orquestra.quantum.api.estimation import (
     EstimateExpectationValues,
     EstimationPreprocessor,
@@ -125,7 +125,7 @@ def add_normal_noise(
 
 
 def create_cost_function(
-    backend: BaseCircuitRunner,
+    backend: CircuitRunner,
     estimation_tasks_factory: EstimationTasksFactory,
     estimation_method: EstimateExpectationValues = _by_averaging,
     parameter_preprocessors: Iterable[ParameterPreprocessor] = None,

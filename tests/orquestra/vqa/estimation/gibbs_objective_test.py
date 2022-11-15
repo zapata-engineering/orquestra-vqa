@@ -10,7 +10,7 @@ from orquestra.quantum.api.estimator_contract import (
 )
 from orquestra.quantum.circuits import RX, Circuit, H, X
 from orquestra.quantum.operators import PauliTerm
-from orquestra.quantum.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.runners import SymbolicSimulator
 from orquestra.quantum.testing import MockCircuitRunner
 
 from orquestra.vqa.estimation.gibbs_objective import GibbsObjectiveEstimator

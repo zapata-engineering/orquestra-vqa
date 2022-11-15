@@ -63,15 +63,16 @@ class CvarEstimator(EstimateExpectationValues):
         )
 
         if self.use_exact_expectation_values:
-            if not isinstance(runner, BaseWavefunctionSimulator):
+            try:
+                wavefunctions_list = [
+                    runner.get_wavefunction(circuit)  # type: ignore
+                    for circuit in circuits
+                ]
+            except AttributeError:
                 raise TypeError(
                     "In order to use exact expectation values "
                     "you need to use QuantumSimulator."
                 )
-
-            wavefunctions_list = [
-                runner.get_wavefunction(circuit) for circuit in circuits
-            ]
 
             return [
                 ExpectationValues(
