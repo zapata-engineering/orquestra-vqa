@@ -106,8 +106,8 @@ class TestQaoa:
             estimation_method=estimation_method,
             n_shots=n_shots,
         )
-        assert isinstance(qaoa.ansatz, WarmStartQAOAAnsatz)
-        assert isinstance(qaoa.estimation_method, CvarEstimator)
+        assert qaoa.ansatz is ansatz
+        assert qaoa.estimation_method is estimation_method
 
     def test_replace_ansatz(self, qaoa_object, hamiltonian):
         ansatz = WarmStartQAOAAnsatz(
@@ -116,16 +116,16 @@ class TestQaoa:
 
         new_qaoa_object = qaoa_object.replace_ansatz(ansatz)
 
-        assert isinstance(qaoa_object.ansatz, QAOAFarhiAnsatz)
-        assert isinstance(new_qaoa_object.ansatz, WarmStartQAOAAnsatz)
+        assert qaoa_object.ansatz is not ansatz
+        assert new_qaoa_object.ansatz is ansatz
 
     def test_replace_optimizer(self, qaoa_object):
         optimizer = ScipyOptimizer(method="COBYLA")
 
         new_qaoa_object = qaoa_object.replace_optimizer(optimizer)
 
-        assert qaoa_object.optimizer.method == "L-BFGS-B"
-        assert new_qaoa_object.optimizer.method == "COBYLA"
+        assert qaoa_object.optimizer is not optimizer
+        assert new_qaoa_object.optimizer is optimizer
 
     def test_replace_estimation_method(self, qaoa_object):
         estimation_method = CvarEstimator(alpha=0.5)
@@ -139,7 +139,8 @@ class TestQaoa:
             qaoa_object.estimation_method.__name__
             == "calculate_exact_expectation_values"
         )
-        assert isinstance(new_qaoa_object.estimation_method, CvarEstimator)
+        assert qaoa_object.estimation_method is not estimation_method
+        assert new_qaoa_object.estimation_method is estimation_method
         assert qaoa_object._n_shots != new_qaoa_object._n_shots
 
     @pytest.mark.parametrize("initial_params", [None, np.random.random(4)])
