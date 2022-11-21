@@ -1,14 +1,13 @@
-import pytest
 import numpy as np
-
-from orquestra.vqa.algorithms.qaoa import QAOA
-from orquestra.quantum.operators import PauliTerm
+import pytest
 from orquestra.opt.optimizers import ScipyOptimizer
 from orquestra.quantum.backends.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.operators import PauliTerm
+
+from orquestra.vqa.algorithms.qaoa import QAOA
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
 from orquestra.vqa.ansatz.qaoa_warm_start import WarmStartQAOAAnsatz
 from orquestra.vqa.estimation.cvar import CvarEstimator
-
 
 # def test_if_runs():
 #     hamiltonian = PauliTerm("Z0") + PauliTerm("Z1")
@@ -130,7 +129,7 @@ class TestQaoa:
         assert isinstance(qaoa_object.ansatz, QAOAFarhiAnsatz)
         assert isinstance(new_qaoa_object.ansatz, WarmStartQAOAAnsatz)
 
-    def test_replace_ansatz(self, qaoa_object):
+    def test_replace_optimizer(self, qaoa_object):
         optimizer = ScipyOptimizer(method="COBYLA")
 
         new_qaoa_object = qaoa_object.replace_optimizer(optimizer)

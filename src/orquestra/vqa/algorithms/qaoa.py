@@ -1,24 +1,26 @@
+from functools import partial
+from typing import List, Optional, cast
+
 import numpy as np
-from orquestra.quantum.operators import PauliRepresentation
-from orquestra.quantum.circuits import Circuit
-from orquestra.quantum.api.estimation import EstimateExpectationValues
-from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.opt.api import CostFunction, Optimizer
 from orquestra.opt.optimizers import ScipyOptimizer
-from orquestra.opt.api import Optimizer, CostFunction
-from orquestra.vqa.api.ansatz import Ansatz
-from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
+from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
+from orquestra.quantum.circuits import Circuit
 from orquestra.quantum.estimation import (
     calculate_exact_expectation_values,
     estimate_expectation_values_by_averaging,
 )
-from typing import Optional
+from orquestra.quantum.operators import PauliRepresentation
+from scipy.optimize import OptimizeResult
+
+from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
+from orquestra.vqa.api.ansatz import Ansatz
 from orquestra.vqa.cost_function.cost_function import (
     create_cost_function,
     substitution_based_estimation_tasks_factory,
 )
-from functools import partial
 from orquestra.vqa.shot_allocation import allocate_shots_uniformly
-from scipy.optimize import OptimizeResult
 
 
 class QAOA:
@@ -37,7 +39,8 @@ class QAOA:
             cost_hamiltonian: Cost Hamiltonian defining the problem.
             optimizer: Optimizer used to find optimal parameters
             ansatz: Ansatz defining what circuit will be used.
-            estimation_method: Method used for calculating expectation values of the Hamiltonian.
+            estimation_method: Method used for calculating expectation values of
+                the Hamiltonian.
             n_shots: number of shots to be used for evaluation of expectation values.
                 For simulation with exact expectation value it should be None.
         """
@@ -57,10 +60,11 @@ class QAOA:
     ) -> "QAOA":
         """Creates a QAOA object with some default settings:
         - optimizer: L-BFGS-B optimizer (scipy implementation)
-        - ansatz: standard ansatz as proposed by Farhi in https://arxiv.org/abs/1411.4028.
-        - estimation method: either using exact expectation values (only for simulation)
-             or standard method of calculating expectation values through averaging
-             the results of measurements.
+        - ansatz: standard ansatz as proposed by Farhi
+            in https://arxiv.org/abs/1411.4028.
+        - estimation method: either using exact expectation values
+            (only for simulation) or standard method of calculating expectation
+            values through averaging the results of measurements.
 
         These can be later replaced using one of the `replace_*` methods.
 
@@ -68,13 +72,15 @@ class QAOA:
             cost_hamiltonian: Cost Hamiltonian defining the problem.
             optimizer: Optimizer used to find optimal parameters
             n_layers: Number of layers for the ansatz.
-            use_exact_expectation_values: A flag indicating whether to use exact calculation of the expectation values.
-                This is possible only when running on a simulator. Defaults to True.
-            n_shots: If non-exact method for calculating expectation values is used, this argument specifies number of shots
-                per expectation value.
+            use_exact_expectation_values: A flag indicating whether to use exact
+                calculation of the expectation values. This is possible only when
+                running on a simulator. Defaults to True.
+            n_shots: If non-exact method for calculating expectation values is used,
+                this argument specifies number of shots per expectation value.
 
         Raises:
-            ValueError: if wrong combination of "use_exact_expectation_values" and "n_shots" is provided.
+            ValueError: if wrong combination of "use_exact_expectation_values" and
+                "n_shots" is provided.
 
         """
         optimizer = ScipyOptimizer(method="L-BFGS-B")
@@ -83,12 +89,15 @@ class QAOA:
             cost_hamiltonian=cost_hamiltonian,
         )
         if use_exact_expectation_values and n_shots is None:
-            estimation_method = calculate_exact_expectation_values
+            estimation_method = cast(
+                EstimateExpectationValues, calculate_exact_expectation_values
+            )
         elif not use_exact_expectation_values and n_shots is not None:
             estimation_method = estimate_expectation_values_by_averaging
         else:
             raise ValueError(
-                f"Invalid n_shots={n_shots} for use_exact_expectation_values={use_exact_expectation_values}."
+                f"Invalid n_shots={n_shots} for \
+                    use_exact_expectation_values={use_exact_expectation_values}."
             )
 
         return cls(cost_hamiltonian, optimizer, ansatz, estimation_method, n_shots)
@@ -125,7 +134,7 @@ class QAOA:
         self, estimation_method: EstimateExpectationValues, n_shots: Optional[int]
     ) -> "QAOA":
         """Creates a new QAOA object with a provided estimation method.
-        It requires providing both new estimation method and number of shots to be used.
+        It requires providing both new estimation method and number of shots.
 
         Args:
             estimation_method: new estimation method to be used.
@@ -140,7 +149,7 @@ class QAOA:
         )
 
     def find_optimal_params(
-        self, backend: QuantumBackend, initial_params: Optional[np.array] = None
+        self, backend: QuantumBackend, initial_params: Optional[np.ndarray] = None
     ) -> OptimizeResult:
         """Optimizes the paramaters of QAOA ansatz using provided backend.
 
@@ -162,10 +171,13 @@ class QAOA:
             backend: backend used for running quantum circuits.
         """
         estimation_preprocessors = []
-        if self._n_shots:
-            shot_allocation = partial(
-                allocate_shots_uniformly, number_of_shots=self._n_shots
-            )
+        if self._n_shots is not None:
+
+            def shot_allocation(estimation_tasks: List[EstimationTask]):
+                return allocate_shots_uniformly(
+                    estimation_tasks, number_of_shots=self._n_shots  # type: ignore
+                )
+
             estimation_preprocessors.append(shot_allocation)
 
         estimation_task_factory = substitution_based_estimation_tasks_factory(

@@ -2,7 +2,7 @@
 # © Copyright 2021-2022 Zapata Computing Inc.
 ################################################################################
 
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 import numpy as np
 from orquestra.quantum.api.estimation import EstimationTask
@@ -148,7 +148,7 @@ def _remove_constant_term_from_group(group: PauliRepresentation) -> PauliSum:
 
 
 def compute_group_variances(
-    groups: List[PauliRepresentation], expecval: ExpectationValues = None
+    groups: List[PauliRepresentation], expecval: Optional[ExpectationValues] = None
 ) -> np.ndarray:
     """Computes the variances of each frame in a grouped operator.
 
