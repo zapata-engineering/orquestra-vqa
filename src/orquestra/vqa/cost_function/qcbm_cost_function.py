@@ -2,7 +2,7 @@
 # © Copyright 2022 Zapata Computing Inc.
 ################################################################################
 from numbers import Number
-from typing import Callable
+from typing import Callable, Optional
 
 import numpy as np
 from orquestra.opt.api.cost_function import CostFunction
@@ -72,7 +72,7 @@ def _create_QCBM_cost_function(
     )
 
     def cost_function(
-        parameters: np.ndarray, store_artifact: StoreArtifact = None
+        parameters: np.ndarray, store_artifact: Optional[StoreArtifact] = None
     ) -> ValueEstimate:
         """
         Evaluates the value of the cost function for given parameters.

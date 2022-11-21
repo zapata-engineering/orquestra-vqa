@@ -5,7 +5,7 @@
 
 
 import itertools
-from typing import Iterable
+from typing import Iterable, Optional
 
 import numpy as np
 from openfermion import (
@@ -265,7 +265,7 @@ def get_ground_state_rdm_from_qubit_op(
 
 
 def remove_inactive_orbitals(
-    interaction_op: InteractionOperator, n_active: int = None, n_core: int = 0
+    interaction_op: InteractionOperator, n_active: Optional[int] = None, n_core: int = 0
 ) -> InteractionOperator:
     """Remove orbitals not in the active space from an interaction operator.
 
