@@ -162,7 +162,9 @@ class TestQaoa:
 
     def test_get_cost_function(self, qaoa_object, backend):
         cost_function = qaoa_object.get_cost_function(backend)
-        assert cost_function(np.zeros(qaoa_object.ansatz.number_of_params)) == 0
+        assert np.isclose(
+            cost_function(np.zeros(qaoa_object.ansatz.number_of_params)), 0
+        )
 
     def test_get_circuit(self, qaoa_object):
         params = np.random.random(qaoa_object.ansatz.number_of_params)
