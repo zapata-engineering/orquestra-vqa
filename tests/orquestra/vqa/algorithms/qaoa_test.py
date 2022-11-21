@@ -9,14 +9,6 @@ from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
 from orquestra.vqa.ansatz.qaoa_warm_start import WarmStartQAOAAnsatz
 from orquestra.vqa.estimation.cvar import CvarEstimator
 
-# def test_if_runs():
-#     hamiltonian = PauliTerm("Z0") + PauliTerm("Z1")
-#     optimizer = ScipyOptimizer(method="L-BFGS-B")
-#     backend = SymbolicSimulator()
-#     qaoa = QAOA.default(cost_hamiltonian=hamiltonian, optimizer=optimizer, n_layers=2)
-#     results = qaoa.find_optimal_params(backend=backend)
-#     breakpoint()
-
 
 @pytest.fixture()
 def hamiltonian():
@@ -28,9 +20,7 @@ def optimizer():
     return ScipyOptimizer(method="L-BFGS-B")
 
 
-@pytest.fixture()
-def n_layers():
-    return 2
+N_LAYERS = 2
 
 
 @pytest.fixture()
@@ -44,42 +34,42 @@ def initial_params(hamiltonian):
 
 
 @pytest.fixture()
-def qaoa_object(hamiltonian, optimizer, n_layers):
-    return QAOA.default(cost_hamiltonian=hamiltonian, n_layers=n_layers)
+def qaoa_object(hamiltonian, optimizer):
+    return QAOA.default(cost_hamiltonian=hamiltonian, n_layers=N_LAYERS)
 
 
 class TestQaoa:
-    def test_default_optimizer_init(self, hamiltonian, n_layers):
-        qaoa = QAOA.default(cost_hamiltonian=hamiltonian, n_layers=n_layers)
+    def test_default_optimizer_is_lbfgsb(self, hamiltonian):
+        qaoa = QAOA.default(cost_hamiltonian=hamiltonian, n_layers=N_LAYERS)
         assert qaoa.optimizer.method == "L-BFGS-B"
 
-    def test_default_ansatz_init(self, hamiltonian, n_layers):
-        qaoa = QAOA.default(cost_hamiltonian=hamiltonian, n_layers=n_layers)
+    def test_default_ansatz_is_farhi(self, hamiltonian):
+        qaoa = QAOA.default(cost_hamiltonian=hamiltonian, n_layers=N_LAYERS)
         assert isinstance(qaoa.ansatz, QAOAFarhiAnsatz)
-        assert qaoa.ansatz.number_of_layers == n_layers
+        assert qaoa.ansatz.number_of_layers == N_LAYERS
 
-    def test_default_estimation_init_default_value(self, hamiltonian, n_layers):
+    def test_default_estimation_init_default_value(self, hamiltonian):
         qaoa = QAOA.default(
             cost_hamiltonian=hamiltonian,
-            n_layers=n_layers,
+            n_layers=N_LAYERS,
         )
         assert qaoa.estimation_method.__name__ == "calculate_exact_expectation_values"
         assert qaoa._n_shots is None
 
-    def test_default_estimation_init_exact(self, hamiltonian, n_layers):
+    def test_default_estimation_init_exact(self, hamiltonian):
         qaoa = QAOA.default(
             cost_hamiltonian=hamiltonian,
-            n_layers=n_layers,
+            n_layers=N_LAYERS,
             use_exact_expectation_values=True,
         )
         assert qaoa.estimation_method.__name__ == "calculate_exact_expectation_values"
         assert qaoa._n_shots is None
 
-    def test_default_estimation_init_averaging(self, hamiltonian, n_layers):
+    def test_default_estimation_init_averaging(self, hamiltonian):
         n_shots = 1000
         qaoa = QAOA.default(
             cost_hamiltonian=hamiltonian,
-            n_layers=n_layers,
+            n_layers=N_LAYERS,
             use_exact_expectation_values=False,
             n_shots=n_shots,
         )
@@ -93,12 +83,12 @@ class TestQaoa:
         "use_exact_expectation_values,n_shots", [(True, 1000), (False, None)]
     )
     def test_default_raises_exception_for_invalid_inputs(
-        self, hamiltonian, n_layers, use_exact_expectation_values, n_shots
+        self, hamiltonian, use_exact_expectation_values, n_shots
     ):
         with pytest.raises(ValueError):
             _ = QAOA.default(
                 cost_hamiltonian=hamiltonian,
-                n_layers=n_layers,
+                n_layers=N_LAYERS,
                 use_exact_expectation_values=use_exact_expectation_values,
                 n_shots=n_shots,
             )

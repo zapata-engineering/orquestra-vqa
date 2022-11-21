@@ -33,6 +33,7 @@ class QAOA:
         n_shots: Optional[int] = None,
     ) -> None:
         """Class providing an easy interface to work with QAOA.
+
         For new users, usage of "default" method is recommended.
 
         Args:
@@ -59,6 +60,7 @@ class QAOA:
         n_shots: Optional[int] = None,
     ) -> "QAOA":
         """Creates a QAOA object with some default settings:
+
         - optimizer: L-BFGS-B optimizer (scipy implementation)
         - ansatz: standard ansatz as proposed by Farhi
             in https://arxiv.org/abs/1411.4028.
@@ -70,7 +72,6 @@ class QAOA:
 
         Args:
             cost_hamiltonian: Cost Hamiltonian defining the problem.
-            optimizer: Optimizer used to find optimal parameters
             n_layers: Number of layers for the ansatz.
             use_exact_expectation_values: A flag indicating whether to use exact
                 calculation of the expectation values. This is possible only when
@@ -134,6 +135,7 @@ class QAOA:
         self, estimation_method: EstimateExpectationValues, n_shots: Optional[int]
     ) -> "QAOA":
         """Creates a new QAOA object with a provided estimation method.
+
         It requires providing both new estimation method and number of shots.
 
         Args:
