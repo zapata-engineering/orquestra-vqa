@@ -8,6 +8,7 @@ from orquestra.quantum.api.backend import QuantumBackend
 from orquestra.quantum.api.estimation import (
     EstimateExpectationValues,
     EstimationPreprocessor,
+    EstimationTask,
 )
 from orquestra.quantum.circuits import Circuit
 from orquestra.quantum.estimation import (
@@ -71,13 +72,13 @@ class VQE:
         hamiltonian: PauliRepresentation,
         ansatz: Ansatz,
         use_exact_expectation_values: bool = True,
-        grouping: str = "greedy",
+        grouping: Optional[str] = "greedy",
         shots_allocation: str = "proportional",
         n_shots: Optional[int] = None,
     ) -> "VQE":
         """Creates a VQE object with some default settings:
-        - optimizer: L-BFGS-B optimizer (scipy implementation)
 
+        - optimizer: L-BFGS-B optimizer (scipy implementation)
         - ansatz: ansatz used for
         - estimation method: either using exact expectation values
             (only for simulation) or standard method of calculating expectation
@@ -91,11 +92,11 @@ class VQE:
                 calculation of the expectation values. This is possible only when
                 running on a simulator. Defaults to True.
             grouping: name of the grouping function provided as a string. It only
-            accepts "greedy" and "individual" as an argument.
+            accepts "greedy", "individual" or None as an argument.
             shots_allocation: name of the shots allocation function provided as a
             string. It only accepts "proportional" and "individual" as an argument.
-            n_shots: If non-exact method for calculating expectation values is used,
-                this argument specifies number of shots per expectation value.
+            n_shots: Specifies number of shots to be used for a given shots allocation
+            method. If exact_expectation_values is true, it should be equal to None.
 
         Raises:
             ValueError: if wrong combination of "use_exact_expectation_values" and
@@ -103,15 +104,13 @@ class VQE:
 
         """
 
-        grouping_object = _get_grouping(grouping)
-        shots_allocation_object = _get_shots_allocation(shots_allocation)
-
         optimizer = ScipyOptimizer(method="L-BFGS-B")
 
         if use_exact_expectation_values and n_shots is None:
             estimation_method = cast(
                 EstimateExpectationValues, calculate_exact_expectation_values
             )
+            grouping = None
         elif not use_exact_expectation_values and n_shots is not None:
             estimation_method = estimate_expectation_values_by_averaging
         else:
@@ -119,6 +118,9 @@ class VQE:
                 f"Invalid n_shots={n_shots} for \
                     use_exact_expectation_values={use_exact_expectation_values}."
             )
+
+        grouping_object = _get_grouping(grouping)
+        shots_allocation_object = _get_shots_allocation(shots_allocation)
 
         return cls(
             hamiltonian,
@@ -293,31 +295,37 @@ class VQE:
         return self.ansatz.get_executable_circuit(params)
 
 
-def _get_grouping(grouping) -> EstimationPreprocessor:
+def _get_grouping(
+    grouping: Optional[str] = None,
+) -> Optional[EstimationPreprocessor]:
     if grouping is not None:
         if grouping == "greedy":
-            grouping = group_greedily
+            grouping_object = group_greedily
         elif grouping == "individual":
-            grouping = group_individually
+            grouping_object = group_individually
         else:
             raise ValueError(
                 'Grouping provided is not recognized by the "default" method'
                 "For custom grouping, please use VQE class init method"
                 'instead of "default" method'
             )
+    else:
+        grouping_object = None
 
-    return grouping
+    return grouping_object
 
 
-def _get_shots_allocation(shot_allocation) -> EstimationPreprocessor:
+def _get_shots_allocation(
+    shot_allocation: str,
+) -> EstimationPreprocessor:
     if shot_allocation == "proportional":
-        shot_allocation = allocate_shots_proportionally
+        shot_allocation_object = allocate_shots_proportionally
     elif shot_allocation == "uniform":
-        shot_allocation == allocate_shots_uniformly
+        shot_allocation_object = allocate_shots_uniformly
     else:
         raise ValueError(
             "Only proportional and uniform shots allocations are accepted"
             "For using custom shots allocation, please use VQE class init method"
             'instead of "default" method'
         )
-    return shot_allocation
+    return shot_allocation_object

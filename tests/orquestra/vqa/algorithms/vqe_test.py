@@ -78,10 +78,10 @@ class TestDefaultVQE:
         )
         assert vqe._n_shots == n_shots
 
-    def test_grouping_instance_default(self, hamiltonian, ansatz):
+    def test_grouping_instance_default_is_None(self, hamiltonian, ansatz):
         vqe = VQE.default(hamiltonian=hamiltonian, ansatz=ansatz)
         # assert isinstance(vqe.grouping, EstimationPreprocessor)
-        assert vqe.grouping.__name__ == "group_greedily"
+        assert vqe.grouping is None
 
     def test_shots_allocation_instances_default(self, hamiltonian, ansatz):
         vqe = VQE.default(hamiltonian=hamiltonian, ansatz=ansatz)
@@ -153,6 +153,21 @@ class TestDefaultVQE:
         assert new_vqe_object.estimation_method is estimation_method
         assert vqe_object._n_shots != new_vqe_object._n_shots
 
+    def test_replace_grouping(self, vqe_object):
+        grouping = group_individually
+
+        new_vqe_object = vqe_object.replace_grouping(grouping)
+
+        assert vqe_object.grouping is not grouping
+        assert new_vqe_object.grouping is grouping
+
+    def test_replace_shots_allocation(self, vqe_object):
+        shots_allocation = allocate_shots_uniformly
+        new_vqe_object = vqe_object.replace_shots_allocation(shots_allocation, 1000)
+
+        assert vqe_object.shots_allocation is not shots_allocation
+        assert new_vqe_object.shots_allocation is shots_allocation
+
     @pytest.mark.parametrize("initial_params", [None, np.random.random(12)])
     def test_find_optimal_params_doesnt_fail(self, vqe_object, backend, initial_params):
         results = vqe_object.find_optimal_params(backend, initial_params)
@@ -168,18 +183,3 @@ class TestDefaultVQE:
         params = np.random.random(vqe_object.ansatz.number_of_params)
         circuit = vqe_object.get_circuit(params)
         assert circuit.n_qubits == vqe_object.ansatz.number_of_qubits
-
-    def test_replace_grouping(self, vqe_object):
-        grouping = group_individually
-
-        new_vqe_object = vqe_object.replace_grouping(grouping)
-
-        assert vqe_object.grouping is not grouping
-        assert new_vqe_object.grouping is grouping
-
-    def test_replace_shots_allocation(self, vqe_object):
-        shots_allocation = allocate_shots_uniformly
-        new_vqe_object = vqe_object.replace_shots_allocation(shots_allocation, 1000)
-
-        assert vqe_object.shots_allocation is not shots_allocation
-        assert new_vqe_object.shots_allocation is shots_allocation
