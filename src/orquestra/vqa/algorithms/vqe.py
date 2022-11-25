@@ -29,8 +29,6 @@ from orquestra.vqa.shot_allocation import (
     allocate_shots_uniformly,
 )
 
-# https://github.com/zapatacomputing/orquestra-core/blob/main/tests/fh_vqe_test.py
-
 
 class VQE:
     def __init__(
@@ -53,16 +51,19 @@ class VQE:
             ansatz: Ansatz defining what circuit will be used.
             estimation_method: Method used for calculating expectation values of
                 the Hamiltonian.
-            n_shots: number of shots to be used for evaluation of expectation values.
+            grouping: Transforms list of estimation tasks by grouping and adding
+            context selection logic to the circuits
+            shots_allocation: Function allocate the shots for each task
+            n_shots: Number of shots to be used for evaluation of expectation values.
                 For simulation with exact expectation value it should be None.
         """
         self.hamiltonian = hamiltonian
         self.optimizer = optimizer
         self.ansatz = ansatz
         self.estimation_method = estimation_method
-        self._n_shots = n_shots
         self.grouping = grouping
         self.shots_allocation = shots_allocation
+        self._n_shots = n_shots
 
     @classmethod
     def default(
@@ -75,8 +76,6 @@ class VQE:
         n_shots: Optional[int] = None,
     ) -> "VQE":
         """Creates a VQE object with some default settings:
-              #TODO: use the VQE paper
-
         - optimizer: L-BFGS-B optimizer (scipy implementation)
 
         - ansatz: ansatz used for
@@ -91,6 +90,10 @@ class VQE:
             use_exact_expectation_values: A flag indicating whether to use exact
                 calculation of the expectation values. This is possible only when
                 running on a simulator. Defaults to True.
+            grouping: name of the grouping function provided as a string. It only
+            accepts "greedy" and "individual" as an argument.
+            shots_allocation: name of the shots allocation function provided as a
+            string. It only accepts "proportional" and "individual" as an argument.
             n_shots: If non-exact method for calculating expectation values is used,
                 this argument specifies number of shots per expectation value.
 
@@ -198,14 +201,10 @@ class VQE:
         )
 
     def replace_grouping(self, grouping: EstimationPreprocessor) -> "VQE":
-        # TODO: redo docstrings
-        """Creates a new VQE object with a provided estimation method.
-
-        It requires providing both new estimation method and number of shots.
+        """Creates a new VQE object with a provided grouping method.
 
         Args:
-            estimation_method: new estimation method to be used.
-            n_shots: number of shots for the new estimation method.
+            grouping: new grouping method to be used.
         """
         return VQE(
             self.hamiltonian,
@@ -220,16 +219,15 @@ class VQE:
     def replace_shots_allocation(
         self, shots_allocation: EstimationPreprocessor, n_shots: int
     ) -> "VQE":
-        # TODO: redo docstrings
-        """Creates a new VQE object with a provided estimation method.
+
+        """Creates a new VQE object with a provided shots allocation.
 
         It requires providing both new estimation method and number of shots.
 
         Args:
-            estimation_method: new estimation method to be used.
+            shots_allocation: new estimation method to be used.
             n_shots: number of shots for the new estimation method.
         """
-        # QUESTION: shots allocation and number of shots
 
         return VQE(
             self.hamiltonian,
@@ -266,9 +264,9 @@ class VQE:
 
         shots_allocation = partial(self.shots_allocation, self._n_shots)
 
-        if self._n_shots is None:
-            estimation_preprocessors = []
-        else:
+        estimation_preprocessors: List[EstimationPreprocessor] = []
+
+        if self._n_shots is not None:
 
             estimation_preprocessors = [
                 self.grouping,
