@@ -8,7 +8,7 @@ import numpy as np
 from orquestra.opt.api.cost_function import CostFunction
 from orquestra.opt.api.functions import StoreArtifact, function_with_gradient
 from orquestra.opt.gradients import finite_differences_gradient
-from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.api import CircuitRunner
 from orquestra.quantum.distributions import (
     MeasurementOutcomeDistribution,
     evaluate_distribution_distance,
@@ -23,7 +23,7 @@ DistanceMeasure = Callable[..., Number]
 
 def create_QCBM_cost_function(
     ansatz: Ansatz,
-    backend: QuantumBackend,
+    backend: CircuitRunner,
     n_samples: int,
     distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
@@ -61,7 +61,7 @@ def create_QCBM_cost_function(
 
 def _create_QCBM_cost_function(
     ansatz: Ansatz,
-    backend: QuantumBackend,
+    backend: CircuitRunner,
     n_samples: int,
     distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,

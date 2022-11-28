@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 from orquestra.opt.optimizers import ScipyOptimizer
-from orquestra.quantum.backends.symbolic_simulator import SymbolicSimulator
 from orquestra.quantum.operators import PauliTerm
+from orquestra.quantum.runners.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.algorithms.qaoa import QAOA
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz

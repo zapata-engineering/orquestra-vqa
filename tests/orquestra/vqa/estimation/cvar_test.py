@@ -4,10 +4,10 @@
 import pytest
 from orquestra.quantum.api.estimation import EstimationTask
 from orquestra.quantum.api.estimator_contract import ESTIMATOR_CONTRACTS
-from orquestra.quantum.backends import SymbolicSimulator
 from orquestra.quantum.circuits import Circuit, H, X
 from orquestra.quantum.operators import PauliTerm
-from orquestra.quantum.testing import MockQuantumBackend
+from orquestra.quantum.runners import SymbolicSimulator
+from orquestra.quantum.testing import MockCircuitRunner
 
 from orquestra.vqa.estimation.cvar import CvarEstimator
 
@@ -63,41 +63,41 @@ class TestCvarEstimator:
         return [EstimationTask(operator, circuit, 10)]
 
     @pytest.fixture()
-    def backend(self):
+    def runner(self):
         return SymbolicSimulator()
 
     def test_raises_exception_if_operator_is_not_ising(
-        self, estimator, backend, circuit
+        self, estimator, runner, circuit
     ):
         # Given
         estimation_tasks = [EstimationTask(PauliTerm("X0"), circuit, 10)]
         with pytest.raises(TypeError):
             estimator(
-                backend=backend,
+                runner=runner,
                 estimation_tasks=estimation_tasks,
             )
 
     def test_cvar_estimator_raises_exception_if_alpha_less_than_0(
-        self, estimator, backend, estimation_tasks
+        self, estimator, runner, estimation_tasks
     ):
         estimator.alpha = -1
         with pytest.raises(ValueError):
             estimator(
-                backend=backend,
+                runner=runner,
                 estimation_tasks=estimation_tasks,
             )
 
     def test_cvar_estimator_raises_exception_if_alpha_greater_than_1(
-        self, estimator, backend, estimation_tasks
+        self, estimator, runner, estimation_tasks
     ):
         estimator.alpha = 2
         with pytest.raises(ValueError):
             estimator(
-                backend=backend,
+                runner=runner,
                 estimation_tasks=estimation_tasks,
             )
 
-    def test_cvar_estimator_returns_correct_values(self, estimator, backend, operator):
+    def test_cvar_estimator_returns_correct_values(self, estimator, runner, operator):
         # Given
         estimation_tasks = [EstimationTask(operator, Circuit([H(0)]), 10000)]
         if estimator.alpha <= 0.5:
@@ -107,7 +107,7 @@ class TestCvarEstimator:
 
         # When
         expectation_values = estimator(
-            backend=backend,
+            runner=runner,
             estimation_tasks=estimation_tasks,
         )
 
@@ -118,11 +118,11 @@ class TestCvarEstimator:
         self, circuit
     ):
         # Given
-        backend = MockQuantumBackend()
+        runner = MockCircuitRunner()
         estimation_tasks = [EstimationTask(PauliTerm("X0"), circuit, 10)]
         estimator = CvarEstimator(use_exact_expectation_values=True, alpha=0.5)
         with pytest.raises(TypeError):
             estimator = estimator(
-                backend=backend,
+                runner=runner,
                 estimation_tasks=estimation_tasks,
             )
