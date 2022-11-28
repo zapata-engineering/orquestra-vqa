@@ -5,7 +5,7 @@ from warnings import warn
 import numpy as np
 from orquestra.opt.api import CostFunction, Optimizer
 from orquestra.opt.optimizers import ScipyOptimizer
-from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.api.circuit_runner import CircuitRunner
 from orquestra.quantum.api.estimation import (
     EstimateExpectationValues,
     EstimationPreprocessor,
@@ -249,26 +249,26 @@ class VQE:
         )
 
     def find_optimal_params(
-        self, backend: QuantumBackend, initial_params: Optional[np.ndarray] = None
+        self, runner: CircuitRunner, initial_params: Optional[np.ndarray] = None
     ) -> OptimizeResult:
-        """Optimizes the paramaters of VQE ansatz using provided backend.
+        """Optimizes the paramaters of VQE ansatz using provided runner.
 
         Args:
-            backend: backend used for running quantum circuits.
+            runner: runner used for running quantum circuits.
             initial_params: Initial parameters for the optimizer. If None provided,
                 will create random parameters from [0, pi]. Defaults to None.
         """
-        cost_function = self.get_cost_function(backend)
+        cost_function = self.get_cost_function(runner)
         if initial_params is None:
             initial_params = np.random.random(self.ansatz.number_of_params) * np.pi
 
         return self.optimizer.minimize(cost_function, initial_params)
 
-    def get_cost_function(self, backend: QuantumBackend) -> CostFunction:
+    def get_cost_function(self, runner: CircuitRunner) -> CostFunction:
         """Returns cost function associated with given VQE instance.
 
         Args:
-            backend: backend used for running quantum circuits.
+            runner: runner used for running quantum circuits.
         """
 
         shots_allocation = partial(self.shots_allocation, self._n_shots)
@@ -288,7 +288,7 @@ class VQE:
         )
 
         return create_cost_function(
-            backend,
+            runner,
             estimation_task_factory,
             self.estimation_method,
         )
