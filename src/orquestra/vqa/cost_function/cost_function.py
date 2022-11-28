@@ -1,7 +1,7 @@
 ################################################################################
 # © Copyright 2020-2022 Zapata Computing Inc.
 ################################################################################
-from typing import Callable, Iterable, List, Union
+from typing import Callable, Iterable, List, Optional, Union
 
 import numpy as np
 import sympy
@@ -128,7 +128,7 @@ def create_cost_function(
     backend: CircuitRunner,
     estimation_tasks_factory: EstimationTasksFactory,
     estimation_method: EstimateExpectationValues = _by_averaging,
-    parameter_preprocessors: Iterable[ParameterPreprocessor] = None,
+    parameter_preprocessors: Optional[Iterable[ParameterPreprocessor]] = None,
     gradient_function: GradientFactory = finite_differences_gradient,
 ) -> CostFunction:
     """This function can be used to generate callable cost functions for parametric
@@ -194,7 +194,7 @@ def create_cost_function(
 def expectation_value_estimation_tasks_factory(
     target_operator: PauliRepresentation,
     parametrized_circuit: Circuit,
-    estimation_preprocessors: List[EstimationPreprocessor] = None,
+    estimation_preprocessors: Optional[List[EstimationPreprocessor]] = None,
     symbols_sort_key: SymbolsSortKey = str,
 ) -> EstimationTasksFactory:
     """Creates a EstimationTasksFactory object that can be used to create
@@ -249,7 +249,7 @@ def expectation_value_estimation_tasks_factory(
 def substitution_based_estimation_tasks_factory(
     target_operator: PauliRepresentation,
     ansatz: Ansatz,
-    estimation_preprocessors: List[EstimationPreprocessor] = None,
+    estimation_preprocessors: Optional[List[EstimationPreprocessor]] = None,
 ) -> EstimationTasksFactory:
     """Creates a EstimationTasksFactory object that can be used to create
     estimation tasks dynamically with parameters provided on the fly. These
@@ -281,7 +281,7 @@ def substitution_based_estimation_tasks_factory(
 def dynamic_circuit_estimation_tasks_factory(
     target_operator: PauliRepresentation,
     ansatz: Ansatz,
-    estimation_preprocessors: List[EstimationPreprocessor] = None,
+    estimation_preprocessors: Optional[List[EstimationPreprocessor]] = None,
 ) -> EstimationTasksFactory:
     """Creates a EstimationTasksFactory object that can be used to create
     estimation tasks dynamically with parameters provided on the fly. These

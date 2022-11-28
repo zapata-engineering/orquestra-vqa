@@ -328,7 +328,7 @@ class TestRQAOA:
         )
 
         opt_result = recursive_qaoa.minimize(cost_function_factory, initial_params)
-        solutions: List[Tuple[int]] = opt_result.opt_solutions
+        solutions = opt_result.opt_solutions
 
         n_qubits = 4
         for solution in solutions:
@@ -375,7 +375,7 @@ class TestRQAOA:
         opt_result = recursive_qaoa.minimize(cost_function_factory, initial_params)
         assert wrapped.count == expected_n_recursions
 
-        solutions: List[Tuple[int]] = opt_result.opt_solutions
+        solutions = opt_result.opt_solutions
         n_qubits = 4
         for solution in solutions:
             assert len(solution) == n_qubits
