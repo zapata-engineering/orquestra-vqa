@@ -17,7 +17,11 @@ from orquestra.vqa.shot_allocation import (
 
 @pytest.fixture()
 def hamiltonian():
-    return PauliTerm("Z0") + PauliTerm("Z1")
+    return (
+        PauliTerm("X0") * PauliTerm("Y0")
+        + PauliTerm("X0") * PauliTerm("Z0")
+        + PauliTerm("X1")
+    )
 
 
 @pytest.fixture()
@@ -49,23 +53,14 @@ class TestDefaultVQE:
     def test_default_optimizer_is_lbfgsb(self, vqe_object):
         assert vqe_object.optimizer.method == "L-BFGS-B"
 
-    def test_default_estimation_init_default_value(self, vqe_object):
+    def test_default_estimation_is_calculate_exact_expectation_values(self, vqe_object):
         assert (
             vqe_object.estimation_method.__name__
             == "calculate_exact_expectation_values"
         )
         assert vqe_object._n_shots is None
 
-    def test_default_estimation_init_exact(self, hamiltonian, ansatz):
-        vqe = VQE.default(
-            hamiltonian=hamiltonian,
-            ansatz=ansatz,
-            use_exact_expectation_values=True,
-        )
-        assert vqe.estimation_method.__name__ == "calculate_exact_expectation_values"
-        assert vqe._n_shots is None
-
-    def test_default_estimation_init_averaging(self, hamiltonian):
+    def test_default_estimation_changed_to_estimate_by_averaging(self, hamiltonian):
         n_shots = 1000
         vqe = VQE.default(
             hamiltonian=hamiltonian,
@@ -78,12 +73,12 @@ class TestDefaultVQE:
         )
         assert vqe._n_shots == n_shots
 
-    def test_grouping_instance_default_is_None(self, hamiltonian, ansatz):
+    def test_default_grouping_is_None(self, hamiltonian, ansatz):
         vqe = VQE.default(hamiltonian=hamiltonian, ansatz=ansatz)
         # assert isinstance(vqe.grouping, EstimationPreprocessor)
         assert vqe.grouping is None
 
-    def test_shots_allocation_instances_default(self, hamiltonian, ansatz):
+    def test_default_shots_allocation_is_proportional(self, hamiltonian, ansatz):
         vqe = VQE.default(hamiltonian=hamiltonian, ansatz=ansatz)
         assert vqe.shots_allocation.__name__ == "allocate_shots_proportionally"
 

@@ -1,5 +1,6 @@
 from functools import partial
 from typing import List, Optional, cast
+from warnings import warn
 
 import numpy as np
 from orquestra.opt.api import CostFunction, Optimizer
@@ -38,7 +39,7 @@ class VQE:
         optimizer: Optimizer,
         ansatz: Ansatz,
         estimation_method: EstimateExpectationValues,
-        grouping: EstimationPreprocessor,
+        grouping: Optional[EstimationPreprocessor],
         shots_allocation: EstimationPreprocessor,
         n_shots: Optional[int] = None,
     ) -> None:
@@ -72,17 +73,18 @@ class VQE:
         hamiltonian: PauliRepresentation,
         ansatz: Ansatz,
         use_exact_expectation_values: bool = True,
-        grouping: Optional[str] = "greedy",
+        grouping: Optional[str] = None,
         shots_allocation: str = "proportional",
         n_shots: Optional[int] = None,
     ) -> "VQE":
         """Creates a VQE object with some default settings:
 
-        - optimizer: L-BFGS-B optimizer (scipy implementation)
-        - ansatz: ansatz used for
-        - estimation method: either using exact expectation values
-            (only for simulation) or standard method of calculating expectation
-            values through averaging the results of measurements.
+            - optimizer: L-BFGS-B optimizer (scipy implementation)
+            - estimation method: either using exact expectation values
+                (only for simulation) or standard method of calculating expectation
+                values through averaging the results of measurements.
+            - grouping: The default value is None, therefore everything is co-measurable
+            - shots_allocation: proportional to the weights of the Pauli terms
 
         These can be later replaced using one of the `replace_*` methods.
 
@@ -110,7 +112,12 @@ class VQE:
             estimation_method = cast(
                 EstimateExpectationValues, calculate_exact_expectation_values
             )
-            grouping = None
+            if grouping is not None:
+                warn(
+                    "Since we are using use_exact expectation values,"
+                    "grouping is changed to None"
+                )
+                grouping = None
         elif not use_exact_expectation_values and n_shots is not None:
             estimation_method = estimate_expectation_values_by_averaging
         else:
@@ -271,7 +278,7 @@ class VQE:
         if self._n_shots is not None:
 
             estimation_preprocessors = [
-                self.grouping,
+                self.grouping,  # type: ignore
                 perform_context_selection,
                 shots_allocation,
             ]
@@ -302,7 +309,7 @@ def _get_grouping(
         if grouping == "greedy":
             grouping_object = group_greedily
         elif grouping == "individual":
-            grouping_object = group_individually
+            grouping_object = group_individually  # type: ignore
         else:
             raise ValueError(
                 'Grouping provided is not recognized by the "default" method'
@@ -321,11 +328,11 @@ def _get_shots_allocation(
     if shot_allocation == "proportional":
         shot_allocation_object = allocate_shots_proportionally
     elif shot_allocation == "uniform":
-        shot_allocation_object = allocate_shots_uniformly
+        shot_allocation_object = allocate_shots_uniformly  # type: ignore
     else:
         raise ValueError(
             "Only proportional and uniform shots allocations are accepted"
             "For using custom shots allocation, please use VQE class init method"
             'instead of "default" method'
         )
-    return shot_allocation_object
+    return shot_allocation_object  # type: ignore
