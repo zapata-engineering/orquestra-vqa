@@ -4,7 +4,7 @@ from typing import List, Optional, cast
 import numpy as np
 from orquestra.opt.api import CostFunction, Optimizer
 from orquestra.opt.optimizers import ScipyOptimizer
-from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.api.circuit_runner import CircuitRunner
 from orquestra.quantum.api.estimation import EstimateExpectationValues, EstimationTask
 from orquestra.quantum.circuits import Circuit
 from orquestra.quantum.estimation import (
@@ -151,26 +151,26 @@ class QAOA:
         )
 
     def find_optimal_params(
-        self, backend: QuantumBackend, initial_params: Optional[np.ndarray] = None
+        self, runner: CircuitRunner, initial_params: Optional[np.ndarray] = None
     ) -> OptimizeResult:
-        """Optimizes the paramaters of QAOA ansatz using provided backend.
+        """Optimizes the paramaters of QAOA ansatz using provided runner.
 
         Args:
-            backend: backend used for running quantum circuits.
+            runner: runner used for running quantum circuits.
             initial_params: Initial parameters for the optimizer. If None provided,
                 will create random parameters from [0, pi]. Defaults to None.
         """
-        cost_function = self.get_cost_function(backend)
+        cost_function = self.get_cost_function(runner)
         if initial_params is None:
             initial_params = np.random.random(self.ansatz.number_of_params) * np.pi
 
         return self.optimizer.minimize(cost_function, initial_params)
 
-    def get_cost_function(self, backend: QuantumBackend) -> CostFunction:
+    def get_cost_function(self, runner: CircuitRunner) -> CostFunction:
         """Returns cost function associated with given QAOA instance.
 
         Args:
-            backend: backend used for running quantum circuits.
+            runner: runner used for running quantum circuits.
         """
         estimation_preprocessors = []
         if self._n_shots is not None:
@@ -187,7 +187,7 @@ class QAOA:
         )
 
         return create_cost_function(
-            backend,
+            runner,
             estimation_task_factory,
             self.estimation_method,
         )
