@@ -8,7 +8,7 @@ import sympy
 from orquestra.opt.api.cost_function import CostFunction, ParameterPreprocessor
 from orquestra.opt.api.functions import function_with_gradient
 from orquestra.opt.gradients import finite_differences_gradient
-from orquestra.quantum.api.backend import QuantumBackend
+from orquestra.quantum.api.circuit_runner import CircuitRunner
 from orquestra.quantum.api.estimation import (
     EstimateExpectationValues,
     EstimationPreprocessor,
@@ -125,7 +125,7 @@ def add_normal_noise(
 
 
 def create_cost_function(
-    backend: QuantumBackend,
+    backend: CircuitRunner,
     estimation_tasks_factory: EstimationTasksFactory,
     estimation_method: EstimateExpectationValues = _by_averaging,
     parameter_preprocessors: Optional[Iterable[ParameterPreprocessor]] = None,
@@ -172,7 +172,8 @@ def create_cost_function(
 
     """
 
-    def _cost_function(parameters: np.ndarray) -> Union[float, ValueEstimate]:
+    def _cost_function(parameters: np.ndarray) -> float:
+
         for preprocessor in (
             [] if parameter_preprocessors is None else parameter_preprocessors
         ):
@@ -181,11 +182,11 @@ def create_cost_function(
         estimation_tasks = estimation_tasks_factory(parameters)
         expectation_values_list = estimation_method(backend, estimation_tasks)
 
-        combined_expectation_values = expectation_values_to_real(
-            concatenate_expectation_values(expectation_values_list)
-        )
+        sum_of_expectation_values = np.concatenate(
+            [expectation_value.values for expectation_value in expectation_values_list]
+        ).sum()
 
-        return sum_expectation_values(combined_expectation_values)
+        return sum_of_expectation_values
 
     return function_with_gradient(_cost_function, gradient_function(_cost_function))
 

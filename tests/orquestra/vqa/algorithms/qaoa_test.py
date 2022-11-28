@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 from orquestra.opt.optimizers import ScipyOptimizer
-from orquestra.quantum.backends.symbolic_simulator import SymbolicSimulator
 from orquestra.quantum.operators import PauliTerm
+from orquestra.quantum.runners.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.algorithms.qaoa import QAOA
 from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
@@ -48,7 +48,9 @@ class TestQaoa:
         assert isinstance(qaoa.ansatz, QAOAFarhiAnsatz)
         assert qaoa.ansatz.number_of_layers == N_LAYERS
 
-    def test_default_estimation_init_default_value(self, hamiltonian):
+    def test_default_estimation_is_calculate_exact_expectation_values(
+        self, hamiltonian
+    ):
         qaoa = QAOA.default(
             cost_hamiltonian=hamiltonian,
             n_layers=N_LAYERS,
@@ -56,16 +58,7 @@ class TestQaoa:
         assert qaoa.estimation_method.__name__ == "calculate_exact_expectation_values"
         assert qaoa._n_shots is None
 
-    def test_default_estimation_init_exact(self, hamiltonian):
-        qaoa = QAOA.default(
-            cost_hamiltonian=hamiltonian,
-            n_layers=N_LAYERS,
-            use_exact_expectation_values=True,
-        )
-        assert qaoa.estimation_method.__name__ == "calculate_exact_expectation_values"
-        assert qaoa._n_shots is None
-
-    def test_default_estimation_init_averaging(self, hamiltonian):
+    def test_default_estimation_changed_to_estimate_by_averaging(self, hamiltonian):
         n_shots = 1000
         qaoa = QAOA.default(
             cost_hamiltonian=hamiltonian,

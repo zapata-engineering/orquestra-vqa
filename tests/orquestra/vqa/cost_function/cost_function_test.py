@@ -6,13 +6,13 @@ from unittest import mock
 
 import numpy as np
 import pytest
-from orquestra.quantum.backends import SymbolicSimulator
 from orquestra.quantum.estimation._estimation import (
     calculate_exact_expectation_values,
     estimate_expectation_values_by_averaging,
 )
 from orquestra.quantum.measurements import ExpectationValues
 from orquestra.quantum.operators import PauliTerm
+from orquestra.quantum.runners import SymbolicSimulator
 from sympy import Symbol
 
 from orquestra.vqa.cost_function.cost_function import (
@@ -212,6 +212,7 @@ class TestEstimationTasksFactory:
 
     @pytest.mark.parametrize("param", [0.0, 0.42, 1.0, np.pi])
     def test_evaluates_to_same_cost_function(self, param):
+
         params = np.array([param])
         dynamic_estimation_factory = dynamic_circuit_estimation_tasks_factory(
             TARGET_OPERATOR, ANSATZ
