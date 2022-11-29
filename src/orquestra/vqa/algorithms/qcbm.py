@@ -1,4 +1,3 @@
-from functools import partial
 from numbers import Number
 from typing import Callable, Optional, cast
 
@@ -36,8 +35,8 @@ class QCBM:
         For new users, usage of "default" method is recommended.
 
         Args:
-            n_layers: Number of layers for the ansatz.
             n_qubits: Number of qubits for the circuit.
+            n_layers: Number of layers for the ansatz.
             optimizer: Optimizer used to find optimal parameters
             estimation_method: Method used for calculating expectation values of
                 the Hamiltonian.
@@ -65,14 +64,13 @@ class QCBM:
         - estimation method: either using exact expectation values
             (only for simulation) or standard method of calculating expectation
             values through averaging the results of measurements.
-        - topology: topology is set to 'all'
+        - topology: topology for ansatz is set to 'all'
 
         These can be later replaced using one of the `replace_*` methods.
 
         Args:
-
-            n_layers: Number of layers for the ansatz.
             n_qubits: Number of qubits for the circuit.
+            n_layers: Number of layers for the ansatz.
             use_exact_expectation_values: A flag indicating whether to use exact
                 calculation of the expectation values. This is possible only when
                 running on a simulator. Defaults to True.
@@ -101,6 +99,11 @@ class QCBM:
         return cls(n_qubits, n_layers, optimizer, estimation_method, n_shots)
 
     def replace_n_qubits(self, n_qubits: int) -> "QCBM":
+        """Creates a new QCBM object with a provided number of qubits.
+
+        Args:
+            n_qubits: new number of qubits to be used.
+        """
         return QCBM(
             n_qubits,
             self._n_layers,
@@ -110,6 +113,11 @@ class QCBM:
         )
 
     def replace_n_layers(self, n_layers: int) -> "QCBM":
+        """Creates a new QCBM object with a provided number of layers.
+
+        Args:
+            n_qubits: new number of layers to be used.
+        """
         return QCBM(
             self._n_qubits,
             n_layers,
