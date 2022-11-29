@@ -39,7 +39,7 @@ target_distribution = MeasurementOutcomeDistribution(
     }
 )
 
-backend = SymbolicSimulator()
+runner = SymbolicSimulator()
 
 n_samples = 1
 
@@ -64,7 +64,7 @@ class Test_create_QCBM_cost_function:
         # Given
         cost_function = create_QCBM_cost_function(
             ansatz,
-            backend,
+            runner,
             n_samples,
             **distance_measure_kwargs,
             target_distribution=target_distribution,
@@ -97,7 +97,7 @@ class Test_create_QCBM_cost_function:
         # Given
         cost_function = cf_factory(
             ansatz,
-            backend,
+            runner,
             n_samples,
             **distance_measure_kwargs,
             target_distribution=target_distribution,
@@ -123,7 +123,7 @@ class Test_create_QCBM_cost_function:
             cost_function = (
                 create_QCBM_cost_function(
                     ansatz,
-                    backend,
+                    runner,
                     n_samples,
                     **distance_measure_kwargs,
                     target_distribution=target_distribution,

@@ -29,7 +29,7 @@ from orquestra.vqa.testing.mock_objects import MockAnsatz
 
 RNGSEED = 1234
 
-BACKEND = SymbolicSimulator()
+SIMULATOR = SymbolicSimulator()
 ESTIMATION_METHOD = estimate_expectation_values_by_averaging
 ESTIMATION_PREPROCESSORS = [partial(allocate_shots_uniformly, number_of_shots=1)]
 
@@ -92,7 +92,7 @@ class TestGroundStateCostFunction:
             parameter_preprocessors.append(noise_preprocessor)
 
         return create_cost_function(
-            BACKEND,
+            SIMULATOR,
             estimation_tasks_factory,
             ESTIMATION_METHOD,
             parameter_preprocessors,
@@ -120,7 +120,7 @@ class TestGroundStateCostFunction:
         )
 
         noisy_ground_state_cost_function = create_cost_function(
-            BACKEND,
+            SIMULATOR,
             estimation_tasks_factory,
             ESTIMATION_METHOD,
             parameter_preprocessors=[
@@ -221,10 +221,12 @@ class TestEstimationTasksFactory:
             TARGET_OPERATOR, ANSATZ
         )
         dynamic_cost_function = create_cost_function(
-            BACKEND, dynamic_estimation_factory, calculate_exact_expectation_values
+            SIMULATOR, dynamic_estimation_factory, calculate_exact_expectation_values
         )
         substituion_cost_function = create_cost_function(
-            BACKEND, substitution_estimation_factory, calculate_exact_expectation_values
+            SIMULATOR,
+            substitution_estimation_factory,
+            calculate_exact_expectation_values,
         )
 
         assert dynamic_cost_function(params) == substituion_cost_function(params)

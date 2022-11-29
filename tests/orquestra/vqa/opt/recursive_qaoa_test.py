@@ -77,7 +77,7 @@ class TestRQAOA:
                 estimation_preprocessors=estimation_preprocessors,
             )
             return create_cost_function(
-                backend=SymbolicSimulator(),
+                runner=SymbolicSimulator(),
                 estimation_tasks_factory=estimation_tasks_factory,
                 estimation_method=estimate_expectation_values_by_averaging,
                 parameter_preprocessors=None,
