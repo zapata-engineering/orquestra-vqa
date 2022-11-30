@@ -43,11 +43,9 @@ class QCBM:
             n_shots: number of shots to be used for evaluation of expectation values.
                 For simulation with exact expectation value it should be None.
         """
-        n_qubits = _get_n_qubits(target_distribution)
+
         self.target_distribution = target_distribution
-        self.ansatz = QCBMAnsatz(n_layers, n_qubits, "all")
         self._n_layers = n_layers
-        self._n_qubits = n_qubits
         self.optimizer = optimizer
         self.estimation_method = estimation_method
         self._n_shots = n_shots
@@ -106,27 +104,11 @@ class QCBM:
             n_shots,
         )
 
-    def replace_target_distribution(
-        self, target_distribution: MeasurementOutcomeDistribution
-    ) -> "QCBM":
-        """Creates a new QCBM object with a provided target distribution.
-
-        Args:
-            target_distribution: bitstring distribution which QCBM aims to learn
-        """
-        return QCBM(
-            target_distribution,
-            self._n_layers,
-            self.optimizer,
-            self.estimation_method,
-            self._n_shots,
-        )
-
     def replace_n_layers(self, n_layers: int) -> "QCBM":
         """Creates a new QCBM object with a provided number of layers.
 
         Args:
-            n_layer: new number of layers to be used.
+            n_layers: new number of layers to be used.
         """
         return QCBM(
             self.target_distribution,
@@ -211,7 +193,13 @@ class QCBM:
         """
         return self.ansatz.get_executable_circuit(params)
 
+    @property
+    def n_qubits(self):
+        key_value = [key for key in self.target_distribution.distribution_dict.keys()][
+            0
+        ]
+        return len(key_value)
 
-def _get_n_qubits(target_distribution):
-    key_value = [key for key in target_distribution.distribution_dict.keys()][0]
-    return len(key_value)
+    @property
+    def ansatz(self):
+        return QCBMAnsatz(self._n_layers, self.n_qubits, "all")

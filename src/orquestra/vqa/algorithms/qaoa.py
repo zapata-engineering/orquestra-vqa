@@ -199,3 +199,7 @@ class QAOA:
             params: ansatz parameters.
         """
         return self.ansatz.get_executable_circuit(params)
+
+    @property
+    def n_qubits(self):
+        return self.ansatz.number_of_qubits

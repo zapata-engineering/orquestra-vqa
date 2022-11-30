@@ -101,7 +101,7 @@ class TestQCBM:
         assert qcbm.estimation_method is estimation_method
 
     def test_n_qubits(self, qcbm_object):
-        assert qcbm_object._n_qubits == N_QUBITS
+        assert qcbm_object.n_qubits == N_QUBITS
 
     def test_replace_optimizer(self, qcbm_object):
         optimizer = ScipyOptimizer(method="COBYLA")
