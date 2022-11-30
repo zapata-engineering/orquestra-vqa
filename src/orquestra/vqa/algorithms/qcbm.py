@@ -25,7 +25,6 @@ class QCBM:
     def __init__(
         self,
         target_distribution: MeasurementOutcomeDistribution,
-        n_qubits: int,
         n_layers: int,
         optimizer: Optimizer,
         estimation_method: EstimateExpectationValues,
@@ -36,8 +35,7 @@ class QCBM:
         For new users, usage of "default" method is recommended.
 
         Args:
-            target_distribution: bistring distribution which QCBM aims to learn
-            n_qubits: Number of qubits for the circuit.
+            target_distribution: bitstring distribution which QCBM aims to learn
             n_layers: Number of layers for the ansatz.
             optimizer: Optimizer used to find optimal parameters
             estimation_method: Method used for calculating expectation values of
@@ -45,6 +43,7 @@ class QCBM:
             n_shots: number of shots to be used for evaluation of expectation values.
                 For simulation with exact expectation value it should be None.
         """
+        n_qubits = _get_n_qubits(target_distribution)
         self.target_distribution = target_distribution
         self.ansatz = QCBMAnsatz(n_layers, n_qubits, "all")
         self._n_layers = n_layers
@@ -57,7 +56,6 @@ class QCBM:
     def default(
         cls,
         target_distribution: MeasurementOutcomeDistribution,
-        n_qubits: int,
         n_layers: int,
         use_exact_expectation_values: bool = True,
         n_shots: Optional[int] = None,
@@ -73,8 +71,7 @@ class QCBM:
         These can be later replaced using one of the `replace_*` methods.
 
         Args:
-            target_distribution: bistring distribution which QCBM aims to learn
-            n_qubits: Number of qubits for the circuit.
+            target_distribution: bitstring distribution which QCBM aims to learn
             n_layers: Number of layers for the ansatz.
             use_exact_expectation_values: A flag indicating whether to use exact
                 calculation of the expectation values. This is possible only when
@@ -103,7 +100,6 @@ class QCBM:
 
         return cls(
             target_distribution,
-            n_qubits,
             n_layers,
             optimizer,
             estimation_method,
@@ -116,26 +112,10 @@ class QCBM:
         """Creates a new QCBM object with a provided target distribution.
 
         Args:
-            n_qubits: new number of qubits to be used.
+            target_distribution: bitstring distribution which QCBM aims to learn
         """
         return QCBM(
             target_distribution,
-            self._n_qubits,
-            self._n_layers,
-            self.optimizer,
-            self.estimation_method,
-            self._n_shots,
-        )
-
-    def replace_n_qubits(self, n_qubits: int) -> "QCBM":
-        """Creates a new QCBM object with a provided number of qubits.
-
-        Args:
-            n_qubits: new number of qubits to be used.
-        """
-        return QCBM(
-            self.target_distribution,
-            n_qubits,
             self._n_layers,
             self.optimizer,
             self.estimation_method,
@@ -146,11 +126,10 @@ class QCBM:
         """Creates a new QCBM object with a provided number of layers.
 
         Args:
-            n_qubits: new number of layers to be used.
+            n_layer: new number of layers to be used.
         """
         return QCBM(
             self.target_distribution,
-            self._n_qubits,
             n_layers,
             self.optimizer,
             self.estimation_method,
@@ -165,7 +144,6 @@ class QCBM:
         """
         return QCBM(
             self.target_distribution,
-            self._n_qubits,
             self._n_layers,
             optimizer,
             self.estimation_method,
@@ -185,7 +163,6 @@ class QCBM:
         """
         return QCBM(
             self.target_distribution,
-            self._n_qubits,
             self._n_layers,
             self.optimizer,
             estimation_method,
@@ -233,3 +210,8 @@ class QCBM:
             params: ansatz parameters.
         """
         return self.ansatz.get_executable_circuit(params)
+
+
+def _get_n_qubits(target_distribution):
+    key_value = [key for key in target_distribution.distribution_dict.keys()][0]
+    return len(key_value)

@@ -11,14 +11,13 @@ from orquestra.vqa.algorithms.qcbm import QCBM
 from orquestra.vqa.ansatz.qcbm import QCBMAnsatz
 from orquestra.vqa.estimation.cvar import CvarEstimator
 
+N_LAYERS = 2
+N_QUBITS = 4
+
 
 @pytest.fixture()
 def optimizer():
     return ScipyOptimizer(method="L-BFGS-B")
-
-
-N_LAYERS = 2
-N_QUBITS = 4
 
 
 @pytest.fixture()
@@ -38,23 +37,23 @@ def target_distribution():
 
 @pytest.fixture()
 def qcbm_object(target_distribution):
-    return QCBM.default(target_distribution, N_QUBITS, N_LAYERS)
+    return QCBM.default(target_distribution, N_LAYERS)
 
 
 class TestQCBM:
     def test_default_optimizer_is_lbfgsb(self, target_distribution):
-        qcbm = QCBM.default(target_distribution, N_QUBITS, N_LAYERS)
+        qcbm = QCBM.default(target_distribution, N_LAYERS)
         assert qcbm.optimizer.method == "L-BFGS-B"
 
     def test_default_ansatz_is_farhi(self, target_distribution):
-        qcbm = QCBM.default(target_distribution, N_QUBITS, N_LAYERS)
+        qcbm = QCBM.default(target_distribution, N_LAYERS)
         assert isinstance(qcbm.ansatz, QCBMAnsatz)
         assert qcbm.ansatz.number_of_layers == N_LAYERS
 
     def test_default_estimation_is_calculate_exact_expectation_values(
         self, target_distribution
     ):
-        qcbm = QCBM.default(target_distribution, N_QUBITS, N_LAYERS)
+        qcbm = QCBM.default(target_distribution, N_LAYERS)
         assert qcbm.estimation_method.__name__ == "calculate_exact_expectation_values"
         assert qcbm._n_shots is None
 
@@ -64,7 +63,6 @@ class TestQCBM:
         n_shots = 1000
         qcbm = QCBM.default(
             target_distribution,
-            n_qubits=N_QUBITS,
             n_layers=N_LAYERS,
             use_exact_expectation_values=False,
             n_shots=n_shots,
@@ -84,7 +82,6 @@ class TestQCBM:
         with pytest.raises(ValueError):
             _ = QCBM.default(
                 target_distribution,
-                n_qubits=N_QUBITS,
                 n_layers=N_LAYERS,
                 use_exact_expectation_values=use_exact_expectation_values,
                 n_shots=n_shots,
@@ -95,7 +92,6 @@ class TestQCBM:
         n_shots = 1000
         qcbm = QCBM(
             target_distribution,
-            n_qubits=N_QUBITS,
             n_layers=N_LAYERS,
             optimizer=optimizer,
             estimation_method=estimation_method,
@@ -104,16 +100,8 @@ class TestQCBM:
         assert qcbm.optimizer is optimizer
         assert qcbm.estimation_method is estimation_method
 
-    def test_replace_target_distribution(self, qcbm_object):
-        new_target_distribution = MeasurementOutcomeDistribution(
-            {"0000": 0.5, "1111": 0.5}
-        )
-        new_qcbm_object = qcbm_object.replace_target_distribution(
-            new_target_distribution
-        )
-
-        assert qcbm_object.target_distribution is not new_target_distribution
-        assert new_qcbm_object.target_distribution is new_target_distribution
+    def test_n_qubits(self, qcbm_object):
+        assert qcbm_object._n_qubits == N_QUBITS
 
     def test_replace_optimizer(self, qcbm_object):
         optimizer = ScipyOptimizer(method="COBYLA")
@@ -138,12 +126,6 @@ class TestQCBM:
         assert qcbm_object.estimation_method is not estimation_method
         assert new_qcbm_object.estimation_method is estimation_method
         assert qcbm_object._n_shots != new_qcbm_object._n_shots
-
-    def test_replace_n_qubits(self, qcbm_object):
-        new_qcbm_object = qcbm_object.replace_n_qubits(n_qubits=20)
-
-        assert new_qcbm_object._n_qubits != qcbm_object._n_qubits
-        assert new_qcbm_object._n_qubits == 20
 
     def test_replace_n_layers(self, qcbm_object):
         new_qcbm_object = qcbm_object.replace_n_layers(n_layers=5)
