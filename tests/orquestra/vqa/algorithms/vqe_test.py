@@ -75,7 +75,6 @@ class TestDefaultVQE:
 
     def test_default_grouping_is_None(self, hamiltonian, ansatz):
         vqe = VQE.default(hamiltonian=hamiltonian, ansatz=ansatz)
-        # assert isinstance(vqe.grouping, EstimationPreprocessor)
         assert vqe.grouping is None
 
     def test_default_shots_allocation_is_proportional(self, hamiltonian, ansatz):

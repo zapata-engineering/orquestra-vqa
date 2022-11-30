@@ -7,9 +7,9 @@ from orquestra.opt.optimizers import ScipyOptimizer
 from orquestra.quantum.api.circuit_runner import CircuitRunner
 from orquestra.quantum.api.estimation import EstimateExpectationValues
 from orquestra.quantum.circuits import Circuit
-from orquestra.quantum.distributions import compute_clipped_negative_log_likelihood
-from orquestra.quantum.distributions.BAS_dataset import (
-    get_bars_and_stripes_target_distribution,
+from orquestra.quantum.distributions import (
+    MeasurementOutcomeDistribution,
+    compute_clipped_negative_log_likelihood,
 )
 from orquestra.quantum.estimation import (
     calculate_exact_expectation_values,
@@ -24,17 +24,19 @@ from orquestra.vqa.cost_function.qcbm_cost_function import create_QCBM_cost_func
 class QCBM:
     def __init__(
         self,
+        target_distribution: MeasurementOutcomeDistribution,
         n_qubits: int,
         n_layers: int,
         optimizer: Optimizer,
         estimation_method: EstimateExpectationValues,
         n_shots: Optional[int] = None,
     ) -> None:
-        """Class providing an easy interface to work with QCBM.
+        """Class providing an easy interface to work with Quantum Circuit Born Machine (QCBM).
 
         For new users, usage of "default" method is recommended.
 
         Args:
+            target_distribution: bistring distribution which QCBM aims to learn
             n_qubits: Number of qubits for the circuit.
             n_layers: Number of layers for the ansatz.
             optimizer: Optimizer used to find optimal parameters
@@ -43,6 +45,7 @@ class QCBM:
             n_shots: number of shots to be used for evaluation of expectation values.
                 For simulation with exact expectation value it should be None.
         """
+        self.target_distribution = target_distribution
         self.ansatz = QCBMAnsatz(n_layers, n_qubits, "all")
         self._n_layers = n_layers
         self._n_qubits = n_qubits
@@ -53,6 +56,7 @@ class QCBM:
     @classmethod
     def default(
         cls,
+        target_distribution: MeasurementOutcomeDistribution,
         n_qubits: int,
         n_layers: int,
         use_exact_expectation_values: bool = True,
@@ -69,6 +73,7 @@ class QCBM:
         These can be later replaced using one of the `replace_*` methods.
 
         Args:
+            target_distribution: bistring distribution which QCBM aims to learn
             n_qubits: Number of qubits for the circuit.
             n_layers: Number of layers for the ansatz.
             use_exact_expectation_values: A flag indicating whether to use exact
@@ -96,7 +101,31 @@ class QCBM:
                     use_exact_expectation_values={use_exact_expectation_values}."
             )
 
-        return cls(n_qubits, n_layers, optimizer, estimation_method, n_shots)
+        return cls(
+            target_distribution,
+            n_qubits,
+            n_layers,
+            optimizer,
+            estimation_method,
+            n_shots,
+        )
+
+    def replace_target_distribution(
+        self, target_distribution: MeasurementOutcomeDistribution
+    ) -> "QCBM":
+        """Creates a new QCBM object with a provided target distribution.
+
+        Args:
+            n_qubits: new number of qubits to be used.
+        """
+        return QCBM(
+            target_distribution,
+            self._n_qubits,
+            self._n_layers,
+            self.optimizer,
+            self.estimation_method,
+            self._n_shots,
+        )
 
     def replace_n_qubits(self, n_qubits: int) -> "QCBM":
         """Creates a new QCBM object with a provided number of qubits.
@@ -105,6 +134,7 @@ class QCBM:
             n_qubits: new number of qubits to be used.
         """
         return QCBM(
+            self.target_distribution,
             n_qubits,
             self._n_layers,
             self.optimizer,
@@ -119,6 +149,7 @@ class QCBM:
             n_qubits: new number of layers to be used.
         """
         return QCBM(
+            self.target_distribution,
             self._n_qubits,
             n_layers,
             self.optimizer,
@@ -133,6 +164,7 @@ class QCBM:
             optimizer: new optimizer to be used.
         """
         return QCBM(
+            self.target_distribution,
             self._n_qubits,
             self._n_layers,
             optimizer,
@@ -152,7 +184,12 @@ class QCBM:
             n_shots: number of shots for the new estimation method.
         """
         return QCBM(
-            self._n_qubits, self._n_layers, self.optimizer, estimation_method, n_shots
+            self.target_distribution,
+            self._n_qubits,
+            self._n_layers,
+            self.optimizer,
+            estimation_method,
+            n_shots,
         )
 
     def find_optimal_params(
@@ -178,8 +215,6 @@ class QCBM:
             runner: runner used for running quantum circuits.
         """
 
-        target_distribution = _get_target_distribution()
-
         return create_QCBM_cost_function(
             ansatz=self.ansatz,
             runner=runner,
@@ -188,7 +223,7 @@ class QCBM:
                 Callable[..., Number], compute_clipped_negative_log_likelihood
             ),
             distance_measure_parameters={"epsilon": 1e-6},
-            target_distribution=target_distribution,
+            target_distribution=self.target_distribution,
         )
 
     def get_circuit(self, params: np.ndarray) -> Circuit:
@@ -198,7 +233,3 @@ class QCBM:
             params: ansatz parameters.
         """
         return self.ansatz.get_executable_circuit(params)
-
-
-def _get_target_distribution():
-    return get_bars_and_stripes_target_distribution(2, 2, 1.0, "zigzag")

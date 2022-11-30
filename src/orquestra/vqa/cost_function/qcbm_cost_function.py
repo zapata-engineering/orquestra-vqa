@@ -37,7 +37,7 @@ def create_QCBM_cost_function(
         distance_measure: function used to calculate the distance measure
         distance_measure_parameters: dictionary containing the relevant parameters
             for the chosen distance measure
-        target_bitstring_distribution: bistring distribution which QCBM aims to learn
+        target_distribution: bistring distribution which QCBM aims to learn
         gradient_function: a function which returns a function used to compute
             the gradient of the cost function
             (see orquestra.opt.gradients.finite_differences_gradient for reference)

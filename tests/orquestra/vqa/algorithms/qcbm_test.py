@@ -1,6 +1,10 @@
 import numpy as np
 import pytest
 from orquestra.opt.optimizers import ScipyOptimizer
+from orquestra.quantum.distributions import MeasurementOutcomeDistribution
+from orquestra.quantum.distributions.BAS_dataset import (
+    get_bars_and_stripes_target_distribution,
+)
 from orquestra.quantum.runners.symbolic_simulator import SymbolicSimulator
 
 from orquestra.vqa.algorithms.qcbm import QCBM
@@ -23,33 +27,43 @@ def simulator():
 
 
 @pytest.fixture()
-def qcbm_object():
-    return QCBM.default(N_QUBITS, N_LAYERS)
-
-
-@pytest.fixture()
 def initial_params():
     return np.random.random(N_QUBITS)
 
 
+@pytest.fixture
+def target_distribution():
+    return get_bars_and_stripes_target_distribution(int(N_QUBITS / 2), 2, 1.0, "zigzag")
+
+
+@pytest.fixture()
+def qcbm_object(target_distribution):
+    return QCBM.default(target_distribution, N_QUBITS, N_LAYERS)
+
+
 class TestQCBM:
-    def test_default_optimizer_is_lbfgsb(self):
-        qcbm = QCBM.default(N_QUBITS, N_LAYERS)
+    def test_default_optimizer_is_lbfgsb(self, target_distribution):
+        qcbm = QCBM.default(target_distribution, N_QUBITS, N_LAYERS)
         assert qcbm.optimizer.method == "L-BFGS-B"
 
-    def test_default_ansatz_is_farhi(self):
-        qcbm = QCBM.default(N_QUBITS, N_LAYERS)
+    def test_default_ansatz_is_farhi(self, target_distribution):
+        qcbm = QCBM.default(target_distribution, N_QUBITS, N_LAYERS)
         assert isinstance(qcbm.ansatz, QCBMAnsatz)
         assert qcbm.ansatz.number_of_layers == N_LAYERS
 
-    def test_default_estimation_is_calculate_exact_expectation_values(self):
-        qcbm = QCBM.default(N_QUBITS, N_LAYERS)
+    def test_default_estimation_is_calculate_exact_expectation_values(
+        self, target_distribution
+    ):
+        qcbm = QCBM.default(target_distribution, N_QUBITS, N_LAYERS)
         assert qcbm.estimation_method.__name__ == "calculate_exact_expectation_values"
         assert qcbm._n_shots is None
 
-    def test_default_estimation_changed_to_estimate_by_averaging(self):
+    def test_default_estimation_changed_to_estimate_by_averaging(
+        self, target_distribution
+    ):
         n_shots = 1000
         qcbm = QCBM.default(
+            target_distribution,
             n_qubits=N_QUBITS,
             n_layers=N_LAYERS,
             use_exact_expectation_values=False,
@@ -65,20 +79,22 @@ class TestQCBM:
         "use_exact_expectation_values,n_shots", [(True, 1000), (False, None)]
     )
     def test_default_raises_exception_for_invalid_inputs(
-        self, use_exact_expectation_values, n_shots
+        self, target_distribution, use_exact_expectation_values, n_shots
     ):
         with pytest.raises(ValueError):
             _ = QCBM.default(
+                target_distribution,
                 n_qubits=N_QUBITS,
                 n_layers=N_LAYERS,
                 use_exact_expectation_values=use_exact_expectation_values,
                 n_shots=n_shots,
             )
 
-    def test_init_works(self, optimizer):
+    def test_init_works(self, target_distribution, optimizer):
         estimation_method = CvarEstimator(alpha=0.5)
         n_shots = 1000
         qcbm = QCBM(
+            target_distribution,
             n_qubits=N_QUBITS,
             n_layers=N_LAYERS,
             optimizer=optimizer,
@@ -87,6 +103,17 @@ class TestQCBM:
         )
         assert qcbm.optimizer is optimizer
         assert qcbm.estimation_method is estimation_method
+
+    def test_replace_target_distribution(self, qcbm_object):
+        new_target_distribution = MeasurementOutcomeDistribution(
+            {"0000": 0.5, "1111": 0.5}
+        )
+        new_qcbm_object = qcbm_object.replace_target_distribution(
+            new_target_distribution
+        )
+
+        assert qcbm_object.target_distribution is not new_target_distribution
+        assert new_qcbm_object.target_distribution is new_target_distribution
 
     def test_replace_optimizer(self, qcbm_object):
         optimizer = ScipyOptimizer(method="COBYLA")
@@ -131,9 +158,9 @@ class TestQCBM:
         results = qcbm_object.find_optimal_params(simulator, initial_params)
         assert len(results.opt_params) == qcbm_object.ansatz.number_of_params
 
-    # def test_get_cost_function(self, qcbm_object, simulator):
-    #     cost_function = qcbm_object.get_cost_function(simulator)
-    #     assert cost_function(np.zeros(qcbm_object.ansatz.number_of_params)) >= 0
+    def test_get_cost_function(self, qcbm_object, simulator):
+        cost_function = qcbm_object.get_cost_function(simulator)
+        assert cost_function(np.zeros(qcbm_object.ansatz.number_of_params)) >= 0
 
     def test_get_circuit(self, qcbm_object):
         params = np.random.random(qcbm_object.ansatz.number_of_params)
