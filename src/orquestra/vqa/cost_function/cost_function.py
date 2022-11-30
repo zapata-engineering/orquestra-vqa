@@ -125,7 +125,7 @@ def add_normal_noise(
 
 
 def create_cost_function(
-    backend: CircuitRunner,
+    runner: CircuitRunner,
     estimation_tasks_factory: EstimationTasksFactory,
     estimation_method: EstimateExpectationValues = _by_averaging,
     parameter_preprocessors: Optional[Iterable[ParameterPreprocessor]] = None,
@@ -135,7 +135,7 @@ def create_cost_function(
     circuits. This function is the main entry to use other functions in this module.
 
     Args:
-        backend: quantum backend used for evaluation.
+        runner: quantum runner used for evaluation.
         estimation_tasks_factory: function that produces estimation tasks from
             parameters. See example use case below for clarification.
         estimation_method: the estimator used to compute expectation value of target
@@ -160,7 +160,7 @@ def create_cost_function(
         noise_preprocessor = add_normal_noise(1e-5, seed=1234)
 
         cost_function = create_cost_function(
-            backend,
+            runner,
             estimation_factory,
             parameter_preprocessors=[noise_preprocessor]
         )
@@ -180,7 +180,7 @@ def create_cost_function(
             parameters = preprocessor(parameters)
 
         estimation_tasks = estimation_tasks_factory(parameters)
-        expectation_values_list = estimation_method(backend, estimation_tasks)
+        expectation_values_list = estimation_method(runner, estimation_tasks)
 
         sum_of_expectation_values = np.concatenate(
             [expectation_value.values for expectation_value in expectation_values_list]

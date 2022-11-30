@@ -24,7 +24,7 @@ N_LAYERS = 2
 
 
 @pytest.fixture()
-def backend():
+def simulator():
     return SymbolicSimulator()
 
 
@@ -138,13 +138,13 @@ class TestQaoa:
 
     @pytest.mark.parametrize("initial_params", [None, np.random.random(4)])
     def test_find_optimal_params_doesnt_fail(
-        self, qaoa_object, backend, initial_params
+        self, qaoa_object, simulator, initial_params
     ):
-        results = qaoa_object.find_optimal_params(backend, initial_params)
+        results = qaoa_object.find_optimal_params(simulator, initial_params)
         assert len(results.opt_params) == qaoa_object.ansatz.number_of_params
 
-    def test_get_cost_function(self, qaoa_object, backend):
-        cost_function = qaoa_object.get_cost_function(backend)
+    def test_get_cost_function(self, qaoa_object, simulator):
+        cost_function = qaoa_object.get_cost_function(simulator)
         assert np.isclose(
             cost_function(np.zeros(qaoa_object.ansatz.number_of_params)), 0
         )

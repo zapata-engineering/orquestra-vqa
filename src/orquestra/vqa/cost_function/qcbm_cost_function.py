@@ -23,7 +23,7 @@ DistanceMeasure = Callable[..., Number]
 
 def create_QCBM_cost_function(
     ansatz: Ansatz,
-    backend: CircuitRunner,
+    runner: CircuitRunner,
     n_samples: int,
     distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
@@ -33,11 +33,11 @@ def create_QCBM_cost_function(
     """Cost function used for evaluating QCBM.
     Args:
         ansatz: the ansatz used to construct the variational circuits
-        backend: backend used for QCBM evaluation
+        runner: runner used for QCBM evaluation
         distance_measure: function used to calculate the distance measure
         distance_measure_parameters: dictionary containing the relevant parameters
             for the chosen distance measure
-        target_bitstring_distribution: bistring distribution which QCBM aims to learn
+        target_distribution: bistring distribution which QCBM aims to learn
         gradient_function: a function which returns a function used to compute
             the gradient of the cost function
             (see orquestra.opt.gradients.finite_differences_gradient for reference)
@@ -49,7 +49,7 @@ def create_QCBM_cost_function(
 
     cost_function = _create_QCBM_cost_function(
         ansatz,
-        backend,
+        runner,
         n_samples,
         distance_measure,
         distance_measure_parameters,
@@ -61,7 +61,7 @@ def create_QCBM_cost_function(
 
 def _create_QCBM_cost_function(
     ansatz: Ansatz,
-    backend: CircuitRunner,
+    runner: CircuitRunner,
     n_samples: int,
     distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
@@ -88,7 +88,7 @@ def _create_QCBM_cost_function(
         # In case of questions ask mstechly.
         # circuit = ansatz.get_executable_circuit(parameters)
         circuit = ansatz._generate_circuit(parameters)
-        distribution = backend.get_measurement_outcome_distribution(circuit, n_samples)
+        distribution = runner.get_measurement_outcome_distribution(circuit, n_samples)
         value = evaluate_distribution_distance(
             target_distribution,
             distribution,

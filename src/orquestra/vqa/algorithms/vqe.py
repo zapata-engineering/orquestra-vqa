@@ -301,6 +301,10 @@ class VQE:
         """
         return self.ansatz.get_executable_circuit(params)
 
+    @property
+    def n_qubits(self):
+        return self.ansatz.number_of_qubits
+
 
 def _get_grouping(
     grouping: Optional[str] = None,

@@ -30,7 +30,7 @@ def optimizer():
 
 
 @pytest.fixture()
-def backend():
+def simulator():
     return SymbolicSimulator()
 
 
@@ -75,7 +75,6 @@ class TestDefaultVQE:
 
     def test_default_grouping_is_None(self, hamiltonian, ansatz):
         vqe = VQE.default(hamiltonian=hamiltonian, ansatz=ansatz)
-        # assert isinstance(vqe.grouping, EstimationPreprocessor)
         assert vqe.grouping is None
 
     def test_default_shots_allocation_is_proportional(self, hamiltonian, ansatz):
@@ -164,12 +163,14 @@ class TestDefaultVQE:
         assert new_vqe_object.shots_allocation is shots_allocation
 
     @pytest.mark.parametrize("initial_params", [None, np.random.random(12)])
-    def test_find_optimal_params_doesnt_fail(self, vqe_object, backend, initial_params):
-        results = vqe_object.find_optimal_params(backend, initial_params)
+    def test_find_optimal_params_doesnt_fail(
+        self, vqe_object, simulator, initial_params
+    ):
+        results = vqe_object.find_optimal_params(simulator, initial_params)
         assert len(results.opt_params) == vqe_object.ansatz.number_of_params
 
-    def test_get_cost_function(self, vqe_object, backend):
-        cost_function = vqe_object.get_cost_function(backend)
+    def test_get_cost_function(self, vqe_object, simulator):
+        cost_function = vqe_object.get_cost_function(simulator)
         assert np.isclose(
             cost_function(np.zeros(vqe_object.ansatz.number_of_params)), 0
         )

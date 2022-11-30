@@ -53,7 +53,7 @@ def cost_function_factory(hamiltonian):
             ansatz,
         )
         return create_cost_function(
-            backend=SymbolicSimulator(),
+            runner=SymbolicSimulator(),
             estimation_tasks_factory=estimation_tasks_factory,
             estimation_method=calculate_exact_expectation_values,  # type: ignore
             parameter_preprocessors=None,
