@@ -17,7 +17,7 @@ from orquestra.quantum.estimation import (
 )
 from scipy.optimize import OptimizeResult
 
-from orquestra.vqa.ansatz.qcbm import QCBMAnsatz
+from orquestra.vqa.ansatz import QCBMAnsatz
 from orquestra.vqa.cost_function.qcbm_cost_function import create_QCBM_cost_function
 
 

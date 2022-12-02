@@ -7,7 +7,7 @@ from orquestra.quantum.circuits import RX, RZ, Circuit, H
 from orquestra.quantum.operators import PauliSum, PauliTerm
 from orquestra.quantum.utils import compare_unitary
 
-from orquestra.vqa.ansatz.qaoa_farhi import (
+from orquestra.vqa.ansatz import (
     QAOAFarhiAnsatz,
     create_all_x_mixer_hamiltonian,
     create_farhi_qaoa_circuits,

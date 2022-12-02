@@ -7,12 +7,12 @@ import numpy as np
 import pytest
 from orquestra.quantum.circuits import RX, RZ, XX, Circuit
 
-from orquestra.vqa.ansatz.qcbm._qcbm import (
+from orquestra.vqa.ansatz import (
     QCBMAnsatz,
+    get_entangling_layer,
     load_qcbm_ansatz_set,
     save_qcbm_ansatz_set,
 )
-from orquestra.vqa.ansatz.qcbm._qcbm_utils import get_entangling_layer
 from orquestra.vqa.api.ansatz_test import AnsatzTests
 
 

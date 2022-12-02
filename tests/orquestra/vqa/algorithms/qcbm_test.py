@@ -5,11 +5,11 @@ from orquestra.quantum.distributions import MeasurementOutcomeDistribution
 from orquestra.quantum.distributions.BAS_dataset import (
     get_bars_and_stripes_target_distribution,
 )
-from orquestra.quantum.runners.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.runners import SymbolicSimulator
 
-from orquestra.vqa.algorithms.qcbm import QCBM
-from orquestra.vqa.ansatz.qcbm import QCBMAnsatz
-from orquestra.vqa.estimation.cvar import CvarEstimator
+from orquestra.vqa.algorithms import QCBM
+from orquestra.vqa.ansatz import QCBMAnsatz
+from orquestra.vqa.estimation import CvarEstimator
 
 N_LAYERS = 2
 N_QUBITS = 4

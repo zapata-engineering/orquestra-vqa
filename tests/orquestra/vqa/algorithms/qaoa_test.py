@@ -2,12 +2,11 @@ import numpy as np
 import pytest
 from orquestra.opt.optimizers import ScipyOptimizer
 from orquestra.quantum.operators import PauliTerm
-from orquestra.quantum.runners.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.runners import SymbolicSimulator
 
-from orquestra.vqa.algorithms.qaoa import QAOA
-from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
-from orquestra.vqa.ansatz.qaoa_warm_start import WarmStartQAOAAnsatz
-from orquestra.vqa.estimation.cvar import CvarEstimator
+from orquestra.vqa.algorithms import QAOA
+from orquestra.vqa.ansatz import QAOAFarhiAnsatz, WarmStartQAOAAnsatz
+from orquestra.vqa.estimation import CvarEstimator
 
 
 @pytest.fixture()

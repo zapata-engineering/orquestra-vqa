@@ -3,11 +3,11 @@ import pytest
 from orquestra.opt.optimizers import ScipyOptimizer
 from orquestra.quantum.api.estimation import EstimationPreprocessor
 from orquestra.quantum.operators import PauliTerm
-from orquestra.quantum.runners.symbolic_simulator import SymbolicSimulator
+from orquestra.quantum.runners import SymbolicSimulator
 
-from orquestra.vqa.algorithms.vqe import VQE
-from orquestra.vqa.ansatz.quantum_compiling import HEAQuantumCompilingAnsatz
-from orquestra.vqa.estimation.cvar import CvarEstimator
+from orquestra.vqa.algorithms import VQE
+from orquestra.vqa.ansatz import HEAQuantumCompilingAnsatz
+from orquestra.vqa.estimation import CvarEstimator
 from orquestra.vqa.grouping import group_greedily, group_individually
 from orquestra.vqa.shot_allocation import (
     allocate_shots_proportionally,

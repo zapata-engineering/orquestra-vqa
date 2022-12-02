@@ -6,7 +6,7 @@ from unittest import mock
 
 import numpy as np
 import pytest
-from orquestra.quantum.estimation._estimation import (
+from orquestra.quantum.estimation import (
     calculate_exact_expectation_values,
     estimate_expectation_values_by_averaging,
 )
@@ -15,7 +15,7 @@ from orquestra.quantum.operators import PauliTerm
 from orquestra.quantum.runners import SymbolicSimulator
 from sympy import Symbol
 
-from orquestra.vqa.cost_function.cost_function import (
+from orquestra.vqa.cost_function import (
     add_normal_noise,
     create_cost_function,
     dynamic_circuit_estimation_tasks_factory,

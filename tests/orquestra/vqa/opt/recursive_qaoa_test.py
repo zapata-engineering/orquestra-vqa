@@ -11,15 +11,13 @@ from orquestra.opt.api.optimizer import optimization_result
 from orquestra.opt.api.optimizer_test import NESTED_OPTIMIZER_CONTRACTS
 from orquestra.opt.mock_objects import MockOptimizer
 from orquestra.quantum.api.estimation import EstimationTask
-from orquestra.quantum.estimation._estimation import (
-    estimate_expectation_values_by_averaging,
-)
+from orquestra.quantum.estimation import estimate_expectation_values_by_averaging
 from orquestra.quantum.operators import PauliRepresentation, PauliTerm
 from orquestra.quantum.runners import SymbolicSimulator
 
-from orquestra.vqa.ansatz.qaoa_farhi import QAOAFarhiAnsatz
+from orquestra.vqa.ansatz import QAOAFarhiAnsatz
 from orquestra.vqa.api.ansatz import Ansatz
-from orquestra.vqa.cost_function.cost_function import (
+from orquestra.vqa.cost_function import (
     create_cost_function,
     substitution_based_estimation_tasks_factory,
 )
