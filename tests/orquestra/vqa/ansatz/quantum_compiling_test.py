@@ -3,7 +3,7 @@
 ################################################################################
 import pytest
 
-from orquestra.vqa.ansatz.quantum_compiling import HEAQuantumCompilingAnsatz
+from orquestra.vqa.ansatz import HEAQuantumCompilingAnsatz
 from orquestra.vqa.api.ansatz_test import AnsatzTests
 
 

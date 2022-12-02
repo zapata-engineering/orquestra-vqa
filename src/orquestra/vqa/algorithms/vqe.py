@@ -20,7 +20,7 @@ from orquestra.quantum.operators import PauliRepresentation
 from scipy.optimize import OptimizeResult
 
 from orquestra.vqa.api.ansatz import Ansatz
-from orquestra.vqa.cost_function.cost_function import (
+from orquestra.vqa.cost_function import (
     create_cost_function,
     substitution_based_estimation_tasks_factory,
 )
