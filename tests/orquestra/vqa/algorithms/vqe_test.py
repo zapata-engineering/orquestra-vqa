@@ -183,7 +183,6 @@ class TestDefaultVQE:
 
     def test_get_cost_function_with_shots(self, vqe_object_with_shots, simulator):
         vqe_object_with_shots.get_cost_function(simulator)
-        # TODO: test behavior of get_cost_function
 
     def test_get_circuit(self, vqe_object):
         params = np.random.random(vqe_object.ansatz.number_of_params)
