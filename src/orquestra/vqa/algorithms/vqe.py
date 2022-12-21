@@ -271,7 +271,8 @@ class VQE:
             runner: runner used for running quantum circuits.
         """
 
-        shots_allocation = partial(self.shots_allocation, self._n_shots)
+        def shots_allocation(estimation_tasks):
+            return self.shots_allocation(estimation_tasks, self._n_shots)
 
         estimation_preprocessors: List[EstimationPreprocessor] = []
 

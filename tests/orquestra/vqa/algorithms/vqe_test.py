@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 from orquestra.opt.optimizers import ScipyOptimizer
-from orquestra.quantum.api.estimation import EstimationPreprocessor
 from orquestra.quantum.operators import PauliTerm
 from orquestra.quantum.runners import SymbolicSimulator
 
@@ -17,11 +16,7 @@ from orquestra.vqa.shot_allocation import (
 
 @pytest.fixture()
 def hamiltonian():
-    return (
-        PauliTerm("X0") * PauliTerm("Y0")
-        + PauliTerm("X0") * PauliTerm("Z0")
-        + PauliTerm("X1")
-    )
+    return PauliTerm("Z0") * PauliTerm("Z0") + PauliTerm("X0") + PauliTerm("X1")
 
 
 @pytest.fixture()
@@ -47,6 +42,17 @@ def initial_params(hamiltonian):
 @pytest.fixture()
 def vqe_object(hamiltonian, ansatz):
     return VQE.default(hamiltonian=hamiltonian, ansatz=ansatz)
+
+
+@pytest.fixture()
+def vqe_object_with_shots(hamiltonian, ansatz):
+    return VQE.default(
+        hamiltonian=hamiltonian,
+        ansatz=ansatz,
+        use_exact_expectation_values=False,
+        grouping="greedy",
+        n_shots=1000,
+    )
 
 
 class TestDefaultVQE:
@@ -172,8 +178,12 @@ class TestDefaultVQE:
     def test_get_cost_function(self, vqe_object, simulator):
         cost_function = vqe_object.get_cost_function(simulator)
         assert np.isclose(
-            cost_function(np.zeros(vqe_object.ansatz.number_of_params)), 0
+            cost_function(np.zeros(vqe_object.ansatz.number_of_params)), 1
         )
+
+    def test_get_cost_function_with_shots(self, vqe_object_with_shots, simulator):
+        vqe_object_with_shots.get_cost_function(simulator)
+        # TODO: test behavior of get_cost_function
 
     def test_get_circuit(self, vqe_object):
         params = np.random.random(vqe_object.ansatz.number_of_params)
