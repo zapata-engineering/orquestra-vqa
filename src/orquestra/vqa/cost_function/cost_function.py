@@ -151,6 +151,9 @@ def create_cost_function(
         A callable CostFunction object.
 
     Example use case:
+
+    .. code:: python
+
         target_operator = ...
         ansatz = ...
 

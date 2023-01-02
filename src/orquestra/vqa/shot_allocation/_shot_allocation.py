@@ -86,18 +86,18 @@ def estimate_nmeas_for_frames(
 
     We are assuming the exact expectation values are provided
     (i.e. infinite number of measurements or simulations without noise)
-    M ~ (sum_{i} prec(H_i)) ** 2.0 / (epsilon ** 2.0)
-    where prec(H_i) is the precision (square root of the variance)
+    :math:`M ~ (sum_{i} prec(H_i)) ** 2.0 / (epsilon ** 2.0)`
+    where :math:`prec(H_i)` is the precision (square root of the variance)
     for each group of co-measurable terms H_{i}. It is computed as
-    prec(H_{i}) = sum{ab} |h_{a}^{i}||h_{b}^{i}| cov(O_{a}^{i}, O_{b}^{i})
-    where h_{a}^{i} is the coefficient of the a-th operator, O_{a}^{i}, in the
-    i-th group. Covariances are assumed to be zero for a != b:
-    cov(O_{a}^{i}, O_{b}^{i}) = <O_{a}^{i} O_{b}^{i}> - <O_{a}^{i}> <O_{b}^{i}> = 0
+    :math:`prec(H_{i}) = sum{ab} |h_{a}^{i}||h_{b}^{i}| cov(O_{a}^{i}, O_{b}^{i})`
+    where :math:`h_{a}^{i}` is the coefficient of the a-th operator, :math:`O_{a}^{i}`,
+    in the i-th group. Covariances are assumed to be zero for a != b:
+    :math:`cov(O_{a}^{i},O_{b}^{i})=<O_{a}^{i}O_{b}^{i}>-<O_{a}^{i}><O_{b}^{i}>=0`
 
     Args:
-        frame_operators (List[PauliRepresentation]): A list of pauli operators, where
+        frame_operators: A list of pauli operators, where
             each element in the list is a group of co-measurable terms.
-        expecval (Optional[ExpectationValues]): An ExpectationValues object containing
+        expecval: An ExpectationValues object containing
             the expectation values of all operators in frame_operators. If absent,
             variances are assumed to be maximal (i.e. equal to the square of the
             term's coefficient). Note that the term coefficients should be

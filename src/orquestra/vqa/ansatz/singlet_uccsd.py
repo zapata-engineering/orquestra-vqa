@@ -116,6 +116,7 @@ class SingletUCCSDAnsatz(Ansatz):
     ) -> Tuple[np.ndarray, FermionOperator]:
         """Screen single and double excitation operators based on a guess
             for the amplitudes
+
         Args:
             threshold (float): threshold to select excitations. Only those with
                 absolute amplitudes above the threshold are kept.
@@ -124,7 +125,7 @@ class SingletUCCSDAnsatz(Ansatz):
         Returns:
             amplitudes (np.array): screened amplitudes
             new_fermion_generator (openfermion.FermionOperator): screened
-                Fermion Operator
+            Fermion Operator
         """
 
         new_fermion_generator = FermionOperator()
