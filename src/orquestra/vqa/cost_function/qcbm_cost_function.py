@@ -31,6 +31,7 @@ def create_QCBM_cost_function(
     gradient_function: GradientFactory = finite_differences_gradient,
 ) -> CostFunction:
     """Cost function used for evaluating QCBM.
+
     Args:
         ansatz: the ansatz used to construct the variational circuits
         runner: runner used for QCBM evaluation
@@ -74,8 +75,7 @@ def _create_QCBM_cost_function(
     def cost_function(
         parameters: np.ndarray, store_artifact: Optional[StoreArtifact] = None
     ) -> ValueEstimate:
-        """
-        Evaluates the value of the cost function for given parameters.
+        """Evaluates the value of the cost function for given parameters.
 
         Args:
             parameters: parameters for which the evaluation should occur.
