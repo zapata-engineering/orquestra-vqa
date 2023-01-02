@@ -92,7 +92,7 @@ def estimate_nmeas_for_frames(
     :math:`prec(H_{i}) = sum{ab} |h_{a}^{i}||h_{b}^{i}| cov(O_{a}^{i}, O_{b}^{i})`
     where :math:`h_{a}^{i}` is the coefficient of the a-th operator, :math:`O_{a}^{i}`,
     in the i-th group. Covariances are assumed to be zero for a != b:
-    :math:`cov(O_{a}^{i}, O_{b}^{i}) = <O_{a}^{i} O_{b}^{i}> - <O_{a}^{i}> <O_{b}^{i}> = 0`
+    :math:`cov(O_{a}^{i},O_{b}^{i})=<O_{a}^{i}O_{b}^{i}>-<O_{a}^{i}><O_{b}^{i}>=0`
 
     Args:
         frame_operators: A list of pauli operators, where
